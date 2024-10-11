@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friends List</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+  <h1>Friends List</h1>
+
+  <!-- Проверка, есть ли друзья -->
+  <div th:if="${friends.isEmpty()}">
+    <p>You don't have any friends yet.</p>
+  </div>
+
+  <!-- Отображение списка друзей -->
+  <ul class="list-group" th:if="${!friends.isEmpty()}">
+    <li class="list-group-item" th:each="friend : ${friends}">
+      <div class="d-flex align-items-center">
+        <!-- Аватар друга (если есть) -->
+        <div th:if="${friend.avatar != null}">
+          <img th:src="'data:image/jpeg;base64,' + ${T(org.apache.tomcat.util.codec.binary.Base64).encodeBase64String(friend.avatar)}"
+               alt="avatar" class="rounded-circle" width="50" height="50">
+        </div>
+
+        <!-- Имя друга -->
+        <div class="ml-3">
+          <h5 th:text="${friend.username}"></h5>
+          <p th:text="${friend.email}"></p>
+        </div>
+
+        <!-- Кнопка удаления друга -->
+        <div class="ml-auto">
+          <form th:action="@{/friends/remove}" method="post">
+            <input type="hidden" th:value="${friend.id}" name="friendId">
+            <button type="submit" class="btn btn-danger">Remove</button>
+          </form>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

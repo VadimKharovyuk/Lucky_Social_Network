@@ -1,22 +1,59 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--  <title>User List</title>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <style>-->
+<!--    body { font-family: Arial, sans-serif; }-->
+<!--    .user-list { max-width: 800px; margin: 0 auto; padding: 20px; }-->
+<!--    .user-item { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }-->
+<!--    .user-item a { text-decoration: none; color: #0066cc; }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="user-list">-->
+<!--  <h1>User List</h1>-->
+<!--  <div th:each="user : ${users}" class="user-item">-->
+<!--    <span th:text="${user.username}"></span>-->
+<!--    <a th:if="${user.id != currentUserId}" th:href="@{/chat/start/{recipientId}(recipientId=${user.id})}">Start Chat</a>-->
+<!--  </div>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>User List</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
-    body { font-family: Arial, sans-serif; }
     .user-list { max-width: 800px; margin: 0 auto; padding: 20px; }
     .user-item { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
     .user-item a { text-decoration: none; color: #0066cc; }
   </style>
 </head>
 <body>
-<div class="user-list">
+<div class="container user-list">
   <h1>User List</h1>
+
+  <!-- Добавлено отображение сообщений об успехе или ошибке -->
+  <div th:if="${message}" class="alert alert-success" role="alert">
+    <span th:text="${message}"></span>
+  </div>
+  <div th:if="${error}" class="alert alert-danger" role="alert">
+    <span th:text="${error}"></span>
+  </div>
+
   <div th:each="user : ${users}" class="user-item">
     <span th:text="${user.username}"></span>
     <a th:if="${user.id != currentUserId}" th:href="@{/chat/start/{recipientId}(recipientId=${user.id})}">Start Chat</a>
+    <form th:if="${user.id != currentUserId}" th:action="@{/users/addFriend}" method="post" style="display: inline;">
+      <input type="hidden" name="userId" th:value="${currentUserId}" />
+      <input type="hidden" name="friendId" th:value="${user.id}" />
+      <button type="submit" class="btn btn-primary btn-sm float-right">Add Friend</button>
+    </form>
   </div>
 </div>
 </body>

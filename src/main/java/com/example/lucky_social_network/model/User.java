@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,6 +30,7 @@ public class User {
 
     private String email;
     private String phone;
+    @Column(length = 500)
     private String bio;
 
     // Используем bytea для бинарных данных
@@ -37,23 +40,36 @@ public class User {
     private LocalDate createdAt;
 
     private LocalDate dateOfBirth;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Gender gender;
-
     private Boolean emailVerified;
-    private Integer followersCount;
-    private Integer friendsCount;
+
 
     private Boolean isPrivate;
     private LocalDateTime lastLogin;
     private String location;
 
+
+    @Column(nullable = false)
+    private Integer friendsCount = 0;
+
+    @Column(nullable = false)
+    private Integer followersCount = 0;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    private Set<User> friends = new HashSet<>();
+
+
     public User(Long id) {
         this.id = id;
     }
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
 
     public enum Gender {
         MALE,
