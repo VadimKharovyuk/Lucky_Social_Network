@@ -1,10 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+  <title>User List</title>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .user-list { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .user-item { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    .user-item a { text-decoration: none; color: #0066cc; }
+  </style>
 </head>
 <body>
-$END$
+<div class="user-list">
+  <h1>User List</h1>
+  <div th:each="user : ${users}" class="user-item">
+    <span th:text="${user.username}"></span>
+    <a th:if="${user.id != currentUserId}" th:href="@{/chat/start/{recipientId}(recipientId=${user.id})}">Start Chat</a>
+  </div>
+</div>
 </body>
 </html>

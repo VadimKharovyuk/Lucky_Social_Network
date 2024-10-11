@@ -1,10 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <title>Chat</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .chat-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .message { margin-bottom: 10px; padding: 10px; border-radius: 5px; }
+        .sender { background-color: #e6f3ff; text-align: right; }
+        .recipient { background-color: #f0f0f0; }
+        .timestamp { font-size: 0.8em; color: #888; }
+        .message-form { margin-top: 20px; }
+    </style>
 </head>
 <body>
-$END$
+<div class="chat-container">
+    <h1>Chat with <span th:text="${recipient.username}"></span></h1>
+
+    <div class="chat-history">
+        <div th:each="message : ${chatHistory}"
+             th:class="${message.sender.id == sender.id ? 'message sender' : 'message recipient'}">
+            <div th:text="${message.content}"></div>
+            <div class="timestamp" th:text="${#temporals.format(message.timestamp, 'dd-MM-yyyy HH:mm')}"></div>
+        </div>
+    </div>
+
+    <form class="message-form" th:action="@{/chat/send}" method="post">
+        <input type="hidden" name="senderId" th:value="${sender.id}">
+        <input type="hidden" name="recipientId" th:value="${recipient.id}">
+        <textarea name="content" rows="3" required></textarea>
+        <button type="submit">Send</button>
+    </form>
+</div>
 </body>
 </html>
