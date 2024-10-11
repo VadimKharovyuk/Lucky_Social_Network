@@ -1,0 +1,116 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--  <title>Your Chats</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Your Chats</h1>-->
+<!--<ul>-->
+<!--  <li th:each="user : ${chatUsers}">-->
+<!--    <a th:href="@{/chat/{senderId}/{recipientId}(senderId=${#authentication.principal.id}, recipientId=${user.id})}"-->
+<!--       th:text="${user.username}">Username</a>-->
+<!--  </li>-->
+<!--</ul>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Your Chats</title>
+  <style>
+    /* Общие стили */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f2f5;
+    }
+
+    /* Синий верхний бар */
+    header {
+      background-color: #3b5998;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    /* Стили для списка чатов */
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 20px auto;
+      max-width: 600px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    ul li {
+      padding: 15px;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.3s;
+    }
+
+    ul li:last-child {
+      border-bottom: none;
+    }
+
+    ul li:hover {
+      background-color: #f0f0f0;
+    }
+
+    a {
+      color: #3b5998;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Кнопка для нового чата */
+    .new-chat-btn {
+      display: inline-block;
+      margin: 20px;
+      padding: 10px 20px;
+      background-color: #42b72a;
+      color: white;
+      font-size: 16px;
+      text-align: center;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .new-chat-btn:hover {
+      background-color: #36a420;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  Your Chats
+</header>
+
+<h1>Your Chats</h1>
+<ul>
+  <li th:each="user : ${chatUsers}">
+    <a th:href="@{/chat/{senderId}/{recipientId}(senderId=${#authentication.principal.id}, recipientId=${user.id})}"
+       th:text="${user.username}">Username</a>
+  </li>
+</ul>
+
+</body>
+</html>

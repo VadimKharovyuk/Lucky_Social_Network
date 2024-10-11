@@ -1,6 +1,7 @@
 package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.service.ChatService;
 import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserListController {
     private final UserService userService;
+    private final ChatService chatService;
 
     @PostMapping("/addFriend")
     public String addFriend(@RequestParam Long userId, @RequestParam Long friendId, RedirectAttributes redirectAttributes) {
@@ -29,7 +31,7 @@ public class UserListController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed to add friend: " + e.getMessage());
         }
-        return "redirect:/users/list";  // Изменено перенаправление
+        return "redirect:/users/list";
     }
 
     @PostMapping("/removeFriend")
@@ -46,12 +48,16 @@ public class UserListController {
     }
 
 //поиск друзей по id
-    @GetMapping("/friends/{userId}")
-    public String getFriends(@PathVariable Long userId, Model model) {
-        Set<User> friends = userService.getFriendsByUser(userId);
-        model.addAttribute("friends", friends);
-        return "friendsList";
-    }
+// Поиск друзей текущего пользователя
+@GetMapping("/friends")
+public String getFriends(Model model) {
+    Long currentUserId = getCurrentUserId(); // Получаем ID текущего пользователя
+    Set<User> friends = userService.getFriendsByUser(currentUserId); // Используем ID текущего пользователя
+    model.addAttribute("friends", friends); // Добавляем список друзей в модель
+    model.addAttribute("currentUserId", currentUserId); // Добавляем ID текущего пользователя в модель
+    return "friendsList"; // Возвращаем имя шаблона
+}
+
 
 
 

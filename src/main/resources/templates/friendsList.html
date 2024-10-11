@@ -27,17 +27,26 @@
         </div>
 
         <!-- Имя друга -->
+        <!-- Имя друга -->
         <div class="ml-3">
           <h5 th:text="${friend.username}"></h5>
-          <p th:text="${friend.email}"></p>
+          <p th:text="${friend.getDateOfBirth()}"></p>
+
+          <!-- Кнопка начать чат, если друг не текущий пользователь -->
+<!--          <a th:if="${friend.id != currentUserId}"-->
+<!--             th:href="@{/chat/start/{recipientId}(recipientId=${friend.id})}"-->
+<!--             class="btn btn-primary">Start Chat</a>-->
         </div>
 
-        <!-- Кнопка удаления друга -->
+
         <div class="ml-auto">
           <form th:action="@{/friends/remove}" method="post">
             <input type="hidden" th:value="${friend.id}" name="friendId">
             <button type="submit" class="btn btn-danger">Remove</button>
-          </form>
+          </form><br>
+          <a th:if="${friend.id != currentUserId}"
+             th:href="@{/chat/start/{recipientId}(recipientId=${friend.id})}"
+             class="btn btn-primary">Start Chat</a>
         </div>
       </div>
     </li>

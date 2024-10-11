@@ -48,7 +48,7 @@
 
   <div th:each="user : ${users}" class="user-item">
     <span th:text="${user.username}"></span>
-    <a th:if="${user.id != currentUserId}" th:href="@{/chat/start/{recipientId}(recipientId=${user.id})}">Start Chat</a>
+<!--    <a th:if="${user.id != currentUserId}" th:href="@{/chat/start/{recipientId}(recipientId=${user.id})}">Start Chat</a>-->
     <form th:if="${user.id != currentUserId}" th:action="@{/users/addFriend}" method="post" style="display: inline;">
       <input type="hidden" name="userId" th:value="${currentUserId}" />
       <input type="hidden" name="friendId" th:value="${user.id}" />

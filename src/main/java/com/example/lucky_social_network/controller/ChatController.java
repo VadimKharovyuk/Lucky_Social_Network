@@ -142,6 +142,18 @@ public class ChatController {
         return "redirect:/chat/" + currentUserId + "/" + recipientId;
     }
 
+
+    @GetMapping("/list")
+    public String getUserChats(Model model) {
+
+        Long currentUserId = getCurrentUserId();  // Получаем ID текущего пользователя
+        model.addAttribute("currentUserId", getCurrentUserId());
+        List<User> chatUsers = chatService.getUserChats(currentUserId);  // Получаем список чатов
+        model.addAttribute("chatUsers", chatUsers);
+        return "chatList";  // Возвращаем имя шаблона
+    }
+
+
     private Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {

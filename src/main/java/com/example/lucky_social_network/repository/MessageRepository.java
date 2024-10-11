@@ -1,6 +1,7 @@
 package com.example.lucky_social_network.repository;
 
 import com.example.lucky_social_network.model.Message;
+import com.example.lucky_social_network.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,5 +14,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findChatHistory(@Param("senderId") Long senderId, @Param("recipientId") Long recipientId);
 
 
+
+    List<Message> findBySenderOrRecipient(User sender, User recipient);
 
 }
