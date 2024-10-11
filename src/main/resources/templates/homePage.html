@@ -1,208 +1,383 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="ru">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>Моя Социальная Сеть</title>-->
+<!--  <style>-->
+<!--    :root {-->
+<!--      --primary-color: #4a90e2;-->
+<!--      --secondary-color: #f3f6f9;-->
+<!--      --text-color: #333;-->
+<!--      --light-text: #666;-->
+<!--      --white: #ffffff;-->
+<!--    }-->
+<!--    body {-->
+<!--      font-family: 'Segoe UI', 'Roboto', sans-serif;-->
+<!--      margin: 0;-->
+<!--      padding: 0;-->
+<!--      display: flex;-->
+<!--      flex-direction: column;-->
+<!--      min-height: 100vh;-->
+<!--      background-color: var(--secondary-color);-->
+<!--      color: var(--text-color);-->
+<!--    }-->
+<!--    header {-->
+<!--      background-color: var(--white);-->
+<!--      color: var(--primary-color);-->
+<!--      padding: 1rem;-->
+<!--      text-align: center;-->
+<!--      box-shadow: 0 2px 4px rgba(0,0,0,0.1);-->
+<!--    }-->
+<!--    nav {-->
+<!--      background-color: var(--white);-->
+<!--      padding: 0.5rem;-->
+<!--      position: sticky;-->
+<!--      top: 0;-->
+<!--      z-index: 1000;-->
+<!--      box-shadow: 0 2px 4px rgba(0,0,0,0.1);-->
+<!--    }-->
+<!--    nav ul {-->
+<!--      list-style-type: none;-->
+<!--      padding: 0;-->
+<!--      margin: 0;-->
+<!--      display: flex;-->
+<!--      justify-content: center;-->
+<!--    }-->
+<!--    nav ul li {-->
+<!--      margin: 0 1rem;-->
+<!--    }-->
+<!--    nav ul li a {-->
+<!--      color: var(--primary-color);-->
+<!--      text-decoration: none;-->
+<!--      font-weight: bold;-->
+<!--      padding: 0.5rem 1rem;-->
+<!--      border-radius: 20px;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    nav ul li a:hover {-->
+<!--      background-color: var(--primary-color);-->
+<!--      color: var(--white);-->
+<!--    }-->
+<!--    main {-->
+<!--      display: flex;-->
+<!--      flex: 1;-->
+<!--      padding: 2rem;-->
+<!--      gap: 2rem;-->
+<!--    }-->
+<!--    .sidebar {-->
+<!--      background-color: var(--white);-->
+<!--      padding: 1rem;-->
+<!--      border-radius: 10px;-->
+<!--      box-shadow: 0 4px 6px rgba(0,0,0,0.1);-->
+<!--      flex: 0 0 250px;-->
+<!--    }-->
+<!--    .content {-->
+<!--      flex: 1;-->
+<!--      display: flex;-->
+<!--      flex-direction: column;-->
+<!--      align-items: center;-->
+<!--      gap: 1rem;-->
+<!--    }-->
+<!--    footer {-->
+<!--      background-color: var(--primary-color);-->
+<!--      color: var(--white);-->
+<!--      text-align: center;-->
+<!--      padding: 1rem;-->
+<!--      margin-top: 2rem;-->
+<!--    }-->
+<!--    .auth-links a {-->
+<!--      display: block;-->
+<!--      margin-bottom: 10px;-->
+<!--      padding: 10px;-->
+<!--      background-color: var(--primary-color);-->
+<!--      color: var(--white);-->
+<!--      text-decoration: none;-->
+<!--      border-radius: 5px;-->
+<!--      text-align: center;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .auth-links a:hover {-->
+<!--      background-color: #3a7bc8;-->
+<!--      transform: translateY(-2px);-->
+<!--    }-->
+<!--    .post {-->
+<!--      background-color: var(--white);-->
+<!--      border-radius: 10px;-->
+<!--      padding: 1.5rem;-->
+<!--      margin-bottom: 1rem;-->
+<!--      box-shadow: 0 4px 6px rgba(0,0,0,0.1);-->
+<!--      max-width: 600px;-->
+<!--      width: 100%;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .post:hover {-->
+<!--      box-shadow: 0 6px 12px rgba(0,0,0,0.15);-->
+<!--      transform: translateY(-5px);-->
+<!--    }-->
+<!--    .friend-suggestion {-->
+<!--      display: flex;-->
+<!--      align-items: center;-->
+<!--      margin-bottom: 1rem;-->
+<!--      padding: 0.5rem;-->
+<!--      background-color: var(--secondary-color);-->
+<!--      border-radius: 8px;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .friend-suggestion:hover {-->
+<!--      background-color: #e9eef5;-->
+<!--    }-->
+<!--    .friend-suggestion img {-->
+<!--      width: 40px;-->
+<!--      height: 40px;-->
+<!--      border-radius: 50%;-->
+<!--      margin-right: 10px;-->
+<!--      object-fit: cover;-->
+<!--    }-->
+<!--    .add-friend-btn {-->
+<!--      background-color: var(--primary-color);-->
+<!--      color: var(--white);-->
+<!--      border: none;-->
+<!--      padding: 5px 10px;-->
+<!--      border-radius: 5px;-->
+<!--      cursor: pointer;-->
+<!--      transition: all 0.3s ease;-->
+<!--      margin-left: auto;-->
+<!--    }-->
+<!--    .add-friend-btn:hover {-->
+<!--      background-color: #3a7bc8;-->
+<!--      transform: scale(1.05);-->
+<!--    }-->
+<!--    h2, h3 {-->
+<!--      color: var(--primary-color);-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--  <h1>Lucky Social Network</h1>-->
+<!--</header>-->
+
+<!--<nav>-->
+<!--  <ul>-->
+<!--    <li><a href="/">Домой</a></li>-->
+<!--    <li><a href="/profile">Профиль</a></li>-->
+<!--    <li><a href="#messages">Сообщения</a></li>-->
+<!--    <li><a href="#notifications">Уведомления</a></li>-->
+<!--  </ul>-->
+<!--</nav>-->
+
+<!--<main>-->
+<!--  <aside class="sidebar">-->
+<!--    <div class="auth-links">-->
+<!--      <a href="/register">Регистрация</a>-->
+<!--      <a href="/login">Вход</a>-->
+<!--    </div>-->
+<!--  </aside>-->
+
+<!--  <div class="content">-->
+<!--    <div class="post">-->
+<!--      <h2>Добро пожаловать в нашу социальную сеть!</h2>-->
+<!--      <p>Здесь вы можете общаться с друзьями, делиться фотографиями и узнавать новости.</p>-->
+<!--    </div>-->
+<!--    <div class="post">-->
+<!--      <h3>Последние обновления</h3>-->
+<!--      <p>Мы добавили новые функции для улучшения вашего опыта. Исследуйте и дайте нам знать, что вы думаете!</p>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--  <aside class="sidebar">-->
+<!--    <h3>Рекомендуемые друзья</h3>-->
+<!--    <div class="friend-suggestion">-->
+<!--      <img src="/api/placeholder/40/40" alt="Friend 1">-->
+<!--      <span>Иван Петров</span>-->
+<!--      <button class="add-friend-btn">Добавить</button>-->
+<!--    </div>-->
+<!--    <div class="friend-suggestion">-->
+<!--      <img src="/api/placeholder/40/40" alt="Friend 2">-->
+<!--      <span>Анна Сидорова</span>-->
+<!--      <button class="add-friend-btn">Добавить</button>-->
+<!--    </div>-->
+<!--  </aside>-->
+<!--</main>-->
+
+<!--<footer>-->
+<!--  <p>&copy; 2024 Моя Социальная Сеть. Все права защищены.</p>-->
+<!--</footer>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Моя Социальная Сеть</title>
+  <title>ConnectHub - Объединяя мир</title>
   <style>
-    :root {
-      --primary-color: #4a90e2;
-      --secondary-color: #f3f6f9;
-      --text-color: #333;
-      --light-text: #666;
-      --white: #ffffff;
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
     body {
-      font-family: 'Segoe UI', 'Roboto', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      background-color: var(--secondary-color);
-      color: var(--text-color);
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      line-height: 1.6;
+    }
+    .container {
+      width: 85%;
+      margin: auto;
+      overflow: hidden;
     }
     header {
-      background-color: var(--white);
-      color: var(--primary-color);
-      padding: 1rem;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    nav {
-      background-color: var(--white);
-      padding: 0.5rem;
-      position: sticky;
+      padding: 1rem 0;
+      position: fixed;
+      width: 100%;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
     }
-    nav ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      justify-content: center;
+    header .logo {
+      float: left;
+      font-size: 1.5rem;
+      font-weight: 600;
     }
-    nav ul li {
-      margin: 0 1rem;
+    header nav {
+      float: right;
     }
-    nav ul li a {
-      color: var(--primary-color);
+    header nav ul {
+      list-style: none;
+    }
+    header nav ul li {
+      display: inline;
+      margin-left: 1.5rem;
+    }
+    header nav ul li a {
       text-decoration: none;
-      font-weight: bold;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
+      color: #fff;
+      font-weight: 300;
       transition: all 0.3s ease;
     }
-    nav ul li a:hover {
-      background-color: var(--primary-color);
-      color: var(--white);
+    header nav ul li a:hover {
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
     }
-    main {
+    .main-content {
       display: flex;
-      flex: 1;
-      padding: 2rem;
-      gap: 2rem;
+      margin-top: 6rem;
+      align-items: flex-start;
     }
-    .sidebar {
-      background-color: var(--white);
-      padding: 1rem;
+    .info-blocks {
+      flex: 3;
+    }
+    .info-block {
+      background: rgba(255, 255, 255, 0.1);
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
       border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      flex: 0 0 250px;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
     }
-    .content {
+    .info-block:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    .info-block h2 {
+      margin-bottom: 0.5rem;
+      color: #ffd700;
+    }
+    aside {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
+      margin-left: 2rem;
     }
-    footer {
-      background-color: var(--primary-color);
-      color: var(--white);
-      text-align: center;
-      padding: 1rem;
-      margin-top: 2rem;
+    .auth-links {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1.5rem;
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
     }
     .auth-links a {
       display: block;
-      margin-bottom: 10px;
-      padding: 10px;
-      background-color: var(--primary-color);
-      color: var(--white);
+      text-align: center;
+      background: #ffd700;
+      color: #333;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
       text-decoration: none;
       border-radius: 5px;
-      text-align: center;
+      font-weight: 600;
       transition: all 0.3s ease;
     }
     .auth-links a:hover {
-      background-color: #3a7bc8;
-      transform: translateY(-2px);
+      background: #fff;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
     }
-    .post {
-      background-color: var(--white);
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      max-width: 600px;
-      width: 100%;
-      transition: all 0.3s ease;
+    footer {
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      text-align: center;
+      padding: 1rem 0;
+      margin-top: 2rem;
     }
-    .post:hover {
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-      transform: translateY(-5px);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .friend-suggestion {
-      display: flex;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      background-color: var(--secondary-color);
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
-    .friend-suggestion:hover {
-      background-color: #e9eef5;
-    }
-    .friend-suggestion img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 10px;
-      object-fit: cover;
-    }
-    .add-friend-btn {
-      background-color: var(--primary-color);
-      color: var(--white);
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-left: auto;
-    }
-    .add-friend-btn:hover {
-      background-color: #3a7bc8;
-      transform: scale(1.05);
-    }
-    h2, h3 {
-      color: var(--primary-color);
+    .info-block, .auth-links {
+      animation: fadeIn 0.5s ease-out forwards;
     }
   </style>
 </head>
 <body>
 <header>
-  <h1>Lucky Social Network</h1>
+  <div class="container">
+    <div class="logo">Lucky Social Network</div>
+    <nav>
+      <ul>
+        <li><a href="/">Моя страница</a></li>
+        <li><a href="#features">Возможности</a></li>
+        <li><a href="#about">О нас</a></li>
+        <li><a href="#contact">Контакты</a></li>
+      </ul>
+    </nav>
+  </div>
 </header>
 
-<nav>
-  <ul>
-    <li><a href="/">Домой</a></li>
-    <li><a href="/profile">Профиль</a></li>
-    <li><a href="#messages">Сообщения</a></li>
-    <li><a href="#notifications">Уведомления</a></li>
-  </ul>
-</nav>
-
-<main>
-  <aside class="sidebar">
-    <div class="auth-links">
-      <a href="/register">Регистрация</a>
-      <a href="/login">Вход</a>
+<div class="container main-content">
+  <div class="info-blocks">
+    <div class="info-block">
+      <h2>Объединяем мир</h2>
+      <p>ConnectHub - это место, где каждый может найти свое сообщество и поделиться своими идеями.</p>
     </div>
-  </aside>
-
-  <div class="content">
-    <div class="post">
-      <h2>Добро пожаловать в нашу социальную сеть!</h2>
-      <p>Здесь вы можете общаться с друзьями, делиться фотографиями и узнавать новости.</p>
+    <div class="info-block">
+      <h2>Безграничное общение</h2>
+      <p>Общайтесь с людьми со всего мира, расширяйте свой кругозор и находите новых друзей.</p>
     </div>
-    <div class="post">
-      <h3>Последние обновления</h3>
-      <p>Мы добавили новые функции для улучшения вашего опыта. Исследуйте и дайте нам знать, что вы думаете!</p>
+    <div class="info-block">
+      <h2>Творите и вдохновляйте</h2>
+      <p>Делитесь своим творчеством, вдохновляйте других и находите вдохновение для себя.</p>
+    </div>
+    <div class="info-block">
+      <h2>Безопасность превыше всего</h2>
+      <p>Мы заботимся о вашей безопасности и конфиденциальности, предоставляя надежную платформу для общения.</p>
     </div>
   </div>
-
-  <aside class="sidebar">
-    <h3>Рекомендуемые друзья</h3>
-    <div class="friend-suggestion">
-      <img src="/api/placeholder/40/40" alt="Friend 1">
-      <span>Иван Петров</span>
-      <button class="add-friend-btn">Добавить</button>
-    </div>
-    <div class="friend-suggestion">
-      <img src="/api/placeholder/40/40" alt="Friend 2">
-      <span>Анна Сидорова</span>
-      <button class="add-friend-btn">Добавить</button>
+  <aside>
+    <div class="auth-links">
+      <a href="/login">Войти</a>
+      <a href="/register">Присоединиться</a>
     </div>
   </aside>
-</main>
+</div>
 
 <footer>
-  <p>&copy; 2024 Моя Социальная Сеть. Все права защищены.</p>
+  <div class="container">
+    <p>&copy; 2024 ConnectHub. Соединяя сердца и умы.</p>
+  </div>
 </footer>
 </body>
 </html>
