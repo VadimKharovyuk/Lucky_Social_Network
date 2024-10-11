@@ -25,12 +25,23 @@ public class ProfileController {
         return "profile";
     }
 
+
     @PostMapping("/update")
     public String updateProfile(@ModelAttribute User updatedUser, @RequestParam("avatarFile") MultipartFile avatarFile) throws IOException {
+        User existingUser = userService.getUserById(updatedUser.getId());
+
+        // Обновляем только измененные поля
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setPhone(updatedUser.getPhone());
+        existingUser.setBio(updatedUser.getBio());
+        existingUser.setDateOfBirth(updatedUser.getDateOfBirth());
+        existingUser.setLocation(updatedUser.getLocation());
+
+        // Если пользователь загрузил новый аватар, обновляем его
         if (!avatarFile.isEmpty()) {
-            updatedUser.setAvatar(avatarFile.getBytes());
+            existingUser.setAvatar(avatarFile.getBytes());
         }
-        userService.updateUser(updatedUser);
+        userService.updateUser(existingUser);
         return "redirect:/profile";
     }
 }

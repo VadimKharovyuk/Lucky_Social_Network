@@ -17,6 +17,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+
     public User registerNewUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(LocalDate.now());
@@ -30,9 +35,6 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
-    public User updateUser(User user) {
-        return userRepository.save(user);
-    }
 
     public User getUserById(Long senderId) {
        return userRepository.findById(senderId).orElseThrow(() -> new UsernameNotFoundException("User not found: " + senderId));
