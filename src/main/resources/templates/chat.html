@@ -5,13 +5,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; }
-        .chat-container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .message { margin-bottom: 10px; padding: 10px; border-radius: 5px; }
-        .sender { background-color: #e6f3ff; text-align: right; }
-        .recipient { background-color: #f0f0f0; }
-        .timestamp { font-size: 0.8em; color: #888; }
-        .message-form { margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .chat-history {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 70%;
+        }
+        .sender {
+            background-color: #e6f3ff;
+            text-align: right;
+            margin-left: 30%;
+        }
+        .recipient {
+            background-color: #f0f0f0;
+        }
+        .timestamp {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 5px;
+        }
+        .message-form {
+            display: flex;
+            flex-direction: column;
+        }
+        .message-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 60px;
+        }
+        .message-form button {
+            align-self: flex-end;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .message-form button:hover {
+            background-color: #0052a3;
+        }
     </style>
 </head>
 <body>
@@ -29,7 +94,7 @@
     <form class="message-form" th:action="@{/chat/send}" method="post">
         <input type="hidden" name="senderId" th:value="${sender.id}">
         <input type="hidden" name="recipientId" th:value="${recipient.id}">
-        <textarea name="content" rows="3" required></textarea>
+        <textarea name="content" rows="3" required placeholder="Type your message here..."></textarea>
         <button type="submit">Send</button>
     </form>
 </div>

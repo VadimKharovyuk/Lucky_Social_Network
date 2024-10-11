@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Личный кабинет</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f0f2f5;
+      font-family: Arial, sans-serif;
+    }
+    .profile-container {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .profile-header {
+      background-color: #1877f2;
+      color: #fff;
+      padding: 20px;
+      border-radius: 8px 8px 0 0;
+      margin: -20px -20px 20px -20px;
+    }
+    .profile-avatar {
+      width: 168px;
+      height: 168px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+    }
+    .btn-facebook {
+      background-color: #1877f2;
+      color: #fff;
+    }
+    .btn-facebook:hover {
+      background-color: #166fe5;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="profile-container">
+    <div class="profile-header">
+      <h1 th:text="${user.username}">Имя пользователя</h1>
+    </div>
+    <div class="row">
+      <div class="col-md-4 text-center mb-4">
+        <img th:if="${user.avatar}" th:src="@{'data:image/jpeg;base64,' + ${#base64.encodeBase64String(user.avatar)}}" class="profile-avatar" alt="Аватар">
+        <img th:unless="${user.avatar}" src="/default-avatar.jpg" class="profile-avatar" alt="Аватар по умолчанию">
+      </div>
+      <div class="col-md-8">
+        <form th:action="@{/profile/update}" method="post" enctype="multipart/form-data">
+          <input type="hidden" th:field="${user.id}">
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" th:field="${user.email}">
+          </div>
+          <div class="form-group">
+            <label for="phone">Телефон:</label>
+            <input type="tel" class="form-control" id="phone" th:field="${user.phone}">
+          </div>
+          <div class="form-group">
+            <label for="bio">О себе:</label>
+            <textarea class="form-control" id="bio" th:field="${user.bio}" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="dateOfBirth">Дата рождения:</label>
+            <input type="date" class="form-control" id="dateOfBirth" th:field="${user.dateOfBirth}">
+          </div>
+          <div class="form-group">
+            <label for="location">Местоположение:</label>
+            <input type="text" class="form-control" id="location" th:field="${user.location}">
+          </div>
+          <div class="form-group">
+            <label for="gender">Пол:</label>
+            <select class="form-control" id="gender" th:field="${user.gender}">
+              <option value="MALE">Мужской</option>
+              <option value="FEMALE">Женский</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="avatarFile">Изменить аватар:</label>
+            <input type="file" class="form-control-file" id="avatarFile" name="avatarFile">
+          </div>
+          <button type="submit" class="btn btn-facebook">Сохранить изменения</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

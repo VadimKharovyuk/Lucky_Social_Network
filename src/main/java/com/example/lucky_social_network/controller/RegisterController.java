@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Controller
 @RequiredArgsConstructor
-public class UserController {
+public class RegisterController {
 
     private  final UserService userService;
 
