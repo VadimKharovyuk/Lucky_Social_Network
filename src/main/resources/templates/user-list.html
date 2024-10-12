@@ -139,7 +139,6 @@
     </div>
   </nav>
 </header>
-
 <div class="main-container">
   <div class="content-container">
     <h1>Список пользователей</h1>
@@ -155,11 +154,14 @@
     <div th:each="user : ${users}" class="user-item">
       <div class="d-flex justify-content-between align-items-center">
         <a th:href="@{/profile/{userId}(userId=${user.id})}" th:text="${user.username}" class="text-decoration-none"></a>
-        <form th:if="${user.id != currentUserId}" th:action="@{/users/addFriend}" method="post">
-          <input type="hidden" name="userId" th:value="${currentUserId}" />
-          <input type="hidden" name="friendId" th:value="${user.id}" />
-          <button type="submit" class="btn btn-primary btn-sm">Добавить в друзья</button>
-        </form>
+        <div th:if="${user.id != currentUserId}">
+          <span th:if="${@userService.areFriends(currentUserId, user.id)}">Друзья</span>
+          <form th:unless="${@userService.areFriends(currentUserId, user.id)}" th:action="@{/users/addFriend}" method="post">
+            <input type="hidden" name="userId" th:value="${currentUserId}" />
+            <input type="hidden" name="friendId" th:value="${user.id}" />
+            <button type="submit" class="btn btn-primary btn-sm">Добавить в друзья</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
