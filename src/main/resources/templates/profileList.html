@@ -1,0 +1,311 @@
+<!--&lt;!&ndash;<!DOCTYPE html>&ndash;&gt;-->
+<!--&lt;!&ndash;<html lang="ru" xmlns:th="http://www.thymeleaf.org">&ndash;&gt;-->
+<!--&lt;!&ndash;<head>&ndash;&gt;-->
+<!--&lt;!&ndash;  <meta charset="UTF-8">&ndash;&gt;-->
+<!--&lt;!&ndash;  <meta name="viewport" content="width=device-width, initial-scale=1.0">&ndash;&gt;-->
+<!--&lt;!&ndash;  <title>Список пользователей - Lucky Social Network</title>&ndash;&gt;-->
+<!--&lt;!&ndash;  <style>&ndash;&gt;-->
+<!--&lt;!&ndash;    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');&ndash;&gt;-->
+
+<!--&lt;!&ndash;    body {&ndash;&gt;-->
+<!--&lt;!&ndash;      font-family: 'Poppins', sans-serif;&ndash;&gt;-->
+<!--&lt;!&ndash;      line-height: 1.6;&ndash;&gt;-->
+<!--&lt;!&ndash;      color: #333;&ndash;&gt;-->
+<!--&lt;!&ndash;      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);&ndash;&gt;-->
+<!--&lt;!&ndash;      margin: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;      padding: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .container {&ndash;&gt;-->
+<!--&lt;!&ndash;      max-width: 1200px;&ndash;&gt;-->
+<!--&lt;!&ndash;      margin: 0 auto;&ndash;&gt;-->
+<!--&lt;!&ndash;      padding: 20px;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    h1 {&ndash;&gt;-->
+<!--&lt;!&ndash;      text-align: center;&ndash;&gt;-->
+<!--&lt;!&ndash;      color: #fff;&ndash;&gt;-->
+<!--&lt;!&ndash;      margin-bottom: 30px;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .user-list {&ndash;&gt;-->
+<!--&lt;!&ndash;      display: flex;&ndash;&gt;-->
+<!--&lt;!&ndash;      overflow-x: auto;&ndash;&gt;-->
+<!--&lt;!&ndash;      gap: 20px;&ndash;&gt;-->
+<!--&lt;!&ndash;      padding-bottom: 20px;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .user-card {&ndash;&gt;-->
+<!--&lt;!&ndash;      background: rgba(255, 255, 255, 0.1);&ndash;&gt;-->
+<!--&lt;!&ndash;      border-radius: 10px;&ndash;&gt;-->
+<!--&lt;!&ndash;      padding: 20px;&ndash;&gt;-->
+<!--&lt;!&ndash;      text-align: center;&ndash;&gt;-->
+<!--&lt;!&ndash;      backdrop-filter: blur(5px);&ndash;&gt;-->
+<!--&lt;!&ndash;      transition: all 0.3s ease;&ndash;&gt;-->
+<!--&lt;!&ndash;      flex: 0 0 auto;&ndash;&gt;-->
+<!--&lt;!&ndash;      width: 200px;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .user-card:hover {&ndash;&gt;-->
+<!--&lt;!&ndash;      transform: translateY(-10px) scale(1.05);&ndash;&gt;-->
+<!--&lt;!&ndash;      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);&ndash;&gt;-->
+<!--&lt;!&ndash;      background: rgba(255, 255, 255, 0.2);&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .user-card img {&ndash;&gt;-->
+<!--&lt;!&ndash;      width: 100px;&ndash;&gt;-->
+<!--&lt;!&ndash;      height: 100px;&ndash;&gt;-->
+<!--&lt;!&ndash;      border-radius: 50%;&ndash;&gt;-->
+<!--&lt;!&ndash;      margin-bottom: 10px;&ndash;&gt;-->
+<!--&lt;!&ndash;      transition: all 0.3s ease;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .user-card:hover img {&ndash;&gt;-->
+<!--&lt;!&ndash;      transform: scale(1.1);&ndash;&gt;-->
+<!--&lt;!&ndash;      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .user-card h3 {&ndash;&gt;-->
+<!--&lt;!&ndash;      margin: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;      color: #ffd700;&ndash;&gt;-->
+<!--&lt;!&ndash;      transition: all 0.3s ease;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .user-card:hover h3 {&ndash;&gt;-->
+<!--&lt;!&ndash;      color: #fff;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .user-card a {&ndash;&gt;-->
+<!--&lt;!&ndash;      display: inline-block;&ndash;&gt;-->
+<!--&lt;!&ndash;      margin-top: 10px;&ndash;&gt;-->
+<!--&lt;!&ndash;      padding: 5px 10px;&ndash;&gt;-->
+<!--&lt;!&ndash;      background: #ffd700;&ndash;&gt;-->
+<!--&lt;!&ndash;      color: #333;&ndash;&gt;-->
+<!--&lt;!&ndash;      text-decoration: none;&ndash;&gt;-->
+<!--&lt;!&ndash;      border-radius: 5px;&ndash;&gt;-->
+<!--&lt;!&ndash;      transition: all 0.3s ease;&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;    .user-card a:hover {&ndash;&gt;-->
+<!--&lt;!&ndash;      background: #fff;&ndash;&gt;-->
+<!--&lt;!&ndash;      box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);&ndash;&gt;-->
+<!--&lt;!&ndash;      transform: scale(1.1);&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;  </style>&ndash;&gt;-->
+<!--&lt;!&ndash;</head>&ndash;&gt;-->
+<!--&lt;!&ndash;<body>&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="container">&ndash;&gt;-->
+<!--&lt;!&ndash;  <h1>Список пользователей Lucky Social Network</h1>&ndash;&gt;-->
+<!--&lt;!&ndash;  <div class="user-list">&ndash;&gt;-->
+<!--&lt;!&ndash;    <div th:each="user : ${userList}" class="user-card">&ndash;&gt;-->
+<!--&lt;!&ndash;      <img src="/api/placeholder/100/100" th:alt="${user.username}">&ndash;&gt;-->
+<!--&lt;!&ndash;      <h3 th:text="${user.username}"></h3>&ndash;&gt;-->
+<!--&lt;!&ndash;      <h3 th:text="${user.getGender()}"></h3>&ndash;&gt;-->
+<!--&lt;!&ndash;      <h3 th:text="${user.getBio()}"></h3>&ndash;&gt;-->
+<!--&lt;!&ndash;      <a th:href="@{/profile/{id}(id=${user.id})}">Посмотреть профиль</a>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;  </div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;</body>&ndash;&gt;-->
+<!--&lt;!&ndash;</html>&ndash;&gt;-->
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="ru" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>Список пользователей - Lucky Social Network</title>-->
+<!--  <style>-->
+<!--    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');-->
+
+<!--    body {-->
+<!--      font-family: 'Poppins', sans-serif;-->
+<!--      line-height: 1.6;-->
+<!--      color: #333;-->
+<!--      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);-->
+<!--      margin: 0;-->
+<!--      padding: 0;-->
+<!--    }-->
+<!--    .container {-->
+<!--      max-width: 1200px;-->
+<!--      margin: 0 auto;-->
+<!--      padding: 20px;-->
+<!--    }-->
+<!--    h1 {-->
+<!--      text-align: center;-->
+<!--      color: #fff;-->
+<!--      margin-bottom: 30px;-->
+<!--    }-->
+<!--    .user-list {-->
+<!--      display: grid;-->
+<!--      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));-->
+<!--      gap: 20px;-->
+<!--      justify-items: center;-->
+<!--    }-->
+<!--    .user-card {-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      border-radius: 10px;-->
+<!--      padding: 20px;-->
+<!--      text-align: center;-->
+<!--      backdrop-filter: blur(5px);-->
+<!--      transition: all 0.3s ease;-->
+<!--      width: 200px;-->
+<!--    }-->
+<!--    .user-card:hover {-->
+<!--      transform: translateY(-10px) scale(1.05);-->
+<!--      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);-->
+<!--      background: rgba(255, 255, 255, 0.2);-->
+<!--    }-->
+<!--    .user-card img {-->
+<!--      width: 100px;-->
+<!--      height: 100px;-->
+<!--      border-radius: 50%;-->
+<!--      margin-bottom: 10px;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .user-card:hover img {-->
+<!--      transform: scale(1.1);-->
+<!--      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);-->
+<!--    }-->
+<!--    .user-card h3 {-->
+<!--      margin: 0;-->
+<!--      color: #ffd700;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .user-card:hover h3 {-->
+<!--      color: #fff;-->
+<!--    }-->
+<!--    .user-card a {-->
+<!--      display: inline-block;-->
+<!--      margin-top: 10px;-->
+<!--      padding: 5px 10px;-->
+<!--      background: #ffd700;-->
+<!--      color: #333;-->
+<!--      text-decoration: none;-->
+<!--      border-radius: 5px;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .user-card a:hover {-->
+<!--      background: #fff;-->
+<!--      box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);-->
+<!--      transform: scale(1.1);-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--  <h1>Список пользователей Lucky Social Network</h1>-->
+<!--  <div class="user-list">-->
+<!--    <div th:each="user : ${userList}" class="user-card">-->
+<!--      <img src="/api/placeholder/100/100" th:alt="${user.username}">-->
+<!--      <h3 th:text="${user.username}"></h3>-->
+<!--      <h3 th:text="${user.getGender()}"></h3>-->
+<!--      <h3 th:text="${user.getBio()}"></h3>-->
+<!--      <a th:href="@{/profile/{id}(id=${user.id})}">Посмотреть профиль</a>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Список пользователей - Lucky Social Network</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 30px;
+    }
+    .user-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .user-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+    .user-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .user-photo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-right: 20px;
+      transition: all 0.3s ease;
+    }
+    .user-card:hover .user-photo {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    }
+    .user-info {
+      flex-grow: 1;
+    }
+    .user-info h3 {
+      margin: 0 0 5px 0;
+      color: #ffd700;
+      transition: all 0.3s ease;
+    }
+    .user-card:hover .user-info h3 {
+      color: #fff;
+    }
+    .user-gender {
+      font-size: 0.9em;
+      color: #ccc;
+      margin-bottom: 5px;
+    }
+    .user-bio {
+      font-size: 0.8em;
+      color: #eee;
+      margin-bottom: 10px;
+    }
+    .view-profile {
+      display: inline-block;
+      padding: 5px 10px;
+      background: #ffd700;
+      color: #333;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+    }
+    .view-profile:hover {
+      background: #fff;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Список пользователей Lucky Social Network</h1>
+  <div class="user-list">
+    <div th:each="user : ${userList}" class="user-card">
+      <img class="user-photo" src="/api/placeholder/100/100" th:alt="${user.username}">
+      <div class="user-info">
+        <h3 th:text="${user.username}"></h3>
+        <p class="user-gender" th:text="${user.getGender()}"></p>
+        <p class="user-bio" th:text="${user.getBio()}"></p>
+        <a class="view-profile" th:href="@{/profile/{id}(id=${user.id})}">Посмотреть профиль</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

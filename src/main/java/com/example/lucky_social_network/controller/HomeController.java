@@ -9,6 +9,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,9 +32,25 @@ public class HomeController {
         return "home";
     }
     @GetMapping("/home")
-    public String homePage( ) {
+    public String homePage(Model model ) {
+       List<User> userList= userService.getAllUsers();
+       model.addAttribute("userList", userList);
         return "homePage";
     }
+
+    @GetMapping("/profile-list")
+    public String profileList(Model model) {
+        List<User> userList= userService.getAllUsers();
+        model.addAttribute("userList", userList);
+        return "profileList";
+    }
+
+//    @GetMapping("/user/{id}")
+//    public String userProfile(@PathVariable Long id, Model model) {
+//        User user = userService.getUserProfileById(id);
+//        model.addAttribute("user", user);
+//        return "user-profile";
+//    }
 
 
 
