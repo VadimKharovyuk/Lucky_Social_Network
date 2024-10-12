@@ -1,8 +1,12 @@
 package com.example.lucky_social_network.service;
 
+import com.example.lucky_social_network.exception.FriendshipNotFoundException;
+import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.repository.MessageRepository;
 import com.example.lucky_social_network.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,12 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MessageRepository messageRepository;
 
 
     public User updateUser(User user) {
@@ -77,8 +82,18 @@ public User registerNewUser(User user) {
 
     @Transactional
     public void removeFriend(Long userId, Long friendId) {
+        log.info("Attempting to remove friend relationship between users: {} and {}", userId, friendId);
+
         User user = getUserById(userId);
         User friend = getUserById(friendId);
+
+        if (!user.getFriends().contains(friend)) {
+            log.warn("Friend relationship not found between users: {} and {}", userId, friendId);
+            throw new FriendshipNotFoundException("Дружба не найдена между пользователями");
+        }
+
+        // Удаляем друга из списка друзей
+        user.removeFriend(friend);
 
         // Уменьшаем количество друзей у пользователя
         user.setFriendsCount(Math.max(0, user.getFriendsCount() - 1));
@@ -87,6 +102,8 @@ public User registerNewUser(User user) {
 
         userRepository.save(user);
         userRepository.save(friend);
+
+        log.info("Friend relationship successfully removed between users: {} and {}", userId, friendId);
     }
 
 
@@ -105,4 +122,8 @@ public User registerNewUser(User user) {
         User user1 = getUserById(userId1);
         return user1.getFriends().stream().anyMatch(friend -> friend.getId().equals(userId2));
     }
+
+
+
+
 }

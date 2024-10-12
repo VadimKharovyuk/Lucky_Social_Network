@@ -45,13 +45,6 @@ public class HomeController {
         return "profileList";
     }
 
-//    @GetMapping("/user/{id}")
-//    public String userProfile(@PathVariable Long id, Model model) {
-//        User user = userService.getUserProfileById(id);
-//        model.addAttribute("user", user);
-//        return "user-profile";
-//    }
-
 
 
 

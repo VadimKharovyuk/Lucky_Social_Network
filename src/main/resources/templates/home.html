@@ -78,8 +78,8 @@
       <div class="sidebar">
         <h5>Навигация</h5>
         <ul class="nav flex-column">
-          <li class="nav-item"><a th:href="@{/profile/{id}(id=${currentUser.id})}" class="nav-link"><i class="fas fa-user me-2"></i>Мой профиль</a></li>
           <li class="nav-item"><a href="/home" class="nav-link"><i class="fas fa-home me-2"></i>Главная</a></li>
+          <li class="nav-item"><a th:href="@{/profile/{id}(id=${currentUser.id})}" class="nav-link"><i class="fas fa-user me-2"></i>Мой профиль</a></li>
           <li class="nav-item"><a href="/users/friends" class="nav-link"><i class="fas fa-user-friends me-2"></i>Друзья</a></li>
           <li class="nav-item"><a href="/chat/list" class="nav-link"><i class="fas fa-envelope me-2"></i>Сообщения</a></li>
           <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-bell me-2"></i>Уведомления</a></li>

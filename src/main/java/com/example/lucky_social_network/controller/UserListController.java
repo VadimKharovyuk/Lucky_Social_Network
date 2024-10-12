@@ -1,13 +1,18 @@
 package com.example.lucky_social_network.controller;
 
+import com.example.lucky_social_network.exception.FriendshipNotFoundException;
+import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.ChatService;
 import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +28,22 @@ public class UserListController {
     private final UserService userService;
     private final ChatService chatService;
 
+    @PostMapping("/delete/{friendId}")
+    public String removeFriend(@PathVariable Long friendId,
+                               @AuthenticationPrincipal UserDetails userDetails,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            Long userId = ((CustomUserDetails) userDetails).getId();
+            userService.removeFriend(userId, friendId);
+            redirectAttributes.addFlashAttribute("message", "Друг успешно удален");
+        } catch (UserNotFoundException | FriendshipNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Произошла ошибка при удалении друга");
+        }
+        return "redirect:/users/friends";
+    }
+
     @PostMapping("/addFriend")
     public String addFriend(@RequestParam Long userId, @RequestParam Long friendId, RedirectAttributes redirectAttributes) {
         try {
@@ -34,10 +55,7 @@ public class UserListController {
         return "redirect:/users/list";
     }
 
-    @PostMapping("/removeFriend")
-    public void removeFriend(@RequestParam Long userId, @RequestParam Long friendId) {
-        userService.removeFriend(userId, friendId);
-    }
+
 
     @GetMapping("/list")
     public String getUserList(Model model) {
@@ -64,6 +82,7 @@ public String getFriends(Model model) {
     model.addAttribute("currentUserId", currentUserId); // Добавляем ID текущего пользователя в модель
     return "friendsList"; // Возвращаем имя шаблона
 }
+
 
 
 

@@ -54,13 +54,18 @@ public class User {
     @Column(nullable = false)
     private Integer followersCount = 0;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "user_friends",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
     private Set<User> friends = new HashSet<>();
+
+    public void removeFriend(User friend) {
+        this.friends.remove(friend);
+        friend.getFriends().remove(this);
+    }
 
 
     public User(Long id) {
