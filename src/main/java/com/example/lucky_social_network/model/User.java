@@ -62,6 +62,7 @@ public class User {
     )
     private Set<User> friends = new HashSet<>();
 
+
     public void removeFriend(User friend) {
         this.friends.remove(friend);
         friend.getFriends().remove(this);
