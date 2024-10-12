@@ -188,7 +188,6 @@
     </nav>
   </div>
 </header>
-
 <div class="main-container">
   <div class="content-container">
     <h1 class="mb-4">Список друзей</h1>
@@ -208,9 +207,11 @@
                  alt="avatar" class="rounded-circle" width="50" height="50">
           </div>
 
-          <!-- Имя друга -->
+          <!-- Имя друга с ссылкой на профиль -->
           <div class="ml-3 flex-grow-1">
-            <h5 th:text="${friend.username}" class="mb-0"></h5>
+            <h5 class="mb-0">
+              <a th:href="@{/profile/{userId}(userId=${friend.id})}" th:text="${friend.username}" class="text-decoration-none"></a>
+            </h5>
             <p th:text="${friend.getDateOfBirth()}" class="mb-0 text-muted"></p>
           </div>
 

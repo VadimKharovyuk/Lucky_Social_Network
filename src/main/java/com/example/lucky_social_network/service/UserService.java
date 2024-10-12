@@ -96,4 +96,13 @@ public User registerNewUser(User user) {
         return user.getFriends();
     }
 
+    public User getUserProfileById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+    }
+
+    public boolean areFriends(Long userId1, Long userId2) {
+        User user1 = getUserById(userId1);
+        return user1.getFriends().stream().anyMatch(friend -> friend.getId().equals(userId2));
+    }
 }

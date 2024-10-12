@@ -154,7 +154,7 @@
 
     <div th:each="user : ${users}" class="user-item">
       <div class="d-flex justify-content-between align-items-center">
-        <span th:text="${user.username}"></span>
+        <a th:href="@{/profile/{userId}(userId=${user.id})}" th:text="${user.username}" class="text-decoration-none"></a>
         <form th:if="${user.id != currentUserId}" th:action="@{/users/addFriend}" method="post">
           <input type="hidden" name="userId" th:value="${currentUserId}" />
           <input type="hidden" name="friendId" th:value="${user.id}" />
