@@ -302,6 +302,7 @@
       <div class="user-info">
         <h3 th:text="${user.username}"></h3>
         <p class="user-gender" th:text="${user.getGender()}"></p>
+        <span th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}"></span>
         <p class="user-bio" th:text="${user.getBio()}"></p>
         <a class="view-profile" th:href="@{/profile/{id}(id=${user.id})}">Посмотреть профиль</a>
       </div>
