@@ -26,23 +26,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserListController {
     private final UserService userService;
-    private final ChatService chatService;
 
-    @PostMapping("/delete/{friendId}")
-    public String removeFriend(@PathVariable Long friendId,
-                               @AuthenticationPrincipal UserDetails userDetails,
-                               RedirectAttributes redirectAttributes) {
-        try {
-            Long userId = ((CustomUserDetails) userDetails).getId();
-            userService.removeFriend(userId, friendId);
-            redirectAttributes.addFlashAttribute("message", "Друг успешно удален");
-        } catch (UserNotFoundException | FriendshipNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Произошла ошибка при удалении друга");
-        }
-        return "redirect:/users/friends";
-    }
+
 
     @PostMapping("/addFriend")
     public String addFriend(@RequestParam Long userId, @RequestParam Long friendId, RedirectAttributes redirectAttributes) {
@@ -82,6 +67,22 @@ public String getFriends(Model model) {
     model.addAttribute("currentUserId", currentUserId); // Добавляем ID текущего пользователя в модель
     return "friendsList"; // Возвращаем имя шаблона
 }
+
+    @PostMapping("/delete/{friendId}")
+    public String removeFriend(@PathVariable Long friendId,
+                               @AuthenticationPrincipal UserDetails userDetails,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            Long userId = ((CustomUserDetails) userDetails).getId();
+            userService.removeFriend(userId, friendId);
+            redirectAttributes.addFlashAttribute("message", "Друг успешно удален");
+        } catch (UserNotFoundException | FriendshipNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Произошла ошибка при удалении друга");
+        }
+        return "redirect:/users/friends";
+    }
 
 
 

@@ -142,11 +142,15 @@
             <p th:text="${user.location}">Location</p>
           </div>
         </div>
+
         <div class="action-buttons">
           <!-- Кнопка "Добавить в друзья" видна только если пользователи не друзья и это не профиль текущего пользователя -->
-          <a th:if="${!areFriends && user.id != currentUser.id}"
-             th:href="@{/friends/add/{id}(id=${user.id})}"
-             class="btn btn-primary btn-block mb-2">Добавить в друзья</a>
+          <form th:if="${!user.friends.contains(currentUser) && user.id != currentUser.id}"
+                th:action="@{/users/addFriend}" method="post">
+            <input type="hidden" name="userId" th:value="${currentUser.id}">
+            <input type="hidden" name="friendId" th:value="${user.id}">
+            <button type="submit" class="btn btn-primary btn-block mb-2">Добавить в друзья</button>
+          </form>
 
           <!-- Кнопка "Написать сообщение" видна только если это не профиль текущего пользователя -->
           <a th:if="${user.id != currentUser.id}"
