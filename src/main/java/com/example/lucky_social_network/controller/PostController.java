@@ -6,6 +6,8 @@ import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.PostService;
 import com.example.lucky_social_network.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 @Slf4j
 @Controller
@@ -31,27 +34,27 @@ public class PostController {
 
     @PostMapping("/create")
     public String createPost(@ModelAttribute PostCreationDto postDto,
-                             @RequestParam("userId") Long userId,
-                             RedirectAttributes redirectAttributes) {
+                             @RequestParam("userId") Long userId) {
         User currentUser = userService.getUserById(userId);
-        if (currentUser == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Пользователь не найден");
-            return "redirect:/login";
-        }
-        try {
-            postService.createPost(currentUser, postDto.getContent());
-            redirectAttributes.addFlashAttribute("successMessage", "Пост успешно создан");
-            return "redirect:/profile/" + currentUser.getId();
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid input for post creation", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "Неверные данные для создания поста");
-            return "redirect:/profile/" + currentUser.getId();
-        } catch (Exception e) {
-            log.error("Unexpected error while creating post", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "Произошла ошибка при создании поста");
-            return "redirect:/error";
-        }
+
+        postService.createPost(currentUser, postDto.getContent());
+
+        return "redirect:/profile/" + userId;
     }
+
+    @PostMapping("/delete/{postId}")
+    public String deletePost(@PathVariable Long postId,
+                             HttpServletRequest request) throws AccessDeniedException {
+            Long currentUserId = getCurrentUserId();
+            postService.deletePost(postId, currentUserId);
+
+        String referer = request.getHeader("Referer");
+        return "redirect:" + (referer != null ? referer : "/");
+    }
+
+
+
+
 
 
     @GetMapping
@@ -66,11 +69,6 @@ public class PostController {
         return "posts/view";
     }
 
-//    @PostMapping("/create")
-//    public String createPost(@ModelAttribute Post post, @AuthenticationPrincipal User currentUser) {
-//        postService.createPost(currentUser, post.getContent());
-//        return "redirect:/profile/" + currentUser.getId();
-//    }
 
     @GetMapping("/user/{userId}")
     public String getUserPosts(@PathVariable Long userId, Model model) {
@@ -79,8 +77,6 @@ public class PostController {
         model.addAttribute("userPosts", userPosts);
         return "posts/user-posts";
     }
-
-
 
 
 
@@ -96,11 +92,7 @@ public class PostController {
         return "redirect:/posts/" + id;
     }
 
-    @PostMapping("/{id}/delete")
-    public String deletePost(@PathVariable Long id) {
-        postService.deletePost(id);
-        return "redirect:/posts";
-    }
+
 
     @PostMapping("/{id}/like")
     public String likePost(@PathVariable Long id) {
@@ -109,13 +101,6 @@ public class PostController {
     }
 
 
-
-
-    @GetMapping("/create")
-    public String createPostForm(Model model) {
-        model.addAttribute("post", new Post());
-        return "posts/create";
-    }
 
     private Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

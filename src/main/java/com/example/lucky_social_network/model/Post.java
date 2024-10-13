@@ -25,7 +25,7 @@ public class Post {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @Column(nullable = false)
+    @Column(nullable = false , length = 600)
     private String content;
 
     @Column(nullable = false)

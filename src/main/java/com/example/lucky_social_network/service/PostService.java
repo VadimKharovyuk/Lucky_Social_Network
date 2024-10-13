@@ -3,10 +3,12 @@ package com.example.lucky_social_network.service;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.PostRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -45,14 +47,19 @@ public class PostService {
         return postRepository.save(post);
     }
 
+
     @Transactional
-    public void deletePost(Long id) {
-        postRepository.deleteById(id);
+    public void deletePost(Long postId, Long userId) throws AccessDeniedException {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+        if (!post.getAuthor().getId().equals(userId)) {
+            throw new AccessDeniedException("You don't have permission to delete this post");
+        }
+
+        postRepository.delete(post);
     }
 
-    public List<Post> getRecentPosts(int limit) {
-        return postRepository.findTopNOrderByTimestampDesc(limit);
-    }
 
     @Transactional
     public void incrementLikeCount(Post post) {
@@ -68,7 +75,4 @@ public class PostService {
         }
     }
 
-    public Long getLikeCount(Post post) {
-        return post.getLikeCount();
-    }
 }
