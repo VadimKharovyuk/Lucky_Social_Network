@@ -47,6 +47,8 @@ public class User {
 
     private Boolean isPrivate;
     private LocalDateTime lastLogin;
+
+
     private String location;
 
 

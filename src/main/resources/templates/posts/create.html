@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Post</title>
+</head>
+<body>
+<h1>Create New Post</h1>
+<form th:action="@{/posts/create}" method="post">
+    <textarea name="content" rows="4" cols="50" required></textarea><br>
+    <button type="submit">Create Post</button>
+</form>
+<a href="/posts">Back to All Posts</a>
+</body>
+</html>

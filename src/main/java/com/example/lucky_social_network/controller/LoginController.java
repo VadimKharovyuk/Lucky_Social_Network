@@ -40,10 +40,7 @@ public class LoginController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = userService.findByUsername(username);
-            user.setLastLogin(LocalDateTime.now());
-
-            // Обновляем пользователя, не меняя семейное положение и партнера
-            userService.updateUser(user, null, null);
+            userService.updateLastLogin(user);
 
             return "redirect:/home";
         } catch (Exception e) {

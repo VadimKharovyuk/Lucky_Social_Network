@@ -418,6 +418,10 @@
             <div class="profile-info">
                 <div class="profile-name" th:text="${user.username}">Сергей Ситников</div>
                 <div class="profile-status">Online</div>
+
+<!--                <p th:if="${user.lastLogin != null}">-->
+<!--                    Последний вход: <span th:text="${#temporals.format(user.lastLogin, 'dd.MM.yyyy HH:mm')}"></span>-->
+<!--                </p>-->
                 <div class="profile-details">
                     <div>День рождения: <span th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}"></span></div>
                     <div>Город: <span th:text="${user.location}"></span></div>
@@ -457,15 +461,37 @@
             </div>
         </div>
 
-        <div class="posts-container">
+        <!-- Форма создания поста (только для владельца профиля) -->
+        <!-- Форма создания поста (только для владельца профиля) -->
+        <div class="posts-container" th:if="${currentUser != null && currentUser.id == user.id}">
             <div class="post-form">
-                <form th:action="@{/posts/create}" method="post">
-                    <textarea name="content" class="post-input" placeholder="Что у вас нового?"></textarea>
+                <form th:action="@{/posts/create}" method="post" th:object="${postCreationDto}">
+                    <input type="hidden" name="userId" th:value="${currentUser.id}" />
+                    <textarea th:field="*{content}" class="post-input" placeholder="Что у вас нового?"></textarea>
                     <div class="post-submit">
                         <button type="submit" class="btn btn-primary">Опубликовать</button>
                     </div>
                 </form>
             </div>
+        </div>
+
+        <!-- Отображение постов пользователя -->
+        <div th:fragment="userPosts">
+            <h2>Посты пользователя</h2>
+            <div th:if="${userPosts != null and not #lists.isEmpty(userPosts)}">
+                <div th:each="post : ${userPosts}" class="post">
+                    <div class="post-content" th:text="${post.content}"></div>
+                    <div class="post-meta">
+                        <span class="post-timestamp" th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span>
+                        <span class="post-likes" th:text="${'Лайки: ' + post.likeCount}"></span>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${userPosts == null or #lists.isEmpty(userPosts)}">
+                <p>У пользователя пока нет постов.</p>
+            </div>
+        </div>
+        </div>
 <!--            <div class="posts-list">-->
 <!--                <div class="post-item">-->
 <!--                    <div class="post-author">Сергей Ситников</div>-->

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -37,17 +38,15 @@ public class UserService {
         existingUser.setBio(user.getBio());
         existingUser.setDateOfBirth(user.getDateOfBirth());
         existingUser.setLocation(user.getLocation());
-        existingUser.setLastLogin(user.getLastLogin());
+
 
         // Обновляем семейное положение
-        if (relationshipStatus != null) {
-            if (!relationshipStatus.isEmpty()) {
-                existingUser.setRelationshipStatus(new ArrayList<>(Arrays.asList(relationshipStatus)));
-            } else {
-                existingUser.setRelationshipStatus(new ArrayList<>());
-            }
-        }
 
+        if (relationshipStatus != null) {
+            existingUser.setRelationshipStatus(relationshipStatus.isEmpty()
+                    ? new ArrayList<>()
+                    : new ArrayList<>(Collections.singletonList(relationshipStatus)));
+        }
         // Обновляем партнера
         if (partnerId != null) {
             User partner = userRepository.findById(partnerId)
@@ -57,7 +56,15 @@ public class UserService {
             existingUser.setPartner(null);
         }
 
+
         return userRepository.save(existingUser);
+    }
+
+    public void updateLastLogin(User user) {
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        existingUser.setLastLogin(LocalDateTime.now());
+        userRepository.save(existingUser);
     }
 
 

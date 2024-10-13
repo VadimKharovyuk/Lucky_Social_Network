@@ -1,10 +1,14 @@
 package com.example.lucky_social_network.controller;
 
+import com.example.lucky_social_network.dto.PostCreationDto;
+import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.RelationshipStatusConstants;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.CustomUserDetails;
+import com.example.lucky_social_network.service.PostService;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -13,31 +17,34 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-
+import java.util.List;
+@Slf4j
 @Controller
 @RequestMapping("/profile")
 @RequiredArgsConstructor
 public class ProfileController {
 
     private final UserService userService;
+    private final PostService postService;
 
 
     //профиль по id
     @GetMapping("/{userId}")
     public String getUserProfile(@PathVariable Long userId, Model model) {
         User user = userService.getUserProfileById(userId);
-
-        // Получаем ID текущего пользователя
         Long currentUserId = getCurrentUserId();
-
-        // Получаем текущего пользователя
         User currentUser = userService.getUserById(currentUserId);
-        model.addAttribute("currentUser", currentUser);
 
-        // Проверяем, являются ли пользователи друзьями
         boolean areFriends = userService.areFriends(currentUserId, userId);
+        List<Post> userPosts = postService.getPostsByAuthor(user);
+
+
+        model.addAttribute("currentUser", currentUser);
         model.addAttribute("areFriends", areFriends);
         model.addAttribute("user", user);
+        model.addAttribute("postCreationDto", new PostCreationDto());
+        model.addAttribute("userPosts", userPosts);
+
         return "user-profile";
     }
 //профиль пользователя
@@ -50,25 +57,6 @@ public class ProfileController {
     }
 
 //обновиить профиль
-//    @PostMapping("/update")
-//    public String updateProfile(@ModelAttribute User updatedUser, @RequestParam("avatarFile") MultipartFile avatarFile) throws IOException {
-//        User existingUser = userService.getUserById(updatedUser.getId());
-//
-//        // Обновляем только измененные поля
-//        existingUser.setEmail(updatedUser.getEmail());
-//        existingUser.setPhone(updatedUser.getPhone());
-//        existingUser.setBio(updatedUser.getBio());
-//        existingUser.setDateOfBirth(updatedUser.getDateOfBirth());
-//        existingUser.setLocation(updatedUser.getLocation());
-//
-//
-//        // Если пользователь загрузил новый аватар, обновляем его
-//        if (!avatarFile.isEmpty()) {
-//            existingUser.setAvatar(avatarFile.getBytes());
-//        }
-//        userService.updateUser(existingUser);
-//        return "redirect:/profile";
-//    }
 @PostMapping("/update")
 public String updateProfile(@ModelAttribute User updatedUser,
                             @RequestParam("avatarFile") MultipartFile avatarFile,
