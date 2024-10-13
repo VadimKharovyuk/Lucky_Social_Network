@@ -8,7 +8,9 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -81,4 +83,14 @@ public class User {
         MALE,
         FEMALE
     }
+
+    @ElementCollection
+    @CollectionTable(name = "user_relationship_status", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "status")
+    private List<String> relationshipStatus = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "partner_id")
+    private User partner;
+
 }

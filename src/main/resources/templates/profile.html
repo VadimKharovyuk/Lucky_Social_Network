@@ -39,6 +39,18 @@
       background-color: #166fe5;
       color: #fff;
     }
+    .form-group select {
+      width: 100%;
+      padding: .375rem .75rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: .25rem;
+      transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
   </style>
 </head>
 <body>
@@ -75,6 +87,31 @@
             <label for="location">Местоположение:</label>
             <input type="text" class="form-control" id="location" th:field="${user.location}">
           </div>
+
+          <!-- Новые поля для семейного положения и партнера -->
+          <div class="form-group">
+            <label for="relationshipStatus">Семейное положение:</label>
+            <select class="form-control" id="relationshipStatus" name="relationshipStatus">
+              <option value="">Выберите семейное положение</option>
+              <option th:each="status : ${relationshipStatuses}"
+                      th:value="${status}"
+                      th:text="${status}"
+                      th:selected="${user.relationshipStatus != null and user.relationshipStatus.contains(status)}">
+              </option>
+            </select>
+          </div>
+          <div class="form-group" id="partnerSelectGroup" style="display: none;">
+            <label for="partnerSelect">Партнер:</label>
+            <select class="form-control" id="partnerSelect" name="partnerId">
+              <option value="">Выберите партнера</option>
+              <option th:each="friend : ${user.friends}"
+                      th:value="${friend.id}"
+                      th:text="${friend.username}"
+                      th:selected="${user.partner != null and user.partner.id == friend.id}">
+              </option>
+            </select>
+          </div>
+
           <div class="form-group">
             <label for="avatarFile">Изменить аватар:</label>
             <input type="file" class="form-control-file" id="avatarFile" name="avatarFile">
@@ -88,5 +125,16 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  document.getElementById('relationshipStatus').addEventListener('change', function() {
+    var partnerSelectGroup = document.getElementById('partnerSelectGroup');
+    if (this.value === 'Женат/Замужем' || this.value === 'В отношениях') {
+      partnerSelectGroup.style.display = 'block';
+    } else {
+      partnerSelectGroup.style.display = 'none';
+      document.getElementById('partnerSelect').value = '';
+    }
+  });
+</script>
 </body>
 </html>

@@ -28,7 +28,6 @@ public class LoginController {
     public String showLoginForm() {
         return "login";
     }
-
     @PostMapping("/login")
     public String processLogin(@RequestParam String username,
                                @RequestParam String password,
@@ -42,14 +41,38 @@ public class LoginController {
 
             User user = userService.findByUsername(username);
             user.setLastLogin(LocalDateTime.now());
-            userService.updateUser(user);
 
-            return "redirect:/";
+            // Обновляем пользователя, не меняя семейное положение и партнера
+            userService.updateUser(user, null, null);
+
+            return "redirect:/home";
         } catch (Exception e) {
             model.addAttribute("error", "Неверное имя пользователя или пароль");
             return "login";
         }
     }
+
+//    @PostMapping("/login")
+//    public String processLogin(@RequestParam String username,
+//                               @RequestParam String password,
+//                               Model model) {
+//        try {
+//            Authentication authentication = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(username, password)
+//            );
+//
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//            User user = userService.findByUsername(username);
+//            user.setLastLogin(LocalDateTime.now());
+//            userService.updateUser(user);
+//
+//            return "redirect:/home";
+//        } catch (Exception e) {
+//            model.addAttribute("error", "Неверное имя пользователя или пароль");
+//            return "login";
+//        }
+//    }
 
     @GetMapping("/logout")
     public String logout() {

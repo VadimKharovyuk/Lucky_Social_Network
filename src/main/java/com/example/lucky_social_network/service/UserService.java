@@ -13,30 +13,54 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MessageRepository messageRepository;
 
 
-    public User updateUser(User user) {
-        return userRepository.save(user);
-    }
-
-//    public User registerNewUser(User user) {
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        user.setCreatedAt(LocalDate.now());
-//        user.setEmailVerified(false);
-//        user.setIsPrivate(false);
+//    public User updateUser(User user) {
 //        return userRepository.save(user);
 //    }
+
+    public User updateUser(User user, String relationshipStatus, Long partnerId) {
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Обновляем основные поля
+        existingUser.setEmail(user.getEmail());
+        existingUser.setPhone(user.getPhone());
+        existingUser.setBio(user.getBio());
+        existingUser.setDateOfBirth(user.getDateOfBirth());
+        existingUser.setLocation(user.getLocation());
+        existingUser.setLastLogin(user.getLastLogin());
+
+        // Обновляем семейное положение
+        if (relationshipStatus != null) {
+            if (!relationshipStatus.isEmpty()) {
+                existingUser.setRelationshipStatus(new ArrayList<>(Arrays.asList(relationshipStatus)));
+            } else {
+                existingUser.setRelationshipStatus(new ArrayList<>());
+            }
+        }
+
+        // Обновляем партнера
+        if (partnerId != null) {
+            User partner = userRepository.findById(partnerId)
+                    .orElseThrow(() -> new RuntimeException("Partner not found"));
+            existingUser.setPartner(partner);
+        } else {
+            existingUser.setPartner(null);
+        }
+
+        return userRepository.save(existingUser);
+    }
+
+
 public User registerNewUser(User user) {
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     user.setCreatedAt(LocalDate.now());

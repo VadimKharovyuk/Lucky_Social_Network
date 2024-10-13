@@ -72,14 +72,14 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/", "/chat/send", "/register",
-                                "/login", "/css/**","/home","/profile-list",
+                                "/login", "/css/**","/","/profile-list",
                                 "/js/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl("/home")
                         .permitAll()
                 )
                 .logout((logout) -> logout

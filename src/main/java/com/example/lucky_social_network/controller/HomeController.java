@@ -21,6 +21,16 @@ public class HomeController {
 
     @GetMapping
     public String home(Model model) {
+        List<User> userList= userService.getAllUsers();
+        model.addAttribute("userList", userList);
+
+        return "homePage";
+//        return "home";
+    }
+
+    @GetMapping("/home")
+    public String homePage(Model model ) {
+
         // Получаем ID текущего пользователя
         Long currentUserId = getCurrentUserId();
 
@@ -29,13 +39,11 @@ public class HomeController {
 
         // Добавляем пользователя в модель
         model.addAttribute("currentUser", currentUser);
+
+
+//        return "homePage";
         return "home";
-    }
-    @GetMapping("/home")
-    public String homePage(Model model ) {
-       List<User> userList= userService.getAllUsers();
-       model.addAttribute("userList", userList);
-        return "homePage";
+
     }
 
     @GetMapping("/profile-list")

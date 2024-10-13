@@ -1,5 +1,6 @@
 package com.example.lucky_social_network.controller;
 
+import com.example.lucky_social_network.model.RelationshipStatusConstants;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.UserService;
@@ -43,29 +44,44 @@ public class ProfileController {
     @GetMapping
     public String getProfile(Authentication authentication, Model model) {
         User user = userService.findByUsername(authentication.getName());
+        model.addAttribute("relationshipStatuses", RelationshipStatusConstants.getAllStatuses());
         model.addAttribute("user", user);
         return "profile";
     }
 
 //обновиить профиль
-    @PostMapping("/update")
-    public String updateProfile(@ModelAttribute User updatedUser, @RequestParam("avatarFile") MultipartFile avatarFile) throws IOException {
-        User existingUser = userService.getUserById(updatedUser.getId());
-
-        // Обновляем только измененные поля
-        existingUser.setEmail(updatedUser.getEmail());
-        existingUser.setPhone(updatedUser.getPhone());
-        existingUser.setBio(updatedUser.getBio());
-        existingUser.setDateOfBirth(updatedUser.getDateOfBirth());
-        existingUser.setLocation(updatedUser.getLocation());
-
-        // Если пользователь загрузил новый аватар, обновляем его
-        if (!avatarFile.isEmpty()) {
-            existingUser.setAvatar(avatarFile.getBytes());
-        }
-        userService.updateUser(existingUser);
-        return "redirect:/profile";
+//    @PostMapping("/update")
+//    public String updateProfile(@ModelAttribute User updatedUser, @RequestParam("avatarFile") MultipartFile avatarFile) throws IOException {
+//        User existingUser = userService.getUserById(updatedUser.getId());
+//
+//        // Обновляем только измененные поля
+//        existingUser.setEmail(updatedUser.getEmail());
+//        existingUser.setPhone(updatedUser.getPhone());
+//        existingUser.setBio(updatedUser.getBio());
+//        existingUser.setDateOfBirth(updatedUser.getDateOfBirth());
+//        existingUser.setLocation(updatedUser.getLocation());
+//
+//
+//        // Если пользователь загрузил новый аватар, обновляем его
+//        if (!avatarFile.isEmpty()) {
+//            existingUser.setAvatar(avatarFile.getBytes());
+//        }
+//        userService.updateUser(existingUser);
+//        return "redirect:/profile";
+//    }
+@PostMapping("/update")
+public String updateProfile(@ModelAttribute User updatedUser,
+                            @RequestParam("avatarFile") MultipartFile avatarFile,
+                            @RequestParam(required = false) String relationshipStatus,
+                            @RequestParam(required = false) Long partnerId) throws IOException {
+    // Если пользователь загрузил новый аватар, обновляем его
+    if (!avatarFile.isEmpty()) {
+        updatedUser.setAvatar(avatarFile.getBytes());
     }
+
+    userService.updateUser(updatedUser, relationshipStatus, partnerId);
+    return "redirect:/profile";
+}
 
 
 
