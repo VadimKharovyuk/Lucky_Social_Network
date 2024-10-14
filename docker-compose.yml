@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "1050:1050"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/Lucky_Social_Network
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=19111993
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=Lucky_Social_Network
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=19111993
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
