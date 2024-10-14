@@ -5,12 +5,16 @@ import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.PostService;
+import com.example.lucky_social_network.service.SubscriptionService;
 import com.example.lucky_social_network.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.awt.print.Pageable;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 @Slf4j
@@ -29,28 +34,47 @@ public class PostController {
 
     private final PostService postService;
     private final UserService userService;
-
+    private final SubscriptionService subscriptionService;
 
 
     @PostMapping("/create")
     public String createPost(@ModelAttribute PostCreationDto postDto,
                              @RequestParam("userId") Long userId) {
         User currentUser = userService.getUserById(userId);
-
         postService.createPost(currentUser, postDto.getContent());
-
         return "redirect:/profile/" + userId;
     }
 
     @PostMapping("/delete/{postId}")
     public String deletePost(@PathVariable Long postId,
                              HttpServletRequest request) throws AccessDeniedException {
-            Long currentUserId = getCurrentUserId();
-            postService.deletePost(postId, currentUserId);
-
+        Long currentUserId = getCurrentUserId();
+        postService.deletePost(postId, currentUserId);
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/");
     }
+
+    @PostMapping("/subscribe/{followeeId}")
+    public ResponseEntity<?> subscribe(@PathVariable Long followeeId) {
+        Long currentUserId = getCurrentUserId();
+        subscriptionService.subscribe(currentUserId, followeeId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/unsubscribe/{followeeId}")
+    public ResponseEntity<?> unsubscribe(@PathVariable Long followeeId) {
+        Long currentUserId = getCurrentUserId();
+        subscriptionService.unsubscribe(currentUserId, followeeId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/news-feed")
+    public ResponseEntity<Page<Post>> getNewsFeed(@PageableDefault(size = 20) Pageable pageable) {
+        Long currentUserId = getCurrentUserId();
+        Page<Post> newsFeed = subscriptionService.getNewsFeed(currentUserId, (org.springframework.data.domain.Pageable) pageable);
+        return ResponseEntity.ok(newsFeed);
+    }
+
 
 
 

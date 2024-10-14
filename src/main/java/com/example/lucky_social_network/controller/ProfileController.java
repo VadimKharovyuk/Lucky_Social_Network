@@ -5,6 +5,7 @@ import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.RelationshipStatusConstants;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.CustomUserDetails;
+import com.example.lucky_social_network.service.LikeService;
 import com.example.lucky_social_network.service.PostService;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 @Slf4j
 @Controller
 @RequestMapping("/profile")
@@ -26,6 +31,7 @@ public class ProfileController {
 
     private final UserService userService;
     private final PostService postService;
+    private final LikeService likeService;
 
 
     //профиль по id

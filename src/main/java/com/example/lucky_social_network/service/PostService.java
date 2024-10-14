@@ -5,6 +5,7 @@ import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,12 +13,11 @@ import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-
     @Transactional
     public Post createPost(User author, String content) {
         Post post = new Post();
@@ -64,15 +64,17 @@ public class PostService {
     @Transactional
     public void incrementLikeCount(Post post) {
         post.setLikeCount(post.getLikeCount() + 1);
-        postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        log.info("Incremented like count for post {}: {}", savedPost.getId(), savedPost.getLikeCount());
     }
 
     @Transactional
     public void decrementLikeCount(Post post) {
         if (post.getLikeCount() > 0) {
             post.setLikeCount(post.getLikeCount() - 1);
-            postRepository.save(post);
+            Post savedPost = postRepository.save(post);
+            log.info("Decremented like count for post {}: {}", savedPost.getId(), savedPost.getLikeCount());
         }
-    }
 
+    }
 }

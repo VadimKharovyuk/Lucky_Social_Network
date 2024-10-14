@@ -88,50 +88,56 @@
       </div>
     </aside>
 
-    <main class="col-md-6">
-      <div class="content-section">
-        <h2>Создать пост</h2>
-        <form>
-          <div class="mb-3">
-            <textarea class="form-control" rows="3" placeholder="Что у вас нового?"></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Опубликовать</button>
-        </form>
-      </div>
 
-      <div class="content-section">
-        <h2>Истории</h2>
-        <div class="story-container">
-          <div class="story" style="background-image: url('https://via.placeholder.com/120x200');">
-            <div class="story-title">История 1</div>
-          </div>
-          <div class="story" style="background-image: url('https://via.placeholder.com/120x200');">
-            <div class="story-title">История 2</div>
-          </div>
-          <div class="story" style="background-image: url('https://via.placeholder.com/120x200');">
-            <div class="story-title">История 3</div>
-          </div>
-        </div>
-      </div>
 
-      <div class="content-section">
-        <h2>Лента новостей</h2>
-        <div class="card mb-3">
-          <div class="card-body">
-            <div class="d-flex align-items-center mb-3">
-              <img src="https://via.placeholder.com/40" alt="Profile" class="profile-pic me-2">
-              <h5 class="card-title mb-0">Пользователь 1</h5>
-            </div>
-            <p class="card-text">Это пример поста в ленте новостей. Здесь пользователи могут делиться своими мыслями, фотографиями и видео.</p>
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-outline-primary btn-sm"><i class="fas fa-thumbs-up me-1"></i>Нравится</button>
-              <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-comment me-1"></i>Комментировать</button>
-              <button class="btn btn-outline-info btn-sm"><i class="fas fa-share me-1"></i>Поделиться</button>
+
+
+      <main class="col-md-6">
+        <div class="content-section">
+          <h2>Лента новостей</h2>
+          <div th:if="${newsFeed.empty}" class="alert alert-info">
+            В вашей ленте новостей пока нет постов. Подпишитесь на других пользователей, чтобы видеть их публикации.
+          </div>
+          <div th:each="post : ${newsFeed.content}" class="card mb-3">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <img th:if="${post.author.avatar}" th:src="@{'/user-photos/' + ${post.author.id} + '/avatar'}" alt="Profile" class="profile-pic me-2">
+                <img th:unless="${post.author.avatar}" src="https://via.placeholder.com/40" alt="Profile" class="profile-pic me-2">
+                <h5 class="card-title mb-0" th:text="${post.author.username}">Пользователь</h5>
+              </div>
+              <p class="card-text" th:text="${post.content}">Содержание поста</p>
+              <div class="d-flex justify-content-between">
+                <form th:action="@{'/posts/' + ${post.id} + '/like'}" method="post">
+                  <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-thumbs-up me-1"></i>Нравится (<span th:text="${post.likeCount}">0</span>)
+                  </button>
+                </form>
+                <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-comment me-1"></i>Комментировать</button>
+                <button class="btn btn-outline-info btn-sm"><i class="fas fa-share me-1"></i>Поделиться</button>
+              </div>
             </div>
           </div>
+          <nav th:if="${newsFeed.totalPages > 1}" aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" th:classappend="${newsFeed.first ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/home(page=${newsFeed.number - 1})}" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, newsFeed.totalPages - 1)}"
+                  th:classappend="${pageNumber == newsFeed.number ? 'active' : ''}">
+                <a class="page-link" th:href="@{/home(page=${pageNumber})}" th:text="${pageNumber + 1}"></a>
+              </li>
+              <li class="page-item" th:classappend="${newsFeed.last ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/home(page=${newsFeed.number + 1})}" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
         </div>
-      </div>
-    </main>
+      </main>
+
 
     <aside class="col-md-3">
       <div class="sidebar">

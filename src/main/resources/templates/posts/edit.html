@@ -1,14 +1,135 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Edit Post</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Edit Post</h1>-->
+<!--<form th:action="@{/posts/{id}/edit(id=${post.id})}" method="post" th:if="${post}">-->
+<!--    <textarea name="content" rows="4" cols="50" th:text="${post.content}" required></textarea><br>-->
+<!--    <button type="submit">Update Post</button>-->
+<!--</form>-->
+<!--<a th:href="@{/posts/{id}(id=${post.id})}">Cancel</a>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Post</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 1rem 0;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+        .nav-links li {
+            margin-left: 20px;
+        }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: #3498db;
+        }
+        main {
+            padding: 2rem 0;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        form {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .cancel-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .cancel-link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-<h1>Edit Post</h1>
-<form th:action="@{/posts/{id}/edit(id=${post.id})}" method="post" th:if="${post}">
-    <textarea name="content" rows="4" cols="50" th:text="${post.content}" required></textarea><br>
-    <button type="submit">Update Post</button>
-</form>
-<a th:href="@{/posts/{id}(id=${post.id})}">Cancel</a>
+<header>
+    <div class="container">
+        <nav>
+            <div class="logo">Lucky Social Network</div>
+            <ul class="nav-links">
+                <li><a href="/home">Главная</a></li>
+                <li><a href="/profile">Профиль</a></li>
+                <li><a href="/">Сообщения</a></li>
+                <li><a href="#settings">Настройки</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <h1>Edit Post</h1>
+    <form th:action="@{/posts/{id}/edit(id=${post.id})}" method="post" th:if="${post}">
+        <textarea name="content" rows="4" th:text="${post.content}" required></textarea><br>
+        <button type="submit">Update Post</button>
+    </form>
+    <a th:href="@{/posts/{id}(id=${post.id})}" class="cancel-link">Cancel</a>
+</main>
 </body>
 </html>

@@ -95,4 +95,12 @@ public class User {
     @JoinColumn(name = "partner_id")
     private User partner;
 
+
+
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Subscription> subscriptions = new HashSet<>();
+
+    @OneToMany(mappedBy = "followee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Subscription> followers = new HashSet<>();
 }

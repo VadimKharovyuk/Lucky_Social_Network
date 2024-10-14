@@ -22,6 +22,7 @@ import java.util.*;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SubscriptionService subscriptionService;
 
 
 //    public User updateUser(User user) {
@@ -93,6 +94,7 @@ public User registerNewUser(User user) {
     }
 
 
+    @Transactional
     public void addFriend(Long userId, Long friendId) {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
@@ -105,10 +107,14 @@ public User registerNewUser(User user) {
         friend.getFriends().add(user);
 
         user.setFriendsCount(user.getFriendsCount() == null ? 1 : user.getFriendsCount() + 1);
-        friend.setFollowersCount(friend.getFollowersCount() == null ? 1 : friend.getFollowersCount() + 1);
+        friend.setFriendsCount(friend.getFriendsCount() == null ? 1 : friend.getFriendsCount() + 1);
 
         userRepository.save(user);
         userRepository.save(friend);
+
+        // Автоматически подписываем друзей друг на друга
+        subscriptionService.subscribe(userId, friendId);
+        subscriptionService.subscribe(friendId, userId);
     }
 
     @Transactional
