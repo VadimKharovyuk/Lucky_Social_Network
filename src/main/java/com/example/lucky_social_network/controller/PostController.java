@@ -1,27 +1,24 @@
 package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.dto.PostCreationDto;
+import com.example.lucky_social_network.model.Comment;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.PostService;
 import com.example.lucky_social_network.service.SubscriptionService;
 import com.example.lucky_social_network.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.awt.print.Pageable;
 import java.nio.file.AccessDeniedException;
@@ -81,9 +78,24 @@ public class PostController {
 
 
 
+
     @GetMapping
     public String getAllPosts(Model model) {
-        model.addAttribute("posts", postService.getAllPosts());
+        List<Post> posts = postService.getAllPosts();
+        model.addAttribute("posts", posts);
+
+        // Добавляем пустой объект Comment для формы
+        model.addAttribute("newComment", new Comment());
+
+        // Получаем ID текущего пользователя, если он аутентифицирован
+        Long currentUserId = null;
+        try {
+            currentUserId = userService.getCurrentUserId();
+        } catch (IllegalStateException e) {
+            // Пользователь не аутентифицирован, оставляем currentUserId как null
+        }
+        model.addAttribute("currentUserId", currentUserId);
+
         return "posts/list";
     }
 

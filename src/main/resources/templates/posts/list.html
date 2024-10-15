@@ -1,19 +1,3 @@
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--  <title>All Posts</title>-->
-<!--</head>-->
-<!--<body>-->
-<!--<h1>All Posts</h1>-->
-<!--<a href="/posts/create">Create New Post</a>-->
-<!--<div th:each="post : ${posts}">-->
-<!--  <h2><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.content}"></a></h2>-->
-<!--  <p>By: <span th:text="${post.author.username}"></span></p>-->
-<!--  <p>Likes: <span th:text="${post.likeCount}"></span></p>-->
-<!--</div>-->
-<!--</body>-->
-<!--</html>-->
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
@@ -21,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>All Posts</title>
   <style>
+    /* Существующие стили */
     body {
       font-family: Arial, sans-serif;
       line-height: 1.6;
@@ -29,48 +14,59 @@
       padding: 0;
       background-color: #f4f4f4;
     }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
     }
+
     header {
       background-color: #2c3e50;
       color: #fff;
       padding: 1rem 0;
     }
+
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .logo {
       font-size: 1.5rem;
       font-weight: bold;
     }
+
     .nav-links {
       list-style: none;
       display: flex;
     }
+
     .nav-links li {
       margin-left: 20px;
     }
+
     .nav-links a {
       color: #fff;
       text-decoration: none;
       transition: color 0.3s;
     }
+
     .nav-links a:hover {
       color: #3498db;
     }
+
     main {
       padding: 2rem 0;
     }
+
     h1 {
       color: #2c3e50;
       border-bottom: 2px solid #3498db;
       padding-bottom: 10px;
     }
+
     .create-post {
       display: inline-block;
       margin-bottom: 20px;
@@ -81,30 +77,124 @@
       border-radius: 3px;
       transition: background-color 0.3s;
     }
+
     .create-post:hover {
       background-color: #2980b9;
     }
+
     .post {
       background-color: #fff;
       border-radius: 5px;
       padding: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
+
     .post h2 {
       margin-top: 0;
     }
+
     .post h2 a {
       color: #2c3e50;
       text-decoration: none;
       transition: color 0.3s;
     }
+
     .post h2 a:hover {
       color: #3498db;
     }
+
     .post-meta {
       font-size: 0.9em;
       color: #7f8c8d;
+    }
+
+    /* Новые стили для формы комментария и отображения комментариев */
+    .comment-form {
+      margin-top: 20px;
+      background-color: #ecf0f1;
+      padding: 15px;
+      border-radius: 5px;
+    }
+
+    .comment-form textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #bdc3c7;
+      border-radius: 3px;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .comment-form button {
+      display: block;
+      margin-top: 10px;
+      padding: 8px 15px;
+      background-color: #2ecc71;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .comment-form button:hover {
+      background-color: #27ae60;
+    }
+
+    .comments {
+      margin-top: 20px;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+    }
+
+    .comments h3 {
+      margin-top: 0;
+      color: #2c3e50;
+      border-bottom: 1px solid #bdc3c7;
+      padding-bottom: 5px;
+    }
+
+    .comments ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .comments li {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ecf0f1;
+    }
+
+    .comments li:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .comments p {
+      margin: 0 0 5px 0;
+    }
+
+    .comments small {
+      color: #7f8c8d;
+    }
+
+    .delete-comment {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.8em;
+      margin-left: 10px;
+      transition: background-color 0.3s;
+    }
+
+    .delete-comment:hover {
+      background-color: #c0392b;
     }
   </style>
 </head>
@@ -125,11 +215,183 @@
 
 <main class="container">
   <h1>All Posts</h1>
+
   <div th:each="post : ${posts}" class="post">
     <h2><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.content}"></a></h2>
     <p class="post-meta">By: <span th:text="${post.author.username}"></span></p>
     <p class="post-meta">Likes: <span th:text="${post.likeCount}"></span></p>
+
+    <!-- Форма для добавления комментария -->
+    <form th:if="${currentUserId != null}" th:action="@{/comments/add}" method="post" th:object="${newComment}"
+          class="comment-form">
+      <input type="hidden" name="postId" th:value="${post.id}"/>
+      <input type="hidden" name="userId" th:value="${currentUserId}"/>
+      <textarea th:field="*{content}" required placeholder="Add a comment..."></textarea>
+      <button type="submit">Add Comment</button>
+    </form>
+
+    <!-- Сообщение для неаутентифицированных пользователей -->
+    <p th:if="${currentUserId == null}" class="comment-form">Please <a th:href="@{/login}">login</a> to add a comment.
+    </p>
+
+    <!-- Отображение существующих комментариев -->
+    <div class="comments" th:if="${not #lists.isEmpty(post.comments)}">
+      <h3>Comments:</h3>
+      <ul>
+        <li th:each="comment : ${post.comments}">
+          <p th:text="${comment.content}"></p>
+          <small>By: <span th:text="${comment.author.username}"></span></small>
+          <form th:if="${currentUserId == comment.author.id}"
+                th:action="@{/comments/delete/{commentId}(commentId=${comment.id})}"
+                method="post"
+                style="display: inline;">
+            <button type="submit" class="delete-comment">Delete</button>
+          </form>
+        </li>
+
+      </ul>
+    </div>
   </div>
 </main>
 </body>
 </html>
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>All Posts</title>-->
+<!--  <style>-->
+<!--    body {-->
+<!--      font-family: Arial, sans-serif;-->
+<!--      line-height: 1.6;-->
+<!--      color: #333;-->
+<!--      margin: 0;-->
+<!--      padding: 0;-->
+<!--      background-color: #f4f4f4;-->
+<!--    }-->
+<!--    .container {-->
+<!--      max-width: 1200px;-->
+<!--      margin: 0 auto;-->
+<!--      padding: 0 20px;-->
+<!--    }-->
+<!--    header {-->
+<!--      background-color: #2c3e50;-->
+<!--      color: #fff;-->
+<!--      padding: 1rem 0;-->
+<!--    }-->
+<!--    nav {-->
+<!--      display: flex;-->
+<!--      justify-content: space-between;-->
+<!--      align-items: center;-->
+<!--    }-->
+<!--    .logo {-->
+<!--      font-size: 1.5rem;-->
+<!--      font-weight: bold;-->
+<!--    }-->
+<!--    .nav-links {-->
+<!--      list-style: none;-->
+<!--      display: flex;-->
+<!--    }-->
+<!--    .nav-links li {-->
+<!--      margin-left: 20px;-->
+<!--    }-->
+<!--    .nav-links a {-->
+<!--      color: #fff;-->
+<!--      text-decoration: none;-->
+<!--      transition: color 0.3s;-->
+<!--    }-->
+<!--    .nav-links a:hover {-->
+<!--      color: #3498db;-->
+<!--    }-->
+<!--    main {-->
+<!--      padding: 2rem 0;-->
+<!--    }-->
+<!--    h1 {-->
+<!--      color: #2c3e50;-->
+<!--      border-bottom: 2px solid #3498db;-->
+<!--      padding-bottom: 10px;-->
+<!--    }-->
+<!--    .create-post {-->
+<!--      display: inline-block;-->
+<!--      margin-bottom: 20px;-->
+<!--      padding: 10px 15px;-->
+<!--      background-color: #3498db;-->
+<!--      color: #fff;-->
+<!--      text-decoration: none;-->
+<!--      border-radius: 3px;-->
+<!--      transition: background-color 0.3s;-->
+<!--    }-->
+<!--    .create-post:hover {-->
+<!--      background-color: #2980b9;-->
+<!--    }-->
+<!--    .post {-->
+<!--      background-color: #fff;-->
+<!--      border-radius: 5px;-->
+<!--      padding: 20px;-->
+<!--      margin-bottom: 20px;-->
+<!--      box-shadow: 0 2px 5px rgba(0,0,0,0.1);-->
+<!--    }-->
+<!--    .post h2 {-->
+<!--      margin-top: 0;-->
+<!--    }-->
+<!--    .post h2 a {-->
+<!--      color: #2c3e50;-->
+<!--      text-decoration: none;-->
+<!--      transition: color 0.3s;-->
+<!--    }-->
+<!--    .post h2 a:hover {-->
+<!--      color: #3498db;-->
+<!--    }-->
+<!--    .post-meta {-->
+<!--      font-size: 0.9em;-->
+<!--      color: #7f8c8d;-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--  <div class="container">-->
+<!--    <nav>-->
+<!--      <div class="logo">Lucky Social Network</div>-->
+<!--      <ul class="nav-links">-->
+<!--        <li><a href="/">Главная</a></li>-->
+<!--        <li><a href="/home">Профиль</a></li>-->
+<!--        <li><a href="/">Сообщения</a></li>-->
+<!--        <li><a href="#settings">Настройки</a></li>-->
+<!--      </ul>-->
+<!--    </nav>-->
+<!--  </div>-->
+<!--</header>-->
+
+<!--<main class="container">-->
+<!--  <h1>All Posts</h1>-->
+
+<!--  <div th:each="post : ${posts}" class="post">-->
+<!--    <h2><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.content}"></a></h2>-->
+<!--    <p class="post-meta">By: <span th:text="${post.author.username}"></span></p>-->
+<!--    <p class="post-meta">Likes: <span th:text="${post.likeCount}"></span></p>-->
+
+
+<!--    &lt;!&ndash; Форма для добавления комментария &ndash;&gt;-->
+<!--    <form th:if="${currentUserId != null}" th:action="@{/comments/add}" method="post" th:object="${newComment}">-->
+<!--      <input type="hidden" name="postId" th:value="${post.id}"/>-->
+<!--      <input type="hidden" name="userId" th:value="${currentUserId}"/>-->
+<!--      <textarea th:field="*{content}" required placeholder="Add a comment..."></textarea>-->
+<!--      <button type="submit">Add Comment</button>-->
+<!--    </form>-->
+
+<!--    &lt;!&ndash; Отображение существующих комментариев (опционально) &ndash;&gt;-->
+<!--    <div class="comments" th:if="${not #lists.isEmpty(post.comments)}">-->
+<!--      <h3>Comments:</h3>-->
+<!--      <ul>-->
+<!--        <li th:each="comment : ${post.comments}">-->
+<!--          <p th:text="${comment.content}"></p>-->
+<!--          <small>By: <span th:text="${comment.author.username}"></span></small>-->
+<!--        </li>-->
+<!--      </ul>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</main>-->
+<!--</body>-->
+<!--</html>-->

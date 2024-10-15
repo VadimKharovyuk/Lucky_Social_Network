@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Comment</title>
+</head>
+<body>
+<h1>Edit Comment</h1>
+<form th:action="@{/comments/edit/{id}(id=${comment.id})}" method="post">
+    <textarea name="content" th:text="${comment.content}" required></textarea>
+    <button type="submit">Update Comment</button>
+</form>
+</body>
+</html>

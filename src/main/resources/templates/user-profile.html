@@ -301,6 +301,7 @@
                     <div>День рождения: <span th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}"></span>
                     </div>
                     <div>Город: <span th:text="${user.location}"></span></div>
+
                     <div>
                         Семейное положение:
                         <span th:if="${user.relationshipStatus != null and !user.relationshipStatus.isEmpty()}"
@@ -308,6 +309,9 @@
                         <span th:if="${user.relationshipStatus == null or user.relationshipStatus.isEmpty()}">Не указано</span>
                         <span th:if="${user.partner != null}" th:text="' - ' + ${user.partner.username}"></span>
                     </div>
+                    <br>
+                    <br>
+                    <div>О себе : <span th:text="${user.getBio()}"></span></div>
                 </div>
 
                 <div class="profile-actions">
@@ -336,6 +340,8 @@
                 <div class="stat-value" th:text="${user.friendsCount + user.followersCount}">0</div>
                 <div class="stat-label">Контакты</div>
             </div>
+
+
         </div>
         <!-- Форма создания поста (только для владельца профиля) -->
         <div class="posts-container" th:if="${currentUser != null && currentUser.id == user.id}">

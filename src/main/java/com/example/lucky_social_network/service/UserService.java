@@ -7,6 +7,8 @@ import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -187,4 +189,12 @@ public class UserService {
     }
 
 
+    public Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            return userDetails.getId();
+        }
+        throw new IllegalStateException("User not authenticated or CustomUserDetails not found");
+    }
 }
