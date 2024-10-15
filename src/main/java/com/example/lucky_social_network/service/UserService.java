@@ -1,32 +1,33 @@
 package com.example.lucky_social_network.service;
 
+import com.dropbox.core.DbxException;
 import com.example.lucky_social_network.exception.FriendshipNotFoundException;
 import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
-import com.example.lucky_social_network.repository.MessageRepository;
 import com.example.lucky_social_network.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SubscriptionService subscriptionService;
-    private final ImageService imageService;
+    private final DropboxService dropboxService;
 
 
 //    public User updateUser(User user) {
@@ -166,24 +167,23 @@ public class UserService {
     }
 
 
-    @Transactional
-    public void updateAvatar(Long userId, MultipartFile file) throws IOException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        byte[] optimizedImage = imageService.optimizeImage(file);
-        user.setAvatar(optimizedImage);
-        user.setAvatarContentType(file.getContentType());
-
-        userRepository.save(user);
-        log.info("Avatar updated for user: {}", userId);
+    public String getUserAvatarUrl(User user) {
+        if (user.getAvatarDropboxPath() != null) {
+            try {
+                return dropboxService.getTemporaryLink(user.getAvatarDropboxPath());
+            } catch (DbxException e) {
+                // Обработка ошибок
+                log.error("Error getting Dropbox link for avatar: " + e.getMessage());
+                return null; // или URL аватара по умолчанию
+            }
+        }
+        return null; // или URL аватара по умолчанию
     }
 
-    @Transactional
-    public byte[] getUserAvatar(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        return user.getAvatar();
+    public void updateAvatarDropboxPath(Long userId, String dropboxPath) {
+        User user = getUserById(userId);
+        user.setAvatarDropboxPath(dropboxPath);
+        userRepository.save(user);
     }
 
 

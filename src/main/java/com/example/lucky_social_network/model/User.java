@@ -36,11 +36,8 @@ public class User {
     private String bio;
 
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    private byte[] avatar;
-    @Column(name = "avatar_content_type")
-    private String avatarContentType;
+    @Column(name = "avatar_dropbox_path")
+    private String avatarDropboxPath;
 
 
 
@@ -85,6 +82,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Gender gender;
+
 
     public enum Gender {
         MALE,

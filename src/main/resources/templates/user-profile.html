@@ -79,8 +79,8 @@
         }
 
         .profile-avatar {
-            width: 150px;
-            height: 150px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             object-fit: cover;
             margin-right: 20px;
@@ -282,19 +282,17 @@
     <div class="profile-container">
         <div class="profile-header">
             <div class="profile-header">
-                <img th:if="${user.avatar != null}"
-                     th:src="@{'data:image/jpeg;base64,' + ${base64Avatar}}"
+                <img th:if="${user.avatarDropboxPath != null}"
+                     th:src="${avatarUrl}"
                      alt="User Avatar" class="profile-avatar">
             </div>
-            <img th:if="${user.avatar == null}" src="/path/to/default/avatar.jpg" alt="Default Avatar"
-                 class="profile-avatar">
+
+            
             <div class="profile-info">
                 <div class="profile-name" th:text="${user.username}">Сергей Ситников</div>
                 <div class="profile-status">Online</div>
 
-                <!--                <p th:if="${user.lastLogin != null}">-->
-                <!--                    Последний вход: <span th:text="${#temporals.format(user.lastLogin, 'dd.MM.yyyy HH:mm')}"></span>-->
-                <!--                </p>-->
+
                 <div class="profile-details">
                     <div>День рождения: <span th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}"></span>
                     </div>

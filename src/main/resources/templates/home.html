@@ -99,12 +99,14 @@
             В вашей ленте новостей пока нет постов. Подпишитесь на других пользователей, чтобы видеть их публикации.
           </div>
           <div th:each="post : ${newsFeed.content}" class="card mb-3">
+
             <div class="card-body">
-              <div class="d-flex align-items-center mb-3">
-<!--                <img th:if="${post.author.avatar}" th:src="@{'/user-photos/' + ${post.author.id} + '/avatar'}" alt="Profile" class="profile-pic me-2">-->
-                <img th:unless="${post.author.avatar}" src="https://via.placeholder.com/40" alt="Profile" class="profile-pic me-2">
-                <h5 class="card-title mb-0" th:text="${post.author.username}">Пользователь</h5>
+              <div class="profile-avatar">
+                <img th:if="${avatarImage}" th:src="${avatarImage}" alt="User Avatar" class="img-fluid rounded-circle">
+                <img th:unless="${avatarImage}" src="/default-avatar.jpg" alt="Default Avatar" class="img-fluid rounded-circle">
               </div>
+
+              <!-- Остальное содержимое страницы профиля -->
               <p class="card-text" th:text="${post.content}">Содержание поста</p>
               <div class="d-flex justify-content-between">
                 <form th:action="@{'/posts/' + ${post.id} + '/like'}" method="post">

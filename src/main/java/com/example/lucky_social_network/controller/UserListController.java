@@ -3,12 +3,9 @@ package com.example.lucky_social_network.controller;
 import com.example.lucky_social_network.exception.FriendshipNotFoundException;
 import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
-import com.example.lucky_social_network.service.ChatService;
 import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +15,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Controller
@@ -61,11 +60,26 @@ public class UserListController {
 // Поиск друзей текущего пользователя
 @GetMapping("/friends")
 public String getFriends(Model model) {
-    Long currentUserId = getCurrentUserId(); // Получаем ID текущего пользователя
-    Set<User> friends = userService.getFriendsByUser(currentUserId); // Используем ID текущего пользователя
-    model.addAttribute("friends", friends); // Добавляем список друзей в модель
-    model.addAttribute("currentUserId", currentUserId); // Добавляем ID текущего пользователя в модель
-    return "friendsList"; // Возвращаем имя шаблона
+    Long currentUserId = getCurrentUserId();
+    Set<User> friends = userService.getFriendsByUser(currentUserId);
+
+    // Получаем аватары для всех друзей
+    Map<Long, String> friendAvatars = new HashMap<>();
+    for (User friend : friends) {
+        String avatarUrl = userService.getUserAvatarUrl(friend);
+        friendAvatars.put(friend.getId(), avatarUrl);
+    }
+
+    model.addAttribute("friends", friends);
+    model.addAttribute("friendAvatars", friendAvatars);
+    model.addAttribute("currentUserId", currentUserId);
+
+    // Получаем аватар текущего пользователя
+    User currentUser = userService.getUserById(currentUserId);
+    String currentUserAvatarUrl = userService.getUserAvatarUrl(currentUser);
+    model.addAttribute("currentUserAvatarUrl", currentUserAvatarUrl);
+
+    return "friendsList";
 }
 
     @PostMapping("/delete/{friendId}")
