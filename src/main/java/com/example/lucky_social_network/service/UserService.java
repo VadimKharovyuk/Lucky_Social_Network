@@ -25,6 +25,7 @@ public class UserService {
     private final SubscriptionService subscriptionService;
 
 
+
 //    public User updateUser(User user) {
 //        return userRepository.save(user);
 //    }
@@ -159,7 +160,6 @@ public User registerNewUser(User user) {
         User user1 = getUserById(userId1);
         return user1.getFriends().stream().anyMatch(friend -> friend.getId().equals(userId2));
     }
-
 
 
 

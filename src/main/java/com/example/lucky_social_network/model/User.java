@@ -103,4 +103,6 @@ public class User {
 
     @OneToMany(mappedBy = "followee", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Subscription> followers = new HashSet<>();
+
+
 }

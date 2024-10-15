@@ -3,103 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Chats - ConnectHub</title>
+  <title>Ваши чаты - Lucky Social Network</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+    :root {
+      --primary-color: #4a76a8;
+      --secondary-color: #edeef0;
+      --text-color: #2a2f36;
+      --hover-color: #5181b8;
+    }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--secondary-color);
+      color: var(--text-color);
       line-height: 1.6;
-      min-height: 100vh;
     }
+
     .container {
-      width: 85%;
       max-width: 1200px;
-      margin: auto;
-      padding: 2rem 0;
+      margin: 0 auto;
+      padding: 0 20px;
     }
+
     header {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      position: fixed;
-      width: 100%;
-      top: 0;
-      z-index: 1000;
+      background-color: var(--primary-color);
+      color: white;
       padding: 1rem 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .logo {
       font-size: 1.5rem;
-      font-weight: 600;
+      font-weight: 700;
     }
+
     .nav-links {
       display: flex;
-      list-style: none;
+      list-style-type: none;
     }
+
     .nav-links li {
-      margin-left: 2rem;
+      margin-left: 1.5rem;
     }
+
     .nav-links a {
+      color: white;
       text-decoration: none;
-      color: #fff;
-      font-weight: 300;
-      transition: all 0.3s ease;
+      font-weight: 500;
+      transition: color 0.3s ease;
     }
+
     .nav-links a:hover {
-      color: #ffd700;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      color: var(--secondary-color);
     }
+
     main {
-      margin-top: 6rem;
+      padding: 2rem 0;
     }
+
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
-      text-align: center;
-      color: #ffd700;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary-color);
     }
+
     .chat-list {
-      list-style: none;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(5px);
-      border-radius: 10px;
-      padding: 1rem;
+      list-style-type: none;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
+
+
     .chat-list li {
-      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--secondary-color);
     }
+
+    .chat-list li:last-child {
+      border-bottom: none;
+    }
+
     .chat-list a {
       display: block;
-      text-decoration: none;
-      color: #fff;
-      background: rgba(255, 255, 255, 0.1);
       padding: 1rem;
-      border-radius: 5px;
-      transition: all 0.3s ease;
+      color: var(--text-color);
+      text-decoration: none;
+      transition: background-color 0.3s ease;
     }
+
     .chat-list a:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateY(-3px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background-color: var(--secondary-color);
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+
+    /* Новые стили для отступов между чатами */
     .chat-list li {
-      animation: fadeIn 0.5s ease-out forwards;
-      animation-delay: calc(0.1s * var(--i));
+      margin-bottom: 5px;
+    }
+
+    .chat-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .chat-list a {
+      border-radius: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -121,7 +148,7 @@
 <main class="container">
   <h1>Ваши чаты</h1>
   <ul class="chat-list">
-    <li th:each="user, iterStat : ${chatUsers}" th:style="'--i:' + ${iterStat.index}">
+    <li th:each="user, iterStat : ${chatUsers}">
       <a th:href="@{/chat/{senderId}/{recipientId}(senderId=${#authentication.principal.id},recipientId=${user.id})}"
          th:text="${user.username}">Username</a>
     </li>
@@ -129,3 +156,135 @@
 </main>
 </body>
 </html>
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>Your Chats - ConnectHub</title>-->
+<!--  <style>-->
+<!--    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');-->
+
+<!--    * {-->
+<!--      margin: 0;-->
+<!--      padding: 0;-->
+<!--      box-sizing: border-box;-->
+<!--    }-->
+<!--    body {-->
+<!--      font-family: 'Poppins', sans-serif;-->
+<!--      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);-->
+<!--      color: #fff;-->
+<!--      line-height: 1.6;-->
+<!--      min-height: 100vh;-->
+<!--    }-->
+<!--    .container {-->
+<!--      width: 85%;-->
+<!--      max-width: 1200px;-->
+<!--      margin: auto;-->
+<!--      padding: 2rem 0;-->
+<!--    }-->
+<!--    header {-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      backdrop-filter: blur(10px);-->
+<!--      position: fixed;-->
+<!--      width: 100%;-->
+<!--      top: 0;-->
+<!--      z-index: 1000;-->
+<!--      padding: 1rem 0;-->
+<!--    }-->
+<!--    nav {-->
+<!--      display: flex;-->
+<!--      justify-content: space-between;-->
+<!--      align-items: center;-->
+<!--    }-->
+<!--    .logo {-->
+<!--      font-size: 1.5rem;-->
+<!--      font-weight: 600;-->
+<!--    }-->
+<!--    .nav-links {-->
+<!--      display: flex;-->
+<!--      list-style: none;-->
+<!--    }-->
+<!--    .nav-links li {-->
+<!--      margin-left: 2rem;-->
+<!--    }-->
+<!--    .nav-links a {-->
+<!--      text-decoration: none;-->
+<!--      color: #fff;-->
+<!--      font-weight: 300;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .nav-links a:hover {-->
+<!--      color: #ffd700;-->
+<!--      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);-->
+<!--    }-->
+<!--    main {-->
+<!--      margin-top: 6rem;-->
+<!--    }-->
+<!--    h1 {-->
+<!--      font-size: 2.5rem;-->
+<!--      margin-bottom: 2rem;-->
+<!--      text-align: center;-->
+<!--      color: #ffd700;-->
+<!--    }-->
+<!--    .chat-list {-->
+<!--      list-style: none;-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      backdrop-filter: blur(5px);-->
+<!--      border-radius: 10px;-->
+<!--      padding: 1rem;-->
+<!--    }-->
+<!--    .chat-list li {-->
+<!--      margin-bottom: 1rem;-->
+<!--    }-->
+<!--    .chat-list a {-->
+<!--      display: block;-->
+<!--      text-decoration: none;-->
+<!--      color: #fff;-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      padding: 1rem;-->
+<!--      border-radius: 5px;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .chat-list a:hover {-->
+<!--      background: rgba(255, 255, 255, 0.2);-->
+<!--      transform: translateY(-3px);-->
+<!--      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);-->
+<!--    }-->
+<!--    @keyframes fadeIn {-->
+<!--      from { opacity: 0; transform: translateY(20px); }-->
+<!--      to { opacity: 1; transform: translateY(0); }-->
+<!--    }-->
+<!--    .chat-list li {-->
+<!--      animation: fadeIn 0.5s ease-out forwards;-->
+<!--      animation-delay: calc(0.1s * var(&#45;&#45;i));-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--  <div class="container">-->
+<!--    <nav>-->
+<!--      <div class="logo">Lucky Social Network</div>-->
+<!--      <ul class="nav-links">-->
+<!--        <li><a href="/home">Главная</a></li>-->
+<!--        <li><a href="/profile">Профиль</a></li>-->
+<!--        <li><a href="/">Сообщения</a></li>-->
+<!--        <li><a href="#settings">Настройки</a></li>-->
+<!--      </ul>-->
+<!--    </nav>-->
+<!--  </div>-->
+<!--</header>-->
+
+<!--<main class="container">-->
+<!--  <h1>Ваши чаты</h1>-->
+<!--  <ul class="chat-list">-->
+<!--    <li th:each="user, iterStat : ${chatUsers}" th:style="'&#45;&#45;i:' + ${iterStat.index}">-->
+<!--      <a th:href="@{/chat/{senderId}/{recipientId}(senderId=${#authentication.principal.id},recipientId=${user.id})}"-->
+<!--         th:text="${user.username}">Username</a>-->
+<!--    </li>-->
+<!--  </ul>-->
+<!--</main>-->
+<!--</body>-->
+<!--</html>-->

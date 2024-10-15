@@ -36,5 +36,4 @@ public class Message {
     private LocalDateTime timestamp;
 
 
-
 }

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE (m.sender.id = :senderId AND m.recipient.id = :recipientId) " +
@@ -24,4 +25,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     List<Message> findBySenderOrRecipient(User sender, User recipient);
 
+
 }
+

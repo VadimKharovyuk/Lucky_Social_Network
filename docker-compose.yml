@@ -9,6 +9,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/Lucky_Social_Network
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=19111993
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
       - db
 
@@ -20,6 +21,8 @@ services:
       - POSTGRES_PASSWORD=19111993
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
 volumes:
   postgres_data:

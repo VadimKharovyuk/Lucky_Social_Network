@@ -1,4 +1,5 @@
 package com.example.lucky_social_network.controller;
+
 import com.example.lucky_social_network.model.Message;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.UserRepository;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import com.example.lucky_social_network.service.ChatService;
 import com.example.lucky_social_network.service.UserService;
 
@@ -22,6 +25,7 @@ public class ChatController {
 
     private final ChatService chatService;
     private final UserService userService;
+
 
     @GetMapping("/{senderId}/{recipientId}")
     public String getChatPage(@PathVariable Long senderId,
@@ -52,6 +56,7 @@ public class ChatController {
         Long currentUserId = getCurrentUserId();
         return "redirect:/chat/" + currentUserId + "/" + recipientId;
     }
+
 
 
     @GetMapping("/list")
