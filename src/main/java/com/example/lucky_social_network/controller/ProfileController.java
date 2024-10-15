@@ -49,7 +49,7 @@ public class ProfileController {
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("areFriends", areFriends);
         model.addAttribute("user", user);
-        model.addAttribute("avatarUrl", avatarUrl); // Добавляем URL аватара в модель
+        model.addAttribute("avatarUrl", avatarUrl);
         model.addAttribute("postCreationDto", new PostCreationDto());
         model.addAttribute("userPosts", userPosts);
 
@@ -59,9 +59,7 @@ public class ProfileController {
 @GetMapping
 public String getProfile(Authentication authentication, Model model) {
     User user = userService.findByUsername(authentication.getName());
-
-    // Получаем URL аватара пользователя из Dropbox
-
+    
     String avatarUrl = userService.getUserAvatarUrl(user);
 
     // Добавляем URL аватара в модель, если он существует

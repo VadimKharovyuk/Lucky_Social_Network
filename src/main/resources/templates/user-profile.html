@@ -264,6 +264,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/settings">Настройки</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Выйти</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -277,6 +280,7 @@
         <a href="/posts" class="menu-item">Новости</a>
         <a href="/chat/list" class="menu-item">Сообщения</a>
         <a href="#" class="menu-item">Группы</a>
+
     </aside>
 
     <div class="profile-container">
@@ -287,7 +291,7 @@
                      alt="User Avatar" class="profile-avatar">
             </div>
 
-            
+
             <div class="profile-info">
                 <div class="profile-name" th:text="${user.username}">Сергей Ситников</div>
                 <div class="profile-status">Online</div>
@@ -305,6 +309,7 @@
                         <span th:if="${user.partner != null}" th:text="' - ' + ${user.partner.username}"></span>
                     </div>
                 </div>
+
                 <div class="profile-actions">
                     <form th:if="${!user.friends.contains(currentUser) && user.id != currentUser.id}"
                           th:action="@{/users/addFriend}" method="post">
@@ -312,7 +317,7 @@
                         <input type="hidden" name="friendId" th:value="${user.id}">
                         <button type="submit" class="btn btn-primary btn-block mb-2">Добавить в друзья</button>
                     </form>
-                    <a th:if="${user.id != currentUser.id}" th:href="@{/chat/view/{userId}(userId=${user.id})}"
+                    <a th:if="${user.id != currentUser.id}" th:href="@{/chat/start/{userId}(userId=${user.id})}"
                        class="btn btn-secondary btn-block">Отправить сообщение</a>
                 </div>
             </div>

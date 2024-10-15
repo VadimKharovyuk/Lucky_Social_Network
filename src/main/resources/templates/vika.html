@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виктоия Селещева</title>
+    <style>
+        :root {
+            --background-color: #000000;
+            --text-color: #ffffff;
+            --accent-color-1: #741627;
+            --accent-color-2: #0a0301;
+            --accent-color-3: #8b0000;
+            --accent-color-4: #4a0e1c;
+            --secondary-color: #333333;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'GothamPRO', Arial, sans-serif;
+            background: linear-gradient(135deg,
+            var(--background-color) 0%,
+            var(--accent-color-4) 25%,
+            var(--accent-color-1) 50%,
+            var(--accent-color-3) 75%,
+            var(--accent-color-2) 100%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            width: 60px;
+        }
+
+        .nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 20px;
+            opacity: 0.7;
+        }
+
+        .hero {
+            padding: 100px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 60px;
+            font-weight: 200;
+            letter-spacing: -3.6px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            opacity: 0.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 30px;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            transition: background-color 0.3s;
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .hero-image {
+            max-width: 100%;
+            height: auto;
+            margin-top: 30px;
+        }
+
+        .product-section {
+            padding: 50px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-image {
+            width: 45%;
+            height: auto;
+        }
+
+        .product-info {
+            width: 50%;
+        }
+
+        .product-info h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .product-info p {
+            margin-bottom: 20px;
+        }
+
+        .newsletter {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            margin-top: 50px;
+            text-align: left;
+        }
+
+        .newsletter h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .newsletter p {
+            margin-bottom: 20px;
+        }
+
+        .contacts {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .contact-circles {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .contact-circle {
+            width: 100px;
+            height: 100px;
+            border: 1px solid var(--text-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .product-section {
+            padding: 50px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: transform 0.3s ease;
+        }
+
+        .product-section:hover {
+            transform: scale(1.02);
+        }
+
+        .product-image {
+            width: 45%;
+            height: auto;
+            transition: filter 0.3s ease;
+        }
+
+        .product-section:hover .product-image {
+            filter: brightness(1.1);
+        }
+
+        .product-info {
+            width: 50%;
+        }
+
+        .product-info h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .product-section:hover .product-info h2 {
+            color: var(--accent-color-2);
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 30px;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--accent-color-1);
+            border-color: var(--accent-color-1);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-section {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 50px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .testimonial-section h2 {
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+
+        .testimonial {
+            max-width: 800px;
+            margin: 0 auto;
+            font-style: italic;
+        }
+
+        .faq-section {
+            padding: 50px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-section h2 {
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+        }
+
+        .faq-question {
+            font-weight: bold;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--accent-color-2);
+        }
+
+        .faq-answer {
+            display: none;
+            padding-left: 20px;
+        }
+
+        .about-section {
+            padding: 50px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .about-image {
+            width: 45%;
+            height: auto;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .about-image:hover {
+            transform: scale(1.05);
+        }
+
+        .about-content {
+            width: 50%;
+        }
+
+        .about-content h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .contact-circle {
+            width: 100px;
+            height: 100px;
+            border: 1px solid var(--text-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .contact-circle:hover {
+            background-color: var(--accent-color-1);
+            border-color: var(--accent-color-1);
+            transform: translateY(-5px);
+        }
+
+        .running-text-container {
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px 0;
+        }
+
+        .running-text {
+            white-space: nowrap;
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 120s linear infinite;
+        }
+
+        .running-text:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(-100%, 0);
+            }
+        }
+
+        .running-text span {
+            display: inline-block;
+            padding: 0 20px;
+        }
+
+        .running-text-reverse {
+            animation-direction: reverse;
+        }
+
+
+    </style>
+</head>
+<body>
+<header class="header">
+    <img src="path_to_logo.svg" alt="Логотип" class="logo">
+    <nav class="nav">
+        <a href="#product">Продукты</a>
+        <a href="#contacts">Контакты</a>
+    </nav>
+</header>
+
+<main class="hero">
+    <h1>Виктория Селещева</h1>
+    <p>Для тех, кто устал жить в ж*пе</p>
+    <p>Будет больно, но вам понравится</p>
+    <a href="#" class="cta-button">Выйти из дефицита</a>
+    <img src="path_to_hero_image.jpg" alt="Виктоия Селещева" class="hero-image">
+</main>
+
+<section class="running-text-container">
+    <div class="running-text">
+        <span>Жизнь – в кайф или тягучее, нудное болото?</span>
+        <span>Насколько вы довольны своей жизнью?</span>
+        <span>Как часто вам НЕСТЕРПИМО жить в том, в чем живешь?</span>
+        <span>Вы хотите перемен или готовы жить так всегда?</span>
+        <span>Кажется, что выхода из этого серого круга нет?</span>
+    </div>
+</section>
+
+<section class="running-text-container">
+    <div class="running-text running-text-reverse">
+        <span>Жизнь – в кайф или тягучее, нудное болото?</span>
+        <span>Насколько вы довольны своей жизнью?</span>
+        <span>Как часто вам НЕСТЕРПИМО жить в том, в чем живешь?</span>
+        <span>Вы хотите перемен или готовы жить так всегда?</span>
+        <span>Кажется, что выхода из этого серого круга нет?</span>
+    </div>
+</section>
+
+<section class="product-section">
+    <img src="path_to_product1_image.jpg" alt="Стратегия жизни" class="product-image">
+    <div class="product-info">
+        <h2>Стратегия жизни</h2>
+        <p>Привести себя в Изобилие и Гармонию можете вы сами. Получите гайд с 10+ практиками, которые разблокируют ваши
+            скрытые возможности и активируют внутреннюю Энергию.</p>
+        <a href="#" class="cta-button">Выйти из дефицита</a>
+    </div>
+</section>
+
+<section class="product-section">
+    <div class="product-info">
+        <h2>Онлайн-курс по управлению стрессом</h2>
+        <p>Научитесь эффективно справляться со стрессом и тревогой. Этот курс предоставит вам практические инструменты
+            для поддержания эмоционального баланса в любой ситуации.</p>
+        <a href="#" class="cta-button">Начать курс</a>
+    </div>
+    <img src="path_to_stress_management_image.jpg" alt="Управление стрессом" class="product-image">
+</section>
+
+
+<section class="product-section">
+    <div class="product-info">
+        <h2>Ежедневная медитация</h2>
+        <p>Ежедневная медитация на расширение финансового объема. Для тех, кто хочет научиться принимать, использовать и
+            приумножать свои ресурсы.</p>
+        <a href="#" class="cta-button">Подробнее</a>
+    </div>
+    <img src="path_to_product2_image.jpg" alt="Ежедневная медитация" class="product-image">
+</section>
+
+<section class="product-section">
+    <img src="path_to_product3_image.jpg" alt="Тревога" class="product-image">
+    <div class="product-info">
+        <h2>Тревога</h2>
+        <p>Для тех, чей постоянный спутник — тревога, бессонница и нерешительность. Заземлиться и выстроить твёрдую
+            опору внутри, которая поможет выстоять в любой шторм.</p>
+        <a href="#" class="cta-button">Подробнее</a>
+    </div>
+</section>
+
+<section class="product-section">
+    <div class="product-info">
+        <h2>Индивидуальные консультации</h2>
+        <p>Персональные сессии, направленные на решение ваших уникальных проблем. Вместе мы разработаем стратегию для
+            преодоления трудностей и достижения гармонии в жизни.</p>
+        <a href="#" class="cta-button">Записаться на консультацию</a>
+    </div>
+    <img src="path_to_consultation_image.jpg" alt="Индивидуальные консультации" class="product-image">
+</section>
+
+
+<section class="testimonial-section">
+    <h2>Что говорят клиенты</h2>
+    <div class="testimonial">
+        <p>"Благодаря Виктории я смогла преодолеть свои страхи и начать жить полной жизнью. Ее подход уникален и
+            эффективен!"</p>
+        <p>- Анна С.</p>
+    </div>
+</section>
+
+<section class="faq-section">
+    <h2>Часто задаваемые вопросы</h2>
+    <div class="faq-item">
+        <div class="faq-question">Как долго длится курс?</div>
+        <div class="faq-answer">Длительность курса варьируется в зависимости от выбранной программы. Обычно это от 4 до
+            8 недель.
+        </div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-question">Можно ли получить индивидуальную консультацию?</div>
+        <div class="faq-answer">Да, мы предлагаем индивидуальные консультации. Вы можете записаться через раздел
+            "Контакты".
+        </div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-question">Какой формат занятий вы предлагаете?</div>
+        <div class="faq-answer">Мы предлагаем как онлайн, так и офлайн занятия. Формат зависит от выбранного курса и
+            ваших предпочтений.
+        </div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-question">Есть ли гарантия результата?</div>
+        <div class="faq-answer">Мы не можем гарантировать конкретный результат, так как многое зависит от вашей
+            вовлеченности и индивидуальных особенностей. Однако мы гарантируем высокое качество наших программ и
+            поддержку на всем пути вашего развития.
+        </div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-question">Какие методы вы используете в своей работе?</div>
+        <div class="faq-answer">Мы используем комплексный подход, включающий когнитивно-поведенческую терапию,
+            mindfulness практики, арт-терапию и другие современные методики, доказавшие свою эффективность.
+        </div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-question">Можно ли оплатить курс в рассрочку?</div>
+        <div class="faq-answer">Да, у нас есть возможность оплаты в рассрочку. Детали можно уточнить у нашего менеджера
+            при оформлении заказа.
+        </div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-question">Что делать, если я пропустил занятие?</div>
+        <div class="faq-answer">Не беспокойтесь, все занятия записываются. Вы сможете посмотреть пропущенное занятие в
+            удобное для вас время. Кроме того, вы всегда можете задать вопросы по материалу в нашем закрытом чате.
+        </div>
+    </div>
+</section>
+
+<section class="about-section">
+    <img src="https://static.tildacdn.com/tild3935-6461-4038-a661-613637326335/email_love_like.svg"
+         alt="О Наталье Касариной" class="about-image">
+    <div class="about-content">
+        <h2>О Виктоия Селещевой</h2>
+        <p>Виктоия Селещева- эксперт по личностному росту и финансовому благополучию. С более чем 10-летним опытом, она
+            помогла тысячам людей изменить свою жизнь к лучшему.</p>
+        <a href="#" class="cta-button">Узнать больше</a>
+    </div>
+</section>
+
+
+<section class="newsletter">
+    <h2>Рассылки</h2>
+    <p>Первыми узнавайте о новых продуктах, эксклюзивных предложениях и самых лояльных условиях. В рассылках регулярно
+        дарю подарки и даю уникальную информацию.</p>
+    <a href="#" class="cta-button">Подписаться на рассылку</a>
+</section>
+
+<section class="contacts" id="contacts">
+    <h2>Контакты</h2>
+    <div class="contact-circles">
+        <a href="#" class="contact-circle">TG</a>
+        <a href="#" class="contact-circle">YT</a>
+        <a href="#" class="contact-circle">Служба Заботы</a>
+    </div>
+</section>
+
+<footer class="footer">
+    <p>ИП Виктоия СелещеваГеннадьевна</p>
+    <p>ИНН 501820357691</p>
+    <p>ОГРНИП 318502900050444 Киев область, г. Королев</p>
+    <p>info@kasarina.ru</p>
+</footer>
+</body>
+<script>
+    // Простой скрипт для работы FAQ
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+            const answer = question.nextElementSibling;
+            answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+</script>
+
+<script>
+    // Скрипт для дублирования текста в бегущих строках
+    function duplicateRunningText() {
+        const runningTexts = document.querySelectorAll('.running-text');
+        runningTexts.forEach(text => {
+            const originalContent = text.innerHTML;
+            text.innerHTML = originalContent + originalContent;
+        });
+    }
+
+    // Вызываем функцию при загрузке страницы
+    window.addEventListener('load', duplicateRunningText);
+</script>
+</html>
