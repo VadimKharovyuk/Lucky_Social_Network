@@ -5,13 +5,16 @@ import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.MessageRepository;
 import com.example.lucky_social_network.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,7 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SubscriptionService subscriptionService;
-
+    private final ImageService imageService;
 
 
 //    public User updateUser(User user) {
@@ -70,16 +73,17 @@ public class UserService {
     }
 
 
-public User registerNewUser(User user) {
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
-    user.setCreatedAt(LocalDate.now());
-    user.setEmailVerified(false);
-    user.setIsPrivate(false);
-    user.setFollowersCount(0);
-    user.setFriendsCount(0);
-    return userRepository.save(user);
-}
+    public User registerNewUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setCreatedAt(LocalDate.now());
+        user.setEmailVerified(false);
+        user.setIsPrivate(false);
+        user.setFollowersCount(0);
+        user.setFriendsCount(0);
+        return userRepository.save(user);
+    }
 
+    @Transactional
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
@@ -87,11 +91,11 @@ public User registerNewUser(User user) {
 
 
     public User getUserById(Long senderId) {
-       return userRepository.findById(senderId).orElseThrow(() -> new UsernameNotFoundException("User not found: " + senderId));
+        return userRepository.findById(senderId).orElseThrow(() -> new UsernameNotFoundException("User not found: " + senderId));
     }
 
     public List<User> getAllUsers() {
-       return userRepository.findAll();
+        return userRepository.findAll();
     }
 
 
@@ -161,6 +165,26 @@ public User registerNewUser(User user) {
         return user1.getFriends().stream().anyMatch(friend -> friend.getId().equals(userId2));
     }
 
+
+    @Transactional
+    public void updateAvatar(Long userId, MultipartFile file) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        byte[] optimizedImage = imageService.optimizeImage(file);
+        user.setAvatar(optimizedImage);
+        user.setAvatarContentType(file.getContentType());
+
+        userRepository.save(user);
+        log.info("Avatar updated for user: {}", userId);
+    }
+
+    @Transactional
+    public byte[] getUserAvatar(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return user.getAvatar();
+    }
 
 
 }

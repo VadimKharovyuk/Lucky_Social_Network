@@ -35,9 +35,14 @@ public class User {
     @Column(length = 500)
     private String bio;
 
-    // Используем bytea для бинарных данных
+
     @Lob
+    @Basic(fetch = FetchType.LAZY)
     private byte[] avatar;
+    @Column(name = "avatar_content_type")
+    private String avatarContentType;
+
+
 
     private LocalDate createdAt;
 

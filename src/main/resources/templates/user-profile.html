@@ -273,17 +273,19 @@
 <div class="main-container">
     <aside class="left-sidebar">
         <a href="/home" class="menu-item">Моя Страница</a>
+        <a href="/users/friends" class="menu-item">Друзья</a>
         <a href="/posts" class="menu-item">Новости</a>
         <a href="/chat/list" class="menu-item">Сообщения</a>
-        <a href="/users/friends" class="menu-item">Друзья</a>
         <a href="#" class="menu-item">Группы</a>
     </aside>
 
     <div class="profile-container">
         <div class="profile-header">
-            <img th:if="${user.avatar != null}"
-                 th:src="@{'data:image/jpeg;base64,' + ${T(org.apache.tomcat.util.codec.binary.Base64).encodeBase64String(user.avatar)}}"
-                 alt="User Avatar" class="profile-avatar">
+            <div class="profile-header">
+                <img th:if="${user.avatar != null}"
+                     th:src="@{'data:image/jpeg;base64,' + ${base64Avatar}}"
+                     alt="User Avatar" class="profile-avatar">
+            </div>
             <img th:if="${user.avatar == null}" src="/path/to/default/avatar.jpg" alt="Default Avatar"
                  class="profile-avatar">
             <div class="profile-info">
