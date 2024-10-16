@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -50,6 +51,13 @@ public class ProfileController {
 
         // Получаем список уведомлений для текущего пользователя
         List<Notification> notifications = notificationService.getUserNotifications(currentUserId);
+
+        LocalDate today = LocalDate.now();
+        if (user.getDateOfBirth() != null &&
+                user.getDateOfBirth().getMonth() == today.getMonth() &&
+                user.getDateOfBirth().getDayOfMonth() == today.getDayOfMonth()) {
+            model.addAttribute("isBirthday", true);
+        }
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("areFriends", areFriends);

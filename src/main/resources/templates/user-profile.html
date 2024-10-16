@@ -311,6 +311,13 @@
             visibility: visible;
             opacity: 1;
         }
+
+        .birthday-message {
+            background-color: #ffd700;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -375,6 +382,10 @@
 
 
             <div class="profile-info">
+                <div th:if="${isBirthday}" class="birthday-message">
+                    <h2>Happy Birthday, <span th:text="${user.username}"></span>!</h2>
+                    <p>We hope you have a fantastic day!</p>
+                </div>
                 <h5>
                     <span th:if="${isEmailVerified}" class="verified-icon" title="Email подтвержден">&#9733;</span>
                 </h5>
@@ -399,6 +410,7 @@
                     <br>
                     <div>О себе : <span th:text="${user.getBio()}"></span></div>
                 </div>
+
 
                 <div class="profile-actions">
                     <form th:if="${!user.friends.contains(currentUser) && user.id != currentUser.id}"
