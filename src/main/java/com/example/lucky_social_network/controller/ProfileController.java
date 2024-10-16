@@ -2,13 +2,11 @@ package com.example.lucky_social_network.controller;
 
 import com.dropbox.core.DbxException;
 import com.example.lucky_social_network.dto.PostCreationDto;
+import com.example.lucky_social_network.model.Notification;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.RelationshipStatusConstants;
 import com.example.lucky_social_network.model.User;
-import com.example.lucky_social_network.service.CustomUserDetails;
-import com.example.lucky_social_network.service.DropboxService;
-import com.example.lucky_social_network.service.PostService;
-import com.example.lucky_social_network.service.UserService;
+import com.example.lucky_social_network.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -31,6 +29,7 @@ public class ProfileController {
     private final UserService userService;
     private final PostService postService;
     private final DropboxService dropboxService;
+    private final NotificationService notificationService;
 
 
 
@@ -46,12 +45,20 @@ public class ProfileController {
         boolean areFriends = userService.areFriends(currentUserId, userId);
         List<Post> userPosts = postService.getPostsByAuthor(user);
 
+        // Получаем количество непрочитанных уведомлений
+        long unreadNotificationCount = notificationService.getUnreadNotificationCount(currentUserId);
+
+        // Получаем список уведомлений для текущего пользователя
+        List<Notification> notifications = notificationService.getUserNotifications(currentUserId);
+
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("areFriends", areFriends);
         model.addAttribute("user", user);
         model.addAttribute("avatarUrl", avatarUrl);
         model.addAttribute("postCreationDto", new PostCreationDto());
         model.addAttribute("userPosts", userPosts);
+        model.addAttribute("notificationCount", unreadNotificationCount);
+        model.addAttribute("notifications", notifications);
 
         return "user-profile";
     }
@@ -59,7 +66,7 @@ public class ProfileController {
 @GetMapping
 public String getProfile(Authentication authentication, Model model) {
     User user = userService.findByUsername(authentication.getName());
-    
+
     String avatarUrl = userService.getUserAvatarUrl(user);
 
     // Добавляем URL аватара в модель, если он существует

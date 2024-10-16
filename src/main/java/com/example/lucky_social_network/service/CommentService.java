@@ -17,10 +17,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostService postService;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     public Comment addComment(Long postId, Long userId, String content) {
-        Post post = postService.getPostById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+        Post post = postService.getPostById(postId).orElseThrow(EntityNotFoundException::new);
         User user = userService.getUserById(userId);
 
         Comment comment = new Comment();
@@ -29,7 +29,11 @@ public class CommentService {
         comment.setContent(content);
         comment.setTimestamp(LocalDateTime.now());
 
-        return commentRepository.save(comment);
+        comment = commentRepository.save(comment);
+
+        notificationService.createCommentNotification(post, comment);
+
+        return comment;
     }
 
     public List<Comment> getCommentsByPostId(Long postId) {

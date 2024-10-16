@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .notification {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .notification:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .unread {
+            background-color: #e8f4fd;
+            border-left: 5px solid #3498db;
+        }
+
+        .notification p {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+
+        .notification small {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        form {
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .notification {
+                padding: 10px;
+            }
+        }
+
+        .comment-content {
+            background-color: #f9f9f9;
+            border-left: 3px solid #3498db;
+            padding: 10px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .post-link {
+            display: block;
+            margin-top: 5px;
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .post-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<h1>Your Notifications</h1>
+<div th:each="notification : ${notifications}" th:class="${notification.read ? 'notification' : 'notification unread'}">
+    <p th:text="${notification.message}"></p>
+    <small th:text="${#temporals.format(notification.createdAt, 'dd-MM-yyyy HH:mm')}"></small>
+    <div th:if="${notification.commentContent}" class="comment-content">
+        <p th:text="${notification.commentContent}"></p>
+        <small>Comment by: <span th:text="${notification.commentAuthorName}"></span></small>
+    </div>
+    <a th:if="${notification.postId}" th:href="@{/posts/{id}(id=${notification.postId})}" class="post-link">
+        View Post
+    </a>
+    <form th:if="${!notification.read}" th:action="@{/notifications/{id}/read(id=${notification.id})}" method="post">
+        <button type="submit">Mark as Read</button>
+    </form>
+</div>
+</body>
+</html>
