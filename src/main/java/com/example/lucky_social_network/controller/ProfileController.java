@@ -59,6 +59,7 @@ public class ProfileController {
         model.addAttribute("userPosts", userPosts);
         model.addAttribute("notificationCount", unreadNotificationCount);
         model.addAttribute("notifications", notifications);
+        model.addAttribute("isEmailVerified", user.getEmailVerified());
 
         return "user-profile";
     }
