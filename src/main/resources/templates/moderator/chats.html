@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Moderator - Chats</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2c3e50;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: #fff;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #2980b9;
+        }
+
+        span {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Users with Chats</h1>
+    <ul>
+        <li th:each="user : ${users}">
+            <a th:href="@{/moderator/chat(userId=${user.id})}" th:text="${user.username}"></a>
+            <span th:text="'(ID: ' + ${user.id} + ')'"></span>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Moderator - Chats</title>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            line-height: 1.6;-->
+<!--            margin: 0;-->
+<!--            padding: 20px;-->
+<!--        }-->
+
+<!--        ul {-->
+<!--            list-style-type: none;-->
+<!--            padding: 0;-->
+<!--        }-->
+
+<!--        li {-->
+<!--            margin-bottom: 10px;-->
+<!--        }-->
+
+<!--        a {-->
+<!--            color: #333;-->
+<!--            text-decoration: none;-->
+<!--        }-->
+
+<!--        a:hover {-->
+<!--            color: #666;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Users with Chats</h1>-->
+<!--<ul>-->
+<!--    <li th:each="user : ${users}">-->
+<!--        <a th:href="@{/moderator/chat(userId=${user.id})}" th:text="${user.username}"></a>-->
+<!--        <span th:text="'(ID: ' + ${user.id} + ')'"></span>-->
+<!--    </li>-->
+<!--</ul>-->
+<!--</body>-->
+<!--</html>-->

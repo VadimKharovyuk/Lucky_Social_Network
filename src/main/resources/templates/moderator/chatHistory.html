@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Moderator - Chat History</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-sent {
+            background-color: #e6f3ff;
+        }
+
+        .message-received {
+            background-color: #f0f0f0;
+        }
+
+        strong {
+            color: #007bff;
+        }
+
+        .timestamp {
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .actions {
+            margin-top: 10px;
+        }
+
+        .actions form {
+            display: inline;
+            margin-right: 5px;
+        }
+
+        .actions button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+
+        .actions button:hover {
+            background-color: #d32f2f;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<h1>Chat History: <span th:text="${user1.username}"></span> and <span th:text="${user2.username}"></span></h1>
+
+<ul th:if="${!chatHistory.isEmpty()}">
+    <li th:each="message : ${chatHistory}"
+        th:class="${message.sender.id == user1.id ? 'message-sent' : 'message-received'}">
+        <strong th:text="${message.sender.username}"></strong>:
+        <span th:text="${message.content}"></span>
+        <div class="timestamp" th:text="${#temporals.format(message.timestamp, 'yyyy-MM-dd HH:mm')}"></div>
+        <div class="actions">
+            <form th:action="@{/moderator/message/{id}/delete(id=${message.id})}" method="post">
+                <input type="hidden" name="user1Id" th:value="${user1.id}">
+                <input type="hidden" name="user2Id" th:value="${user2.id}">
+                <button type="submit">Delete Message</button>
+            </form>
+            <form th:action="@{/moderator/user/{id}/warn(id=${message.sender.id})}" method="post">
+                <input type="hidden" name="otherUserId"
+                       th:value="${message.sender.id == user1.id ? user2.id : user1.id}">
+                <button type="submit">Warn User</button>
+            </form>
+        </div>
+    </li>
+</ul>
+
+<p th:if="${chatHistory.isEmpty()}">No messages in this chat.</p>
+
+<a th:href="@{/moderator/chat(userId=${user1.id})}">Back to <span th:text="${user1.username}"></span>'s Chats</a>
+</body>
+</html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Moderator - Chat History</title>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <style>-->
+<!--        /* ... существующие стили ... */-->
+<!--        .actions {-->
+<!--            margin-top: 5px;-->
+<!--        }-->
+
+<!--        .actions form {-->
+<!--            display: inline;-->
+<!--        }-->
+
+<!--        .actions button {-->
+<!--            background: #f44336;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 5px 10px;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Chat History: <span th:text="${user1.username}"></span> and <span th:text="${user2.username}"></span></h1>-->
+
+<!--<ul th:if="${!chatHistory.isEmpty()}">-->
+<!--    <li th:each="message : ${chatHistory}"-->
+<!--        th:class="${message.sender.id == user1.id ? 'message-sent' : 'message-received'}">-->
+<!--        <strong th:text="${message.sender.username}"></strong>:-->
+<!--        <span th:text="${message.content}"></span>-->
+<!--        <div class="timestamp" th:text="${#temporals.format(message.timestamp, 'yyyy-MM-dd HH:mm')}"></div>-->
+<!--        <div class="actions">-->
+<!--            <form th:action="@{/moderator/message/{id}/delete(id=${message.id})}" method="post">-->
+<!--                <input type="hidden" name="user1Id" th:value="${user1.id}">-->
+<!--                <input type="hidden" name="user2Id" th:value="${user2.id}">-->
+<!--                <button type="submit">Delete Message</button>-->
+<!--            </form>-->
+<!--            <form th:action="@{/moderator/user/{id}/warn(id=${message.sender.id})}" method="post">-->
+<!--                <input type="hidden" name="otherUserId"-->
+<!--                       th:value="${message.sender.id == user1.id ? user2.id : user1.id}">-->
+<!--                <button type="submit">Warn User</button>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </li>-->
+<!--</ul>-->
+
+<!--<p th:if="${chatHistory.isEmpty()}">No messages in this chat.</p>-->
+
+<!--<a th:href="@{/moderator/chat(userId=${user1.id})}">Back to <span th:text="${user1.username}"></span>'s Chats</a>-->
+<!--</body>-->
+<!--</html>-->

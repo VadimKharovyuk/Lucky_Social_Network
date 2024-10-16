@@ -20,6 +20,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -108,4 +109,18 @@ public class User {
     private Set<Subscription> followers = new HashSet<>();
 
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles = new HashSet<>();
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+    
+    public enum Role {
+        USER,
+        ADMIN,
+        MODERATOR
+        // Добавьте другие роли по необходимости
+    }
 }

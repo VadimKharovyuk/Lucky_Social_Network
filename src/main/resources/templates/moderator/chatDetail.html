@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Moderator - Chat Detail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        nav {
+            background-color: #444;
+            color: #fff;
+            padding: 0.5rem;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Moderator Panel</h1>
+</header>
+<nav>
+    <ul>
+        <li><a th:href="@{/moderator/chats}">All Chats</a></li>
+        <li><a th:href="@{/moderator/chat-history}">Chat History</a></li>
+    </ul>
+</nav>
+<div class="container">
+    <h2>Chat Partners for <span th:text="${user.username}"></span></h2>
+    <ul>
+        <li th:each="partner : ${chatPartners}">
+            <a th:href="@{/moderator/chat-history(user1Id=${user.id},user2Id=${partner.id})}"
+               th:text="${partner.username}"></a>
+            <span th:text="'(ID: ' + ${partner.id} + ')'"></span>
+        </li>
+    </ul>
+    <a class="back-link" th:href="@{/moderator/chats}">Back to Users List</a>
+</div>
+</body>
+</html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Moderator - Chat Detail</title>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            line-height: 1.6;-->
+<!--            margin: 0;-->
+<!--            padding: 20px;-->
+<!--        }-->
+
+<!--        ul {-->
+<!--            list-style-type: none;-->
+<!--            padding: 0;-->
+<!--        }-->
+
+<!--        li {-->
+<!--            margin-bottom: 10px;-->
+<!--        }-->
+
+<!--        a {-->
+<!--            color: #333;-->
+<!--            text-decoration: none;-->
+<!--        }-->
+
+<!--        a:hover {-->
+<!--            color: #666;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Chat Partners for <span th:text="${user.username}"></span></h1>-->
+<!--<ul>-->
+<!--    <li th:each="partner : ${chatPartners}">-->
+<!--        <a th:href="@{/moderator/chat-history(user1Id=${user.id},user2Id=${partner.id})}"-->
+<!--           th:text="${partner.username}"></a>-->
+<!--        <span th:text="'(ID: ' + ${partner.id} + ')'"></span>-->
+<!--    </li>-->
+<!--</ul>-->
+<!--<a th:href="@{/moderator/chats}">Back to Users List</a>-->
+<!--</body>-->
+<!--</html>-->

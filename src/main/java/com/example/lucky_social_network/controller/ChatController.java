@@ -2,20 +2,17 @@ package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.model.Message;
 import com.example.lucky_social_network.model.User;
-import com.example.lucky_social_network.repository.UserRepository;
-import com.example.lucky_social_network.service.*;
+import com.example.lucky_social_network.service.ChatService;
+import com.example.lucky_social_network.service.CustomUserDetails;
+import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import com.example.lucky_social_network.service.ChatService;
-import com.example.lucky_social_network.service.UserService;
+import java.util.List;
 
 
 @Controller
@@ -50,6 +47,7 @@ public class ChatController {
         chatService.sendMessage(senderId, recipientId, newMessage.getContent());
         return "redirect:/chat/" + senderId + "/" + recipientId;
     }
+
 
     @GetMapping("/start/{recipientId}")
     public String startNewChat(@PathVariable Long recipientId) {
