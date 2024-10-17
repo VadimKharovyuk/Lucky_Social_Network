@@ -444,7 +444,7 @@
                               th:text="${user.relationshipStatus.get(0)}"></span>
                         <span th:if="${user.relationshipStatus == null or user.relationshipStatus.isEmpty()}">Не указано</span>
 
-                        - <span th:text="${user.partner.firstName + ' ' + user.partner.lastName}">Партнер</span>
+                        <!--                         <span th:text="${user.partner.username }">Партнер</span>-->
                     </div>
                     <br>
                     <br>
@@ -453,13 +453,17 @@
 
 
                 <div class="profile-actions">
-                    <form th:if="${!user.friends.contains(currentUser) && user.id != currentUser.id}"
+                    <!-- Кнопка "Добавить в друзья" -->
+                    <form th:if="${currentUser != null && user != null && currentUser.id != user.id && !user.friends.contains(currentUser)}"
                           th:action="@{/users/addFriend}" method="post">
                         <input type="hidden" name="userId" th:value="${currentUser.id}">
                         <input type="hidden" name="friendId" th:value="${user.id}">
                         <button type="submit" class="btn btn-primary btn-block mb-2">Добавить в друзья</button>
                     </form>
-                    <a th:if="${user.id != currentUser.id}" th:href="@{/chat/start/{userId}(userId=${user.id})}"
+
+                    <!-- Кнопка "Отправить сообщение" -->
+                    <a th:if="${currentUser != null && user != null && currentUser.id != user.id}"
+                       th:href="@{/chat/start/{userId}(userId=${user.id})}"
                        class="btn btn-secondary btn-block">Отправить сообщение</a>
                 </div>
             </div>

@@ -33,60 +33,67 @@ public class ProfileController {
     private final NotificationService notificationService;
 
 
-
     @GetMapping("/{userId}")
     public String getUserProfile(@PathVariable Long userId, Model model) {
-        User user = userService.getUserProfileById(userId);
-        Long currentUserId = getCurrentUserId();
-        User currentUser = userService.getUserById(currentUserId);
 
-        // Получаем URL аватара пользователя
+        try {
+            User user = userService.getUserProfileById(userId);
+            Long currentUserId = getCurrentUserId();
+            User currentUser = userService.getUserById(currentUserId);
+
+            // Получаем URL аватара пользователя
+            String avatarUrl = userService.getUserAvatarUrl(user);
+
+            boolean areFriends = userService.areFriends(currentUserId, userId);
+            List<Post> userPosts = postService.getPostsByAuthor(user);
+
+            // Получаем количество непрочитанных уведомлений
+            long unreadNotificationCount = notificationService.getUnreadNotificationCount(currentUserId);
+
+            // Получаем список уведомлений для текущего пользователя
+            List<Notification> notifications = notificationService.getUserNotifications(currentUserId);
+
+            LocalDate today = LocalDate.now();
+            if (user.getDateOfBirth() != null &&
+                    user.getDateOfBirth().getMonth() == today.getMonth() &&
+                    user.getDateOfBirth().getDayOfMonth() == today.getDayOfMonth()) {
+                model.addAttribute("isBirthday", true);
+            }
+
+            model.addAttribute("currentUser", currentUser);
+            model.addAttribute("areFriends", areFriends);
+            model.addAttribute("user", user);
+            model.addAttribute("avatarUrl", avatarUrl);
+            model.addAttribute("postCreationDto", new PostCreationDto());
+            model.addAttribute("userPosts", userPosts);
+            model.addAttribute("notificationCount", unreadNotificationCount);
+            model.addAttribute("notifications", notifications);
+            model.addAttribute("isEmailVerified", user.getEmailVerified());
+            log.info("currentUser: {}, user: {}", currentUser, user);
+
+            return "user-profile";
+        } catch (Exception e) {
+            log.error("Error processing profile request for userId: " + userId, e);
+            throw new RuntimeException("Error processing profile request", e);
+        }
+    }
+
+    //профиль пользователя
+    @GetMapping
+    public String getProfile(Authentication authentication, Model model) {
+        User user = userService.findByUsername(authentication.getName());
+
         String avatarUrl = userService.getUserAvatarUrl(user);
 
-        boolean areFriends = userService.areFriends(currentUserId, userId);
-        List<Post> userPosts = postService.getPostsByAuthor(user);
-
-        // Получаем количество непрочитанных уведомлений
-        long unreadNotificationCount = notificationService.getUnreadNotificationCount(currentUserId);
-
-        // Получаем список уведомлений для текущего пользователя
-        List<Notification> notifications = notificationService.getUserNotifications(currentUserId);
-
-        LocalDate today = LocalDate.now();
-        if (user.getDateOfBirth() != null &&
-                user.getDateOfBirth().getMonth() == today.getMonth() &&
-                user.getDateOfBirth().getDayOfMonth() == today.getDayOfMonth()) {
-            model.addAttribute("isBirthday", true);
+        // Добавляем URL аватара в модель, если он существует
+        if (avatarUrl != null) {
+            model.addAttribute("avatarUrl", avatarUrl);
         }
-
-        model.addAttribute("currentUser", currentUser);
-        model.addAttribute("areFriends", areFriends);
+        model.addAttribute("avatarUrl", avatarUrl);
+        model.addAttribute("relationshipStatuses", RelationshipStatusConstants.getAllStatuses());
         model.addAttribute("user", user);
-        model.addAttribute("avatarUrl", avatarUrl);
-        model.addAttribute("postCreationDto", new PostCreationDto());
-        model.addAttribute("userPosts", userPosts);
-        model.addAttribute("notificationCount", unreadNotificationCount);
-        model.addAttribute("notifications", notifications);
-        model.addAttribute("isEmailVerified", user.getEmailVerified());
-
-        return "user-profile";
+        return "profile";
     }
-//профиль пользователя
-@GetMapping
-public String getProfile(Authentication authentication, Model model) {
-    User user = userService.findByUsername(authentication.getName());
-
-    String avatarUrl = userService.getUserAvatarUrl(user);
-
-    // Добавляем URL аватара в модель, если он существует
-    if (avatarUrl != null) {
-        model.addAttribute("avatarUrl", avatarUrl);
-    }
-    model.addAttribute("avatarUrl", avatarUrl);
-    model.addAttribute("relationshipStatuses", RelationshipStatusConstants.getAllStatuses());
-    model.addAttribute("user", user);
-    return "profile";
-}
 
 //обновиить профиль
 
@@ -118,8 +125,6 @@ public String getProfile(Authentication authentication, Model model) {
             return "redirect:/profile?error=dropbox_upload_failed";
         }
     }
-
-
 
 
     private Long getCurrentUserId() {
