@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Groups</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<h1>My Groups</h1>
+
+<h2>Subscription Groups</h2>
+<ul>
+    <li th:each="group : ${groups}"
+        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">
+        <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>
+    </li>
+</ul>
+
+<h2>Interactive Groups</h2>
+<ul>
+    <li th:each="group : ${groups}"
+        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).INTERACTIVE}">
+        <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>
+    </li>
+</ul>
+
+<div>
+        <span th:if="${currentPage > 0}">
+            <a th:href="@{/groups/my(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Previous</a>
+        </span>
+    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:href="@{/groups/my(page=${i}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"
+               th:text="${i + 1}"></a>
+        </span>
+    <span th:if="${currentPage < totalPages - 1}">
+            <a th:href="@{/groups/my(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Next</a>
+        </span>
+</div>
+
+<div>
+    <p>Sort by:
+        <a th:href="@{/groups/my(sortBy='name', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Name</a> |
+        <a th:href="@{/groups/my(sortBy='createdAt', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Creation
+            Date</a>
+    </p>
+</div>
+
+<p>Total Items: <span th:text="${totalItems}"></span></p>
+</body>
+</html>

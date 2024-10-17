@@ -7,6 +7,10 @@ import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +28,11 @@ public class GroupService {
 
     @Transactional
     public Group createGroup(Group group, User owner) {
-        log.info("Creating group: {}", group.getName());
 
         if (owner == null) {
             log.info("Owner not provided, attempting to get current user");
             owner = userService.getCurrentUser();
         }
-
-        log.info("Owner: {}", owner.getUsername());
-
         group.setOwner(owner);
         group.setCreatedAt(LocalDateTime.now());
         group.setMembersCount(1L);
@@ -45,12 +45,37 @@ public class GroupService {
 
     @Transactional
     public void addMember(Group group, User user) {
+        log.info("Adding user {} to group {}", user.getUsername(), group.getName());
         if (group.getType() == Group.GroupType.INTERACTIVE) {
-            group.getMembers().add(user);
-            group.setMembersCount(group.getMembersCount() + 1);
-            groupRepository.save(group);
+            if (!group.getMembers().contains(user)) {
+                group.getMembers().add(user);
+                group.setMembersCount(group.getMembersCount() + 1);
+                groupRepository.save(group);
+                log.info("User {} successfully added to group {}", user.getUsername(), group.getName());
+            } else {
+                log.info("User {} is already a member of group {}", user.getUsername(), group.getName());
+            }
         } else {
-            throw new IllegalStateException("Cannot add members to a subscription group");
+            log.warn("Cannot add members to non-interactive group {}", group.getName());
+            throw new IllegalStateException("Cannot add members to a non-interactive group");
+        }
+    }
+
+    @Transactional
+    public void subscribeToGroup(Group group, User user) {
+        log.info("Subscribing user {} to group {}", user.getUsername(), group.getName());
+        if (group.getType() == Group.GroupType.SUBSCRIPTION) {
+            if (!group.getMembers().contains(user)) {
+                group.getMembers().add(user);
+                group.setMembersCount(group.getMembersCount() + 1);
+                groupRepository.save(group);
+                log.info("User {} successfully subscribed to group {}", user.getUsername(), group.getName());
+            } else {
+                log.info("User {} is already subscribed to group {}", user.getUsername(), group.getName());
+            }
+        } else {
+            log.warn("Cannot subscribe to non-subscription group {}", group.getName());
+            throw new IllegalStateException("Cannot subscribe to a non-subscription group");
         }
     }
 
@@ -98,15 +123,7 @@ public class GroupService {
     }
 
     // Метод для подписки на группу (только для SUBSCRIPTION типа)
-    @Transactional
-    public void subscribeToGroup(Group group, User user) {
-        if (group.getType() != Group.GroupType.SUBSCRIPTION) {
-            throw new IllegalStateException("Can only subscribe to SUBSCRIPTION type groups");
-        }
-        group.getMembers().add(user);
-        group.setMembersCount(group.getMembersCount() + 1);
-        groupRepository.save(group);
-    }
+
 
     // отписки от группы (только для SUBSCRIPTION типа)
     @Transactional
@@ -142,6 +159,14 @@ public class GroupService {
     public Group getGroupById(Long id) {
         return groupRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+    }
+
+
+    public Page<Group> getCurrentUserGroups(int page, int size, String sortBy, String sortDirection) {
+        Long currentUserId = userService.getCurrentUserId();
+        Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return groupRepository.findByMembersId(currentUserId, pageable);
     }
     // Другие методы...
 }

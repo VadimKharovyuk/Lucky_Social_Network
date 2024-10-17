@@ -6,6 +6,7 @@ import com.example.lucky_social_network.service.GroupService;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +20,41 @@ public class GroupController {
 
     private final GroupService groupService;
     private final UserService userService;
+
+
+    @PostMapping("/{groupId}/join")
+    public String joinGroup(@PathVariable Long groupId) {
+        User currentUser = userService.getCurrentUser();
+        Group group = groupService.getGroupById(groupId);
+
+        if (group.getType() == Group.GroupType.INTERACTIVE) {
+            groupService.addMember(group, currentUser);
+
+        } else {
+            groupService.subscribeToGroup(group, currentUser);
+        }
+        return "redirect:/groups/" + groupId;
+    }
+
+    @GetMapping("/my")
+    public String getCurrentUserGroups(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            Model model) {
+
+        Page<Group> groupPage = groupService.getCurrentUserGroups(page, size, sortBy, sortDirection);
+
+        model.addAttribute("groups", groupPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", groupPage.getTotalPages());
+        model.addAttribute("totalItems", groupPage.getTotalElements());
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDirection", sortDirection);
+
+        return "groups/my-groups";
+    }
 
     @GetMapping
     public String listGroups(Model model) {
@@ -34,17 +70,8 @@ public class GroupController {
 
     @PostMapping("/create")
     public String createGroup(@ModelAttribute Group group) {
-        log.info("Attempting to create group: {}", group.getName());
-
         User currentUser;
-        try {
-            currentUser = userService.getCurrentUser();
-            log.info("Current user: {}", currentUser.getUsername());
-        } catch (IllegalStateException e) {
-            log.error("Failed to get current user: {}", e.getMessage());
-            return "redirect:/login";
-        }
-
+        currentUser = userService.getCurrentUser();
         groupService.createGroup(group, currentUser);
         return "redirect:/groups";
     }
@@ -55,16 +82,6 @@ public class GroupController {
         return "groups/view";
     }
 
-    @PostMapping("/{groupId}/join")
-    public String joinGroup(@PathVariable Long groupId, @AuthenticationPrincipal User currentUser) {
-        Group group = groupService.getGroupById(groupId);
-        if (group.getType() == Group.GroupType.INTERACTIVE) {
-            groupService.addMember(group, currentUser);
-        } else {
-            groupService.subscribeToGroup(group, currentUser);
-        }
-        return "redirect:/groups/" + groupId;
-    }
 
     @PostMapping("/{groupId}/leave")
     public String leaveGroup(@PathVariable Long groupId, @AuthenticationPrincipal User currentUser) {
