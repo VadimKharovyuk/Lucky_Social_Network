@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${group.name}">Group Name</title>
+</head>
+<body>
+<h1 th:text="${group.name}">Group Name</h1>
+<p th:text="${group.description}">Group Description</p>
+<p>Type: <span th:text="${group.type}"></span></p>
+<p>Members: <span th:text="${group.membersCount}"></span></p>
+
+<form th:if="${!group.members.contains(#authentication.principal)}" th:action="@{/groups/{id}/join(id=${group.id})}"
+      method="post">
+    <button type="submit">Join Group</button>
+</form>
+
+<form th:if="${group.members.contains(#authentication.principal)}" th:action="@{/groups/{id}/leave(id=${group.id})}"
+      method="post">
+    <button type="submit">Leave Group</button>
+</form>
+
+<h2>Posts</h2>
+<ul>
+    <li th:each="post : ${group.posts}">
+        <p th:text="${post.content}"></p>
+        <small>Posted by <span th:text="${post.author.username}"></span> on <span
+                th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span></small>
+    </li>
+</ul>
+
+<h3>Create New Post</h3>
+<form th:if="${group.members.contains(#authentication.principal)}" th:action="@{/groups/{id}/post(id=${group.id})}"
+      method="post">
+    <textarea name="content" required></textarea>
+    <button type="submit">Post</button>
+</form>
+</body>
+</html>

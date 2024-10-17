@@ -199,11 +199,6 @@ public class UserService {
         throw new IllegalStateException("User not authenticated or CustomUserDetails not found");
     }
 
-    
-    public List<User> searchUsers(String searchTerm) {
-        return userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(searchTerm, searchTerm);
-    }
-
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -219,4 +214,10 @@ public class UserService {
 
         throw new IllegalStateException("Unexpected principal type: " + principal.getClass());
     }
+    
+    public List<User> searchUsers(String searchTerm) {
+        return userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(searchTerm, searchTerm);
+    }
+
+
 }
