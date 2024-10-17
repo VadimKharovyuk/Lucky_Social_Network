@@ -4,15 +4,10 @@ import com.example.lucky_social_network.dto.PostCreationDto;
 import com.example.lucky_social_network.model.Comment;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
-import com.example.lucky_social_network.service.CustomUserDetails;
-import com.example.lucky_social_network.service.PostService;
-import com.example.lucky_social_network.service.SubscriptionService;
-import com.example.lucky_social_network.service.UserService;
+import com.example.lucky_social_network.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,18 +15,121 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.print.Pageable;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 @Slf4j
 @Controller
 @RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
 
+
     private final PostService postService;
     private final UserService userService;
     private final SubscriptionService subscriptionService;
+    private final CommentService commentService;
+    private final LikeService likeService;
+
+
+    @GetMapping
+    public String getAllPosts(Model model) {
+        List<Post> posts = postService.getAllPostsSortedByDateDesc();
+        model.addAttribute("posts", posts);
+
+
+        Long currentUserId = null;
+        try {
+            currentUserId = userService.getCurrentUserId();
+        } catch (IllegalStateException e) {
+            // Пользователь не аутентифицирован, оставляем currentUserId как null
+        }
+        model.addAttribute("currentUserId", currentUserId);
+
+        return "posts/list";
+    }
+
+    @GetMapping("/{id}")
+    public String getPost(@PathVariable Long id, Model model) {
+        Optional<Post> postOptional = postService.getPostById(id);
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            User currentUser = userService.getCurrentUser();
+
+            model.addAttribute("post", post);
+            model.addAttribute("likeCount", likeService.getLikeCount(post));
+            model.addAttribute("userLiked", likeService.hasUserLikedPost(post, currentUser));
+
+            // Получаем комментарии к посту
+            List<Comment> comments = commentService.getCommentsByPostId(id);
+            model.addAttribute("comments", comments);
+
+            // Добавляем пустой объект Comment для формы
+            model.addAttribute("newComment", new Comment());
+
+            // Добавляем текущего пользователя
+            model.addAttribute("currentUserId", currentUser.getId());
+
+            return "posts/view";
+        } else {
+            return "error/404";
+        }
+    }
+
+
+    @PostMapping("/{id}/like")
+    public String likePost(@PathVariable Long id, Model model) {
+        Optional<Post> postOptional = postService.getPostById(id);
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            User currentUser = userService.getCurrentUser();
+
+            likeService.toggleLike(post, currentUser);
+
+            // Обновляем модель
+            model.addAttribute("post", post);
+            model.addAttribute("likeCount", likeService.getLikeCount(post));
+            model.addAttribute("userLiked", likeService.hasUserLikedPost(post, currentUser));
+
+            // Получаем комментарии к посту
+            List<Comment> comments = commentService.getCommentsByPostId(id);
+            model.addAttribute("comments", comments);
+
+            // Добавляем пустой объект Comment для формы
+            model.addAttribute("newComment", new Comment());
+
+            // Добавляем текущего пользователя
+            model.addAttribute("currentUserId", currentUser.getId());
+
+            return "posts/view";
+        } else {
+            return "error/404";
+        }
+    }
+
+
+    //посты юзера
+    @GetMapping("/user/{userId}")
+    public String getUserPosts(@PathVariable Long userId, Model model) {
+        User user = userService.getUserById(userId);
+        List<Post> userPosts = postService.getPostsByAuthor(user);
+
+        // Получаем текущего пользователя
+        User currentUser = userService.getCurrentUser();
+
+        // Получаем информацию о лайках текущего пользователя
+        Set<Long> likedPostIds = likeService.getLikedPostIdsByUserAndPosts(currentUser, userPosts);
+
+        model.addAttribute("user", user);
+        model.addAttribute("userPosts", userPosts);
+        model.addAttribute("likedPostIds", likedPostIds);
+        model.addAttribute("currentUser", currentUser);
+
+        return "posts/user-posts";
+    }
+
 
     @PostMapping("/create")
     public String createPost(@ModelAttribute PostCreationDto postDto,
@@ -65,54 +163,9 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/news-feed")
-    public ResponseEntity<Page<Post>> getNewsFeed(@PageableDefault(size = 20) Pageable pageable) {
-        Long currentUserId = getCurrentUserId();
-        Page<Post> newsFeed = subscriptionService.getNewsFeed(currentUserId, (org.springframework.data.domain.Pageable) pageable);
-        return ResponseEntity.ok(newsFeed);
-    }
 
 
 
-
-
-
-
-
-    @GetMapping
-    public String getAllPosts(Model model) {
-        List<Post> posts = postService.getAllPosts();
-        model.addAttribute("posts", posts);
-
-        // Добавляем пустой объект Comment для формы
-        model.addAttribute("newComment", new Comment());
-
-        // Получаем ID текущего пользователя, если он аутентифицирован
-        Long currentUserId = null;
-        try {
-            currentUserId = userService.getCurrentUserId();
-        } catch (IllegalStateException e) {
-            // Пользователь не аутентифицирован, оставляем currentUserId как null
-        }
-        model.addAttribute("currentUserId", currentUserId);
-
-        return "posts/list";
-    }
-
-    @GetMapping("/{id}")
-    public String getPost(@PathVariable Long id, Model model) {
-        postService.getPostById(id).ifPresent(post -> model.addAttribute("post", post));
-        return "posts/view";
-    }
-
-
-    @GetMapping("/user/{userId}")
-    public String getUserPosts(@PathVariable Long userId, Model model) {
-        User user = userService.getUserById(userId);
-        List<Post> userPosts = postService.getPostsByAuthor(user);
-        model.addAttribute("userPosts", userPosts);
-        return "posts/user-posts";
-    }
 
 
 
@@ -128,13 +181,6 @@ public class PostController {
         return "redirect:/posts/" + id;
     }
 
-
-
-    @PostMapping("/{id}/like")
-    public String likePost(@PathVariable Long id) {
-        postService.getPostById(id).ifPresent(postService::incrementLikeCount);
-        return "redirect:/posts/" + id;
-    }
 
 
 

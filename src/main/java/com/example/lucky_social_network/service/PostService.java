@@ -45,8 +45,8 @@ public class PostService {
         return postRepository.findById(id);
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<Post> getAllPostsSortedByDateDesc() {
+        return postRepository.findAllByOrderByTimestampDesc();
     }
 
     public List<Post> getPostsByAuthor(User author) {

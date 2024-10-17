@@ -343,6 +343,51 @@
             font-size: 0.9em;
             color: #666;
         }
+
+        .post {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .post-content {
+            margin-bottom: 10px;
+        }
+
+        .post-content a {
+            color: #1c1e21;
+            text-decoration: none;
+        }
+
+        .post-content a:hover {
+            text-decoration: underline;
+        }
+
+        .post-meta {
+            font-size: 0.9em;
+            color: #65676b;
+        }
+
+        .post-location {
+            margin-top: 5px;
+        }
+
+        .post-actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .map-link {
+            color: #1877f2;
+            text-decoration: none;
+        }
+
+        .map-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -516,7 +561,9 @@
             <h2>Посты пользователя</h2>
             <div th:if="${userPosts != null and not #lists.isEmpty(userPosts)}">
                 <div th:each="post : ${userPosts}" class="post">
-                    <div class="post-content" th:text="${post.content}"></div>
+                    <div class="post-content">
+                        <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.content}"></a>
+                    </div>
                     <div class="post-meta">
                 <span class="post-timestamp"
                       th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span>
@@ -524,7 +571,6 @@
                         <!-- Отображение геолокации -->
                         <div th:if="${post.latitude != null and post.longitude != null}" class="post-location">
                             <i class="fas fa-map-marker-alt"></i>
-                            <!-- Иконка местоположения (если используете Font Awesome) -->
                             <span th:if="${not #strings.isEmpty(post.locationName)}"
                                   th:text="${post.locationName}"></span>
                             <span th:if="${#strings.isEmpty(post.locationName)}"
@@ -533,10 +579,14 @@
                                target="_blank" class="map-link">Открыть карту</a>
                         </div>
 
-                        <form th:if="${post.author.id == #authentication.principal.id}"
-                              th:action="@{/posts/delete/{postId}(postId=${post.id})}" method="post">
-                            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-                        </form>
+                        <div class="post-actions">
+                            <!--                            <a th:href="@{/posts/{id}(id=${post.id})}" class="btn btn-primary btn-sm">Просмотреть-->
+                            <!--                                пост</a>-->
+                            <form th:if="${post.author.id == #authentication.principal.id}"
+                                  th:action="@{/posts/delete/{postId}(postId=${post.id})}" method="post">
+                                <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -595,3 +645,5 @@
 </script>
 
 </html>
+
+
