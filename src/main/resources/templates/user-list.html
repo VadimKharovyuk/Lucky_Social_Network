@@ -1,45 +1,7 @@
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--  <title>User List</title>-->
-<!--  <meta charset="UTF-8">-->
-<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
-<!--  <style>-->
-<!--    .user-list { max-width: 800px; margin: 0 auto; padding: 20px; }-->
-<!--    .user-item { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }-->
-<!--    .user-item a { text-decoration: none; color: #0066cc; }-->
-<!--  </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--<div class="container user-list">-->
-<!--  <h1>User List</h1>-->
-
-<!--  &lt;!&ndash; Добавлено отображение сообщений об успехе или ошибке &ndash;&gt;-->
-<!--  <div th:if="${message}" class="alert alert-success" role="alert">-->
-<!--    <span th:text="${message}"></span>-->
-<!--  </div>-->
-<!--  <div th:if="${error}" class="alert alert-danger" role="alert">-->
-<!--    <span th:text="${error}"></span>-->
-<!--  </div>-->
-
-<!--  <div th:each="user : ${users}" class="user-item">-->
-<!--    <span th:text="${user.username}"></span>-->
-<!--&lt;!&ndash;    <a th:if="${user.id != currentUserId}" th:href="@{/chat/start/{recipientId}(recipientId=${user.id})}">Start Chat</a>&ndash;&gt;-->
-<!--    <form th:if="${user.id != currentUserId}" th:action="@{/users/addFriend}" method="post" style="display: inline;">-->
-<!--      <input type="hidden" name="userId" th:value="${currentUserId}" />-->
-<!--      <input type="hidden" name="friendId" th:value="${user.id}" />-->
-<!--      <button type="submit" class="btn btn-primary btn-sm float-right">Add Friend</button>-->
-<!--    </form>-->
-<!--  </div>-->
-<!--</div>-->
-<!--</body>-->
-<!--</html>-->
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
-  <title>Список пользователей - Lucky Social Network</title>
+  <title>Поиск пользователей - Lucky Social Network</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -81,26 +43,53 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       padding: 20px;
-      max-width: 800px;
+      max-width: 600px;
       margin: 0 auto;
     }
     h1 {
       color: #1877f2;
       margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .search-form {
+      margin-bottom: 20px;
     }
     .user-item {
       background-color: #ffffff;
-      border: 1px solid #dddfe2;
       border-radius: 8px;
       padding: 10px;
       margin-bottom: 10px;
       transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .user-item:hover {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      background-color: #f0f2f5;
     }
-    .user-item span {
+
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #e4e6eb;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #1877f2;
+    }
+
+    .user-name {
       font-weight: 500;
+      color: #050505;
     }
     .btn-primary {
       background-color: #1877f2;
@@ -109,6 +98,11 @@
     .btn-primary:hover {
       background-color: #166fe5;
       border-color: #166fe5;
+    }
+
+    .friend-status {
+      font-size: 14px;
+      color: #65676b;
     }
   </style>
 </head>
@@ -141,9 +135,9 @@
 </header>
 <div class="main-container">
   <div class="content-container">
-    <h1>Список пользователей</h1>
+    <h1>Поиск пользователей</h1>
 
-    <!-- Добавлено отображение сообщений об успехе или ошибке -->
+    <!-- Сообщения об успехе или ошибке -->
     <div th:if="${message}" class="alert alert-success" role="alert">
       <span th:text="${message}"></span>
     </div>
@@ -151,17 +145,38 @@
       <span th:text="${error}"></span>
     </div>
 
+    <!-- Форма поиска -->
+    <form class="search-form" th:action="@{/users/list}" method="get">
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Поиск пользователей" name="search" th:value="${search}">
+        <button class="btn btn-outline-primary" type="submit">Поиск</button>
+      </div>
+    </form>
+
+    <!-- Список пользователей -->
+    <div th:if="${users.empty}">
+      <p>Пользователи не найдены.</p>
+    </div>
     <div th:each="user : ${users}" class="user-item">
-      <div class="d-flex justify-content-between align-items-center">
-        <a th:href="@{/profile/{userId}(userId=${user.id})}" th:text="${user.username}" class="text-decoration-none"></a>
-        <div th:if="${user.id != currentUserId}">
-          <span th:if="${@userService.areFriends(currentUserId, user.id)}">Друзья</span>
-          <form th:unless="${@userService.areFriends(currentUserId, user.id)}" th:action="@{/users/addFriend}" method="post">
-            <input type="hidden" name="userId" th:value="${currentUserId}" />
-            <input type="hidden" name="friendId" th:value="${user.id}" />
-            <button type="submit" class="btn btn-primary btn-sm">Добавить в друзья</button>
-          </form>
+      <div class="user-info">
+        <div class="user-avatar"
+             th:text="${#strings.substring((!#strings.isEmpty(user.firstName) ? user.firstName : (!#strings.isEmpty(user.username) ? user.username : 'U')), 0, 1)}">
         </div>
+        <a th:href="@{/profile/{userId}(userId=${user.id})}" class="user-name text-decoration-none">
+                        <span th:text="${(!#strings.isEmpty(user.firstName) and !#strings.isEmpty(user.lastName)) ?
+                                        (user.firstName + ' ' + user.lastName) :
+                                        (!#strings.isEmpty(user.username) ? user.username : 'Пользователь ' + user.id)}">
+                        </span>
+        </a>
+      </div>
+      <div th:if="${user.id != currentUserId}">
+        <span th:if="${@userService.areFriends(currentUserId, user.id)}" class="friend-status">Друзья</span>
+        <form th:unless="${@userService.areFriends(currentUserId, user.id)}" th:action="@{/users/addFriend}"
+              method="post" style="display: inline;">
+          <input type="hidden" name="userId" th:value="${currentUserId}"/>
+          <input type="hidden" name="friendId" th:value="${user.id}"/>
+          <button type="submit" class="btn btn-primary btn-sm">Добавить в друзья</button>
+        </form>
       </div>
     </div>
   </div>
@@ -170,3 +185,139 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--  <title>Список пользователей - Lucky Social Network</title>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">-->
+<!--  <style>-->
+<!--    body {-->
+<!--      font-family: 'Roboto', sans-serif;-->
+<!--      background-color: #f0f2f5;-->
+<!--      color: #1c1e21;-->
+<!--    }-->
+<!--    header {-->
+<!--      background-color: #ffffff;-->
+<!--      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
+<!--      position: fixed;-->
+<!--      width: 100%;-->
+<!--      top: 0;-->
+<!--      z-index: 1000;-->
+<!--    }-->
+<!--    .navbar {-->
+<!--      padding: 0.5rem 1rem;-->
+<!--    }-->
+<!--    .navbar-brand {-->
+<!--      color: #1877f2;-->
+<!--      font-weight: bold;-->
+<!--      font-size: 1.5rem;-->
+<!--    }-->
+<!--    .nav-link {-->
+<!--      color: #65676b;-->
+<!--    }-->
+<!--    .nav-link:hover {-->
+<!--      color: #1877f2;-->
+<!--    }-->
+<!--    .main-container {-->
+<!--      margin-top: 70px;-->
+<!--      padding: 20px;-->
+<!--    }-->
+<!--    .content-container {-->
+<!--      background-color: #ffffff;-->
+<!--      border-radius: 8px;-->
+<!--      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
+<!--      padding: 20px;-->
+<!--      max-width: 800px;-->
+<!--      margin: 0 auto;-->
+<!--    }-->
+<!--    h1 {-->
+<!--      color: #1877f2;-->
+<!--      margin-bottom: 20px;-->
+<!--    }-->
+<!--    .user-item {-->
+<!--      background-color: #ffffff;-->
+<!--      border: 1px solid #dddfe2;-->
+<!--      border-radius: 8px;-->
+<!--      padding: 10px;-->
+<!--      margin-bottom: 10px;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .user-item:hover {-->
+<!--      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);-->
+<!--    }-->
+<!--    .user-item span {-->
+<!--      font-weight: 500;-->
+<!--    }-->
+<!--    .btn-primary {-->
+<!--      background-color: #1877f2;-->
+<!--      border-color: #1877f2;-->
+<!--    }-->
+<!--    .btn-primary:hover {-->
+<!--      background-color: #166fe5;-->
+<!--      border-color: #166fe5;-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--  <nav class="navbar navbar-expand-lg navbar-light">-->
+<!--    <div class="container">-->
+<!--      <a class="navbar-brand" href="/">Lucky Social Network</a>-->
+<!--      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">-->
+<!--        <span class="navbar-toggler-icon"></span>-->
+<!--      </button>-->
+<!--      <div class="collapse navbar-collapse" id="navbarNav">-->
+<!--        <ul class="navbar-nav ms-auto">-->
+<!--          <li class="nav-item">-->
+<!--            <a class="nav-link" href="/">Моя страница</a>-->
+<!--          </li>-->
+<!--          <li class="nav-item">-->
+<!--            <a class="nav-link" href="/friends">Друзья</a>-->
+<!--          </li>-->
+<!--          <li class="nav-item">-->
+<!--            <a class="nav-link" href="/messages">Сообщения</a>-->
+<!--          </li>-->
+<!--          <li class="nav-item">-->
+<!--            <a class="nav-link" href="/settings">Настройки</a>-->
+<!--          </li>-->
+<!--        </ul>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </nav>-->
+<!--</header>-->
+<!--<div class="main-container">-->
+<!--  <div class="content-container">-->
+<!--    <h1>Список пользователей</h1>-->
+
+<!--    &lt;!&ndash; Добавлено отображение сообщений об успехе или ошибке &ndash;&gt;-->
+<!--    <div th:if="${message}" class="alert alert-success" role="alert">-->
+<!--      <span th:text="${message}"></span>-->
+<!--    </div>-->
+<!--    <div th:if="${error}" class="alert alert-danger" role="alert">-->
+<!--      <span th:text="${error}"></span>-->
+<!--    </div>-->
+
+<!--    <div th:each="user : ${users}" class="user-item">-->
+<!--      <div class="d-flex justify-content-between align-items-center">-->
+<!--        <a th:href="@{/profile/{userId}(userId=${user.id})}" th:text="${user.username}" class="text-decoration-none"></a>-->
+<!--        <div th:if="${user.id != currentUserId}">-->
+<!--          <span th:if="${@userService.areFriends(currentUserId, user.id)}">Друзья</span>-->
+<!--          <form th:unless="${@userService.areFriends(currentUserId, user.id)}" th:action="@{/users/addFriend}" method="post">-->
+<!--            <input type="hidden" name="userId" th:value="${currentUserId}" />-->
+<!--            <input type="hidden" name="friendId" th:value="${user.id}" />-->
+<!--            <button type="submit" class="btn btn-primary btn-sm">Добавить в друзья</button>-->
+<!--          </form>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->

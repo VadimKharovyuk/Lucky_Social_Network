@@ -26,7 +26,40 @@ import java.util.Set;
 public class UserListController {
     private final UserService userService;
 
+    @GetMapping("/list")
+    public String getUserList(@RequestParam(required = false) String search, Model model) {
+        Long currentUserId = getCurrentUserId();
+        User currentUser = userService.getUserById(currentUserId);
+        model.addAttribute("currentUser", currentUser);
 
+        List<User> users;
+        if (search != null && !search.isEmpty()) {
+            users = userService.searchUsers(search);
+        } else {
+            users = userService.getAllUsers();
+        }
+        model.addAttribute("users", users);
+        model.addAttribute("currentUserId", currentUserId);
+        model.addAttribute("search", search);
+
+        return "user-list";
+    }
+
+
+//    @GetMapping("/list")
+//    public String getUserList(Model model) {
+//        Long currentUserId = getCurrentUserId();
+//
+//        // Получаем текущего пользователя
+//        User currentUser = userService.getUserById(currentUserId);
+//        model.addAttribute("currentUser", currentUser);
+//
+//        List<User> users = userService.getAllUsers();
+//        model.addAttribute("users", users);
+//        model.addAttribute("currentUserId", getCurrentUserId());
+//
+//        return "user-list";
+//    }
 
     @PostMapping("/addFriend")
     public String addFriend(@RequestParam Long userId, @RequestParam Long friendId, RedirectAttributes redirectAttributes) {
@@ -41,20 +74,6 @@ public class UserListController {
 
 
 
-    @GetMapping("/list")
-    public String getUserList(Model model) {
-        Long currentUserId = getCurrentUserId();
-
-        // Получаем текущего пользователя
-        User currentUser = userService.getUserById(currentUserId);
-        model.addAttribute("currentUser", currentUser);
-
-        List<User> users = userService.getAllUsers();
-        model.addAttribute("users", users);
-        model.addAttribute("currentUserId", getCurrentUserId());
-
-        return "user-list";
-    }
 
 //поиск друзей по id
 // Поиск друзей текущего пользователя

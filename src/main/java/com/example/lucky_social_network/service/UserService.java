@@ -197,4 +197,9 @@ public class UserService {
         }
         throw new IllegalStateException("User not authenticated or CustomUserDetails not found");
     }
+
+    
+    public List<User> searchUsers(String searchTerm) {
+        return userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(searchTerm, searchTerm);
+    }
 }
