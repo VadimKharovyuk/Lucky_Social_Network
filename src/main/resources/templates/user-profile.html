@@ -318,6 +318,15 @@
             border-radius: 5px;
             margin-top: 10px;
         }
+
+        .profile-name {
+            margin-bottom: 0.2em;
+        }
+
+        .profile-username {
+            color: #666;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -389,8 +398,22 @@
                 <h5>
                     <span th:if="${isEmailVerified}" class="verified-icon" title="Email подтвержден">&#9733;</span>
                 </h5>
+                <div class="profile-header">
 
-                <div class="profile-name" th:text="${user.username}">Сергей Ситников</div>
+                    <!-- Проверяем, заполнены ли имя и фамилия -->
+                    <div th:if="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}">
+                        <h2 class="profile-name">
+                            <span th:text="${user.firstName}">Имя</span>
+                            <span th:text="${user.lastName}">Фамилия</span>
+                        </h2>
+                        <!--                        <p class="profile-username" th:text="${'@' + user.username}">@username</p>-->
+                    </div>
+
+                    <!-- Если имя или фамилия не заполнены, показываем только username -->
+                    <h2 th:unless="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"
+                        class="profile-name" th:text="${'@' + user.username}">username</h2>
+                </div>
+
                 <div class="profile-status">Online</div>
 
 
@@ -404,7 +427,8 @@
                         <span th:if="${user.relationshipStatus != null and !user.relationshipStatus.isEmpty()}"
                               th:text="${user.relationshipStatus.get(0)}"></span>
                         <span th:if="${user.relationshipStatus == null or user.relationshipStatus.isEmpty()}">Не указано</span>
-                        <span th:if="${user.partner != null}" th:text="' - ' + ${user.partner.username}"></span>
+
+                        - <span th:text="${user.partner.firstName + ' ' + user.partner.lastName}">Партнер</span>
                     </div>
                     <br>
                     <br>

@@ -32,9 +32,6 @@ public class UserService {
     private final DropboxService dropboxService;
 
 
-//    public User updateUser(User user) {
-//        return userRepository.save(user);
-//    }
 
     public User updateUser(User user, String relationshipStatus, Long partnerId) {
         User existingUser = userRepository.findById(user.getId())
@@ -46,6 +43,9 @@ public class UserService {
         existingUser.setBio(user.getBio());
         existingUser.setDateOfBirth(user.getDateOfBirth());
         existingUser.setLocation(user.getLocation());
+
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
 
 
         // Обновляем семейное положение

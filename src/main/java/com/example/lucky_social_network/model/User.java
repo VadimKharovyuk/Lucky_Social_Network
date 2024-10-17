@@ -31,6 +31,13 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(length = 50)
+    private String firstName;
+    
+    @Column(length = 50)
+    private String lastName;
+
+
     private String email;
     private String phone;
     @Column(length = 500)
@@ -121,6 +128,6 @@ public class User {
         USER,
         ADMIN,
         MODERATOR
-        // Добавьте другие роли по необходимости
+
     }
 }

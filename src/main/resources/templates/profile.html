@@ -77,6 +77,17 @@
             <p th:text="${param.error}">Ошибка загрузки аватара.</p>
           </div>
 
+
+          <div class="form-group">
+            <label for="firstName">Имя:</label>
+            <input type="text" class="form-control" id="firstName" th:field="${user.firstName}" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Фамилия:</label>
+            <input type="text" class="form-control" id="lastName" th:field="${user.lastName}" required>
+          </div>
+          
+
           <div class="form-group">
             <label for="email">Email:</label>
             <input type="email" class="form-control" id="email" th:field="${user.email}" required>

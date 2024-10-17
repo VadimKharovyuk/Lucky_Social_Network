@@ -167,16 +167,6 @@
   <div class="content-container">
     <h1>Список друзей</h1>
 
-    <!--    &lt;!&ndash; Аватар текущего пользователя &ndash;&gt;-->
-    <!--    <div class="current-user-avatar">-->
-    <!--      <img th:if="${currentUserAvatarUrl != null}"-->
-    <!--           th:src="${currentUserAvatarUrl}"-->
-    <!--           alt="Ваш аватар">-->
-    <!--      <img th:unless="${currentUserAvatarUrl != null}"-->
-    <!--           src="/default-avatar.jpg"-->
-    <!--           alt="Аватар по умолчанию">-->
-    <!--      <p>Ваш профиль</p>-->
-    <!--    </div>-->
 
     <!-- Проверка, есть ли друзья -->
     <div th:if="${friends.isEmpty()}">
@@ -196,11 +186,23 @@
              class="friend-avatar"
              th:alt="${'Аватар по умолчанию для ' + friend.username}">
 
+
         <!-- Информация о друге -->
         <div class="friend-info">
-          <h3 th:text="${friend.username}">Имя друга</h3>
+          <h3>
+        <span th:if="${not #strings.isEmpty(friend.firstName) and not #strings.isEmpty(friend.lastName)}"
+              th:text="${friend.firstName + ' ' + friend.lastName}">Имя Фамилия</span>
+            <span th:unless="${not #strings.isEmpty(friend.firstName) and not #strings.isEmpty(friend.lastName)}"
+                  th:text="${friend.username}">Username</span>
+          </h3>
+          <p class="friend-username" th:text="${'@' + friend.username}">@username</p>
           <p th:text="${friend.email}">Email друга</p>
         </div>
+        <!--        &lt;!&ndash; Информация о друге &ndash;&gt;-->
+        <!--        <div class="friend-info">-->
+        <!--          <h3 th:text="${friend.username}">Имя друга</h3>-->
+        <!--          <p th:text="${friend.email}">Email друга</p>-->
+        <!--        </div>-->
 
         <!-- Действия с другом -->
         <div class="friend-actions">

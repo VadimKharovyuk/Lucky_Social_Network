@@ -148,10 +148,20 @@
 <main class="container">
   <h1>Ваши чаты</h1>
   <ul class="chat-list">
-    <li th:each="user, iterStat : ${chatUsers}">
-      <a th:href="@{/chat/{senderId}/{recipientId}(senderId=${#authentication.principal.id},recipientId=${user.id})}"
-         th:text="${user.username}">Username</a>
-    </li>
+    <ul>
+      <li th:each="user, iterStat : ${chatUsers}">
+        <a th:href="@{/chat/{senderId}/{recipientId}(senderId=${#authentication.principal.id},recipientId=${user.id})}">
+            <span th:if="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"
+                  th:text="${user.firstName + ' ' + user.lastName}">Имя Фамилия</span>
+          <span th:unless="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"
+                th:text="${user.username}">Username</span>
+        </a>
+      </li>
+    </ul>
+    <!--    <li th:each="user, iterStat : ${chatUsers}">-->
+    <!--      <a th:href="@{/chat/{senderId}/{recipientId}(senderId=${#authentication.principal.id},recipientId=${user.id})}"-->
+    <!--         th:text="${user.username}">Username</a>-->
+    <!--    </li>-->
   </ul>
 </main>
 </body>
