@@ -1,5 +1,6 @@
 package com.example.lucky_social_network.service;
 
+import com.example.lucky_social_network.dto.PostCreationDto;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.PostRepository;
@@ -18,14 +19,27 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+
+
     @Transactional
-    public Post createPost(User author, String content) {
+    public Post createPost(User author, PostCreationDto postDto) {
         Post post = new Post();
         post.setAuthor(author);
-        post.setContent(content);
+        post.setContent(postDto.getContent());
         post.setTimestamp(LocalDateTime.now());
+        post.setLatitude(postDto.getLatitude());
+        post.setLongitude(postDto.getLongitude());
+        post.setLocationName(postDto.getLocationName());
         return postRepository.save(post);
     }
+//    @Transactional
+//    public Post createPost(User author, String content) {
+//        Post post = new Post();
+//        post.setAuthor(author);
+//        post.setContent(content);
+//        post.setTimestamp(LocalDateTime.now());
+//        return postRepository.save(post);
+//    }
 
     public Optional<Post> getPostById(Long id) {
         return postRepository.findById(id);

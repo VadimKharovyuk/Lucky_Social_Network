@@ -5,4 +5,7 @@ import lombok.Data;
 @Data
 public class PostCreationDto {
     private String content;
+    private Double latitude;
+    private Double longitude;
+    private String locationName;
 }

@@ -327,6 +327,22 @@
             color: #666;
             font-size: 0.9em;
         }
+
+        .geolocation-container {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        #locationName {
+            margin-bottom: 5px;
+        }
+
+        #locationStatus {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -471,10 +487,23 @@
                 <form th:action="@{/posts/create}" method="post" th:object="${postCreationDto}">
                     <input type="hidden" name="userId" th:value="${currentUser.id}"/>
                     <textarea th:field="*{content}" class="post-input" placeholder="Что у вас нового?"></textarea>
+
+                    <!-- Поля для геолокации -->
+                    <div class="geolocation-container">
+                        <input type="hidden" th:field="*{latitude}" id="latitude"/>
+                        <input type="hidden" th:field="*{longitude}" id="longitude"/>
+                        <input type="text" th:field="*{locationName}" id="locationName"
+                               placeholder="Название местоположения" class="form-control"/>
+                        <button type="button" onclick="getLocation()" class="btn btn-secondary">Добавить геолокацию
+                        </button>
+                        <span id="locationStatus"></span>
+                    </div>
+
                     <div class="post-submit">
                         <button type="submit" class="btn btn-primary">Опубликовать</button>
                     </div>
                 </form>
+
             </div>
         </div>
 
@@ -485,11 +514,23 @@
                 <div th:each="post : ${userPosts}" class="post">
                     <div class="post-content" th:text="${post.content}"></div>
                     <div class="post-meta">
-                        <span class="post-timestamp"
-                              th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span>
+                <span class="post-timestamp"
+                      th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span>
+
+                        <!-- Отображение геолокации -->
+                        <div th:if="${post.latitude != null and post.longitude != null}" class="post-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <!-- Иконка местоположения (если используете Font Awesome) -->
+                            <span th:if="${not #strings.isEmpty(post.locationName)}"
+                                  th:text="${post.locationName}"></span>
+                            <span th:if="${#strings.isEmpty(post.locationName)}"
+                                  th:text="${#numbers.formatDecimal(post.latitude, 1, 6) + ', ' + #numbers.formatDecimal(post.longitude, 1, 6)}"></span>
+                            <a th:href="@{'https://www.google.com/maps/search/?api=1&query=' + ${post.latitude} + ',' + ${post.longitude}}"
+                               target="_blank" class="map-link">Открыть карту</a>
+                        </div>
 
                         <form th:if="${post.author.id == #authentication.principal.id}"
-                              th:action="@{/posts/delete/{postId}(postId=${post.id})} " method="post">
+                              th:action="@{/posts/delete/{postId}(postId=${post.id})}" method="post">
                             <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
                         </form>
                     </div>
@@ -502,6 +543,51 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+<script th:inline="javascript">
+    function getLocation() {
+        if (navigator.geolocation) {
+            document.getElementById('locationStatus').textContent = 'Получение геолокации...';
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            document.getElementById('locationStatus').textContent = 'Геолокация не поддерживается вашим браузером.';
+        }
+    }
+
+    function showPosition(position) {
+        document.getElementById('latitude').value = position.coords.latitude;
+        document.getElementById('longitude').value = position.coords.longitude;
+        document.getElementById('locationStatus').textContent = 'Геолокация получена!';
+
+        // Здесь можно добавить обратное геокодирование для получения названия местоположения
+        // Например, использовать Nominatim API (OpenStreetMap):
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.display_name) {
+                    document.getElementById('locationName').value = data.display_name;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function showError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                document.getElementById('locationStatus').textContent = 'Пользователь отклонил запрос на геолокацию.';
+                break;
+            case error.POSITION_UNAVAILABLE:
+                document.getElementById('locationStatus').textContent = 'Информация о местоположении недоступна.';
+                break;
+            case error.TIMEOUT:
+                document.getElementById('locationStatus').textContent = 'Время запроса на получение местоположения истекло.';
+                break;
+            case error.UNKNOWN_ERROR:
+                document.getElementById('locationStatus').textContent = 'Произошла неизвестная ошибка.';
+                break;
+        }
+    }
+</script>
 
 </html>

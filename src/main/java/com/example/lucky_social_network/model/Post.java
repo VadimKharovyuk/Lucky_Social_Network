@@ -38,6 +38,11 @@ public class Post {
     private Long likeCount = 0L;
 
 
+    private Double latitude;
+    private Double longitude;
+    private String locationName;
+
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 }

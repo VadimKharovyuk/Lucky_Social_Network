@@ -33,14 +33,14 @@ public class PostController {
     private final UserService userService;
     private final SubscriptionService subscriptionService;
 
-
     @PostMapping("/create")
     public String createPost(@ModelAttribute PostCreationDto postDto,
                              @RequestParam("userId") Long userId) {
         User currentUser = userService.getUserById(userId);
-        postService.createPost(currentUser, postDto.getContent());
+        postService.createPost(currentUser, postDto);
         return "redirect:/profile/" + userId;
     }
+
 
     @PostMapping("/delete/{postId}")
     public String deletePost(@PathVariable Long postId,
