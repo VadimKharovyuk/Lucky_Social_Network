@@ -2,13 +2,14 @@ package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.Group;
+import com.example.lucky_social_network.model.GroupPost;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.repository.GroupContentRepository;
 import com.example.lucky_social_network.service.GroupService;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class GroupController {
 
     private final GroupService groupService;
     private final UserService userService;
+    private final GroupContentRepository groupContentRepository;
 
     @GetMapping("/{groupId}")
     public String showGroup(@PathVariable Long groupId, Model model) {
@@ -39,13 +41,54 @@ public class GroupController {
         boolean canPost = groupService.canUserPostInGroup(currentUser, group);
         boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
 
+        // Получаем посты группы, отсортированные по дате (самые новые первые)
+        List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
+
         model.addAttribute("group", group);
+        model.addAttribute("posts", posts);  // Добавляем посты в модель
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("isMember", isMember);
         model.addAttribute("canPost", canPost);
         model.addAttribute("isOwner", isOwner);
 
         return "groups/view";
+    }
+
+//    @GetMapping("/{groupId}")
+//    public String showGroup(@PathVariable Long groupId, Model model) {
+//        Group group = groupService.getGroupById(groupId);
+//        User currentUser = userService.getCurrentUser();
+//
+//        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
+//        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
+//        boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
+//
+//        model.addAttribute("group", group);
+//        model.addAttribute("currentUser", currentUser);
+//        model.addAttribute("isMember", isMember);
+//        model.addAttribute("canPost", canPost);
+//        model.addAttribute("isOwner", isOwner);
+//
+//        return "groups/view";
+//    }
+
+    // Метод для отображения фото группы
+    @GetMapping("/{groupId}/photo")
+    @ResponseBody
+    public ResponseEntity<byte[]> getGroupPhoto(@PathVariable Long groupId) {
+        try {
+            byte[] photoData = groupService.getGroupPhoto(groupId);
+            if (photoData != null) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(photoData);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("Error retrieving group photo", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/update/{groupId}")
@@ -66,17 +109,17 @@ public class GroupController {
         }
     }
 
-    @GetMapping("/{groupId}/photo")
-    public ResponseEntity<byte[]> getGroupPhoto(@PathVariable Long groupId) {
-        byte[] photoBytes = groupService.getGroupPhoto(groupId);
-        if (photoBytes != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG); // или другой подходящий тип
-            return new ResponseEntity<>(photoBytes, headers, HttpStatus.OK);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+//    @GetMapping("/{groupId}/photo")
+//    public ResponseEntity<byte[]> getGroupPhoto(@PathVariable Long groupId) {
+//        byte[] photoBytes = groupService.getGroupPhoto(groupId);
+//        if (photoBytes != null) {
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.IMAGE_JPEG); // или другой подходящий тип
+//            return new ResponseEntity<>(photoBytes, headers, HttpStatus.OK);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 
     @PostMapping("/update/{groupId}")
     public String updateGroup(
@@ -177,14 +220,39 @@ public class GroupController {
     }
 
     @PostMapping("/{groupId}/post")
-    public String createPost(@PathVariable Long groupId, @RequestParam String content) {
-        Group group = groupService.getGroupById(groupId);
-        User currentUser = userService.getCurrentUser();
+    public String createPost(@PathVariable Long groupId,
+                             @RequestParam("content") String content,
+                             @RequestParam(value = "image", required = false) MultipartFile image,
+                             RedirectAttributes redirectAttributes) {
+        try {
+            User currentUser = userService.getCurrentUser();
 
-        groupService.createPost(group, currentUser, content);
+            byte[] imageData = null;
+            if (image != null && !image.isEmpty()) {
+                imageData = image.getBytes();
+            }
+
+            GroupPost post = groupService.createPost(groupId, currentUser, content, imageData);
+            redirectAttributes.addFlashAttribute("message", "Post created successfully");
+        } catch (IOException e) {
+            log.error("Error processing image upload", e);
+            redirectAttributes.addFlashAttribute("error", "Error uploading image");
+        } catch (RuntimeException e) {
+            log.error("Error creating post", e);
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
 
         return "redirect:/groups/" + groupId;
     }
+//    @PostMapping("/{groupId}/post")
+//    public String createPost(@PathVariable Long groupId, @RequestParam String content) {
+//        Group group = groupService.getGroupById(groupId);
+//        User currentUser = userService.getCurrentUser();
+//
+//        groupService.createPost(group, currentUser, content);
+//
+//        return "redirect:/groups/" + groupId;
+//    }
 
 
 }

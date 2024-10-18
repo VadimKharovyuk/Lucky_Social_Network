@@ -30,6 +30,8 @@ public class GroupPost {
 
     @Column(nullable = false, length = 1000)
     private String content;
+    @Column
+    private String imgurImageUrl;
 
     @Column(nullable = false)
     private LocalDateTime timestamp;

@@ -1,4 +1,4 @@
-package com.example.lucky_social_network.service;
+package com.example.lucky_social_network.service.picService;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -18,6 +18,7 @@ public class ImgurService {
     private String accessToken;
 
     private final String IMGUR_API_URL = "https://api.imgur.com/3/image";
+
 
     private final RestTemplate restTemplate = new RestTemplate();
 

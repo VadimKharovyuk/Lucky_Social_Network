@@ -4,7 +4,9 @@ import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.Group;
 import com.example.lucky_social_network.model.GroupPost;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.repository.GroupContentRepository;
 import com.example.lucky_social_network.repository.GroupRepository;
+import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,9 +28,10 @@ import java.util.List;
 public class GroupService {
 
     private final GroupRepository groupRepository;
-
     private final UserService userService;
     private final ImgurService imgurService;
+    private final GroupContentRepository groupContentRepository;
+
 
     @Transactional
     public Group updateGroup(Long groupId, String name, String description, byte[] photoData) {
@@ -137,8 +140,12 @@ public class GroupService {
         }
     }
 
+
     @Transactional
-    public GroupPost createPost(Group group, User author, String content) {
+    public GroupPost createPost(Long groupId, User author, String content, byte[] imageData) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+
         if (group.getType() == Group.GroupType.SUBSCRIPTION && !author.equals(group.getOwner())) {
             throw new IllegalStateException("Only the owner can post in a subscription group");
         }
@@ -153,12 +160,53 @@ public class GroupService {
         post.setContent(content);
         post.setTimestamp(LocalDateTime.now());
 
-        group.getPosts().add(post);
+        if (imageData != null && imageData.length > 0) {
+            try {
+                String imageUrl = imgurService.uploadImage(imageData);
+                if (imageUrl != null) {
+                    post.setImgurImageUrl(imageUrl);
+                    log.info("Image uploaded successfully for post. URL: {}", imageUrl);
+                } else {
+                    log.error("Failed to upload image for post");
+                    throw new RuntimeException("Failed to upload image to Imgur");
+                }
+            } catch (Exception e) {
+                log.error("Error uploading image to Imgur", e);
+                throw new RuntimeException("Error uploading image to Imgur", e);
+            }
+        }
+
+        GroupPost savedPost = groupContentRepository.save(post);
+
+        group.getPosts().add(savedPost);
         group.setPostsCount(group.getPostsCount() + 1);
         groupRepository.save(group);
 
-        return post;
+        return savedPost;
     }
+
+//    @Transactional
+//    public GroupPost createPost(Group group, User author, String content) {
+//        if (group.getType() == Group.GroupType.SUBSCRIPTION && !author.equals(group.getOwner())) {
+//            throw new IllegalStateException("Only the owner can post in a subscription group");
+//        }
+//
+//        if (group.getType() == Group.GroupType.INTERACTIVE && !group.getMembers().contains(author)) {
+//            throw new IllegalStateException("Only members can post in an interactive group");
+//        }
+//
+//        GroupPost post = new GroupPost();
+//        post.setGroup(group);
+//        post.setAuthor(author);
+//        post.setContent(content);
+//        post.setTimestamp(LocalDateTime.now());
+//
+//        group.getPosts().add(post);
+//        group.setPostsCount(group.getPostsCount() + 1);
+//        groupRepository.save(group);
+//
+//        return post;
+//    }
 
     @Transactional(readOnly = true)
     public boolean canUserPostInGroup(User user, Group group) {

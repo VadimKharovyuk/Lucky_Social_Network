@@ -5,6 +5,7 @@ import com.example.lucky_social_network.exception.FriendshipNotFoundException;
 import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.UserRepository;
+import com.example.lucky_social_network.service.picService.DropboxService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

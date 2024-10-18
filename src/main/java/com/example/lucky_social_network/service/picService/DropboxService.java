@@ -1,4 +1,4 @@
-package com.example.lucky_social_network.service;
+package com.example.lucky_social_network.service.picService;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
