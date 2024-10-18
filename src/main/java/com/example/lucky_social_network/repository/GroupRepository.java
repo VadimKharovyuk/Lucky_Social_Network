@@ -18,4 +18,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     Page<Group> findByMembersId(Long userId, Pageable pageable);
 
+    boolean existsByIdAndMembersId(Long groupId, Long userId);
+    
 }

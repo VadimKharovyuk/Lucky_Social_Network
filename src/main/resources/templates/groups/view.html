@@ -2,38 +2,197 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${group.name}">Group Name</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            color: #1877f2;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: #65676b;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            color: #1877f2;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1877f2;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: #1877f2;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #166fe5;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f0f2f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        small {
+            color: #65676b;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            color: #ff0000;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-<h1 th:text="${group.name}">Group Name</h1>
-<p th:text="${group.description}">Group Description</p>
-<p>Type: <span th:text="${group.type}"></span></p>
-<p>Members: <span th:text="${group.membersCount}"></span></p>
+<nav class="navbar">
+    <div class="navbar-content">
+        <a href="#" class="logo">Lucky Social Network</a>
+        <div class="nav-links">
+            <a href="#">Главная</a>
+            <a href="#">Профиль</a>
+            <a href="#">Сообщения</a>
+            <a href="#">Уведомления</a>
+        </div>
+    </div>
+</nav>
 
-<form th:if="${!group.members.contains(#authentication.principal)}" th:action="@{/groups/{id}/join(id=${group.id})}"
-      method="post">
-    <button type="submit">Join Group</button>
-</form>
+<div class="container">
+    <h1 th:text="${group.name}">Group Name</h1>
+    <p th:text="${group.description}">Group Description</p>
+    <p>Тип: <span th:text="${group.type}"></span></p>
+    <p>Участники: <span th:text="${group.membersCount}"></span></p>
 
-<form th:if="${group.members.contains(#authentication.principal)}" th:action="@{/groups/{id}/leave(id=${group.id})}"
-      method="post">
-    <button type="submit">Leave Group</button>
-</form>
+    <form th:if="${!isMember}" th:action="@{/groups/{id}/join(id=${group.id})}" method="post">
+        <button type="submit">Присоединиться к группе</button>
+    </form>
 
-<h2>Posts</h2>
-<ul>
-    <li th:each="post : ${group.posts}">
-        <p th:text="${post.content}"></p>
-        <small>Posted by <span th:text="${post.author.username}"></span> on <span
-                th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span></small>
-    </li>
-</ul>
+    <form th:if="${isMember}" th:action="@{/groups/{id}/leave(id=${group.id})}" method="post">
+        <button type="submit">Покинуть группу</button>
+    </form>
 
+    <h2>Посты</h2>
+    <ul>
+        <li th:each="post : ${group.posts}">
+            <p th:text="${post.content}"></p>
+            <small>Опубликовано пользователем <span
+                    th:text="${post.author.firstName + ' '+post.getAuthor().lastName}"></span>
+                <span th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span></small>
+        </li>
+    </ul>
 
-<h3>Create New Post</h3>
-<form th:if="${group.members.contains(#authentication.principal)}" th:action="@{/groups/{id}/post(id=${group.id})}"
-      method="post">
-    <textarea name="content" required></textarea>
-    <button type="submit">Post</button>
-</form>
+    <h3>Создать новый пост</h3>
+    <form th:if="${canPost}" th:action="@{/groups/{id}/post(id=${group.id})}" method="post">
+        <textarea name="content" required placeholder="Напишите что-нибудь..."></textarea>
+        <button type="submit">Опубликовать</button>
+    </form>
+    <p th:if="${!canPost}" class="error-message">У вас нет разрешения на публикацию в этой группе.</p>
+</div>
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title th:text="${group.name}">Group Name</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1 th:text="${group.name}">Group Name</h1>-->
+<!--<p th:text="${group.description}">Group Description</p>-->
+<!--<p>Type: <span th:text="${group.type}"></span></p>-->
+<!--<p>Members: <span th:text="${group.membersCount}"></span></p>-->
+
+<!--<form th:if="${!isMember}" th:action="@{/groups/{id}/join(id=${group.id})}" method="post">-->
+<!--    <button type="submit">Join Group</button>-->
+<!--</form>-->
+
+<!--<form th:if="${isMember}" th:action="@{/groups/{id}/leave(id=${group.id})}" method="post">-->
+<!--    <button type="submit">Leave Group</button>-->
+<!--</form>-->
+
+<!--<h2>Posts</h2>-->
+<!--<ul>-->
+<!--    <li th:each="post : ${group.posts}">-->
+<!--        <p th:text="${post.content}"></p>-->
+<!--        <small>Posted by <span th:text="${post.author.username}"></span> on-->
+<!--            <span th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span></small>-->
+<!--    </li>-->
+<!--</ul>-->
+
+<!--<h3>Create New Post</h3>-->
+<!--<form th:if="${canPost}" th:action="@{/groups/{id}/post(id=${group.id})}" method="post">-->
+<!--    <textarea name="content" required></textarea>-->
+<!--    <button type="submit">Post</button>-->
+<!--</form>-->
+<!--<p th:if="${!canPost}" class="error-message">You do not have permission to post in this group.</p>-->
+<!--</body>-->
+<!--</html>-->

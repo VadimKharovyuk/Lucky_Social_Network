@@ -1,50 +1,549 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>My Groups</title>
+    <title>Мои группы</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            color: #1877f2;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: #65676b;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            color: #1877f2;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
+            color: #1c1e21;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .button {
+            background-color: #1877f2;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .button:hover {
+            background-color: #166fe5;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 1px solid #dddfe2;
+            border-radius: 4px;
+        }
+
+        .pagination a:hover {
+            background-color: #f0f2f5;
+        }
+
+        .sort-options {
+            margin-top: 20px;
+            color: #65676b;
+        }
+
+        .group-list {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-form {
+            margin-bottom: 20px;
+        }
+
+        .search-form input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .group-list ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .group-list li {
+            margin-bottom: 0;
+        }
+
+        .group-list .button {
+            width: 100%;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+    </style>
 </head>
 <body>
-<h1>My Groups</h1>
+<nav class="navbar">
+    <div class="navbar-content">
+        <a href="#" class="logo">Lucky Social Network</a>
+        <div class="nav-links">
+            <a href="#">Главная</a>
+            <a href="#">Профиль</a>
+            <a href="#">Сообщения</a>
+            <a href="#">Уведомления</a>
+        </div>
+    </div>
+</nav>
 
-<h2>Subscription Groups</h2>
-<ul>
-    <li th:each="group : ${groups}"
-        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">
-        <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>
-    </li>
-</ul>
+<div class="container">
+    <main class="main-content">
+        <h1>Мои группы</h1>
 
-<h2>Interactive Groups</h2>
-<ul>
-    <li th:each="group : ${groups}"
-        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).INTERACTIVE}">
-        <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>
-    </li>
-</ul>
+        <div class="group-list">
+            <h2>Группы по подписке</h2>
+            <ul>
+                <li th:each="group : ${groups}"
+                    th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">
+                    <button class="button"
+                            th:onclick="'window.location.href=\'' + @{/groups/{id}(id=${group.id})} + '\''"
+                            th:text="${group.name}"></button>
+                </li>
+            </ul>
+        </div>
 
-<div>
-        <span th:if="${currentPage > 0}">
-            <a th:href="@{/groups/my(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Previous</a>
-        </span>
-    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-            <a th:href="@{/groups/my(page=${i}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"
-               th:text="${i + 1}"></a>
-        </span>
-    <span th:if="${currentPage < totalPages - 1}">
-            <a th:href="@{/groups/my(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Next</a>
-        </span>
+        <div class="group-list">
+            <div class="group-list">
+                <h2>Интерактивные группы</h2>
+                <ul>
+                    <li th:each="group : ${groups}"
+                        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).INTERACTIVE}">
+                        <button class="button"
+                                th:onclick="'window.location.href=\'' + @{/groups/{id}(id=${group.id})} + '\''"
+                                th:text="${group.name}"></button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pagination">
+                <span th:if="${currentPage > 0}">
+                    <a th:href="@{/groups/my(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Предыдущая</a>
+                </span>
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a th:href="@{/groups/my(page=${i}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"
+                       th:text="${i + 1}"></a>
+                </span>
+            <span th:if="${currentPage < totalPages - 1}">
+                    <a th:href="@{/groups/my(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Следующая</a>
+                </span>
+        </div>
+
+        <div class="sort-options">
+            <p>Сортировать по:
+                <a th:href="@{/groups/my(sortBy='name', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Названию</a>
+                |
+                <a th:href="@{/groups/my(sortBy='createdAt', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Дате
+                    создания</a>
+            </p>
+        </div>
+
+        <p>Всего элементов: <span th:text="${totalItems}"></span></p>
+    </main>
+
+    <aside class="sidebar">
+        <h2>Поиск групп</h2>
+        <form class="search-form" action="/groups/search" method="get">
+            <input type="text" name="query" placeholder="Поиск групп...">
+            <button type="submit" class="button">Поиск</button>
+        </form>
+
+        <h3>Все группы</h3>
+        <ul>
+            <li th:each="group : ${allGroups}">
+                <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>
+            </li>
+        </ul>
+
+        <h3>Группы по подписке</h3>
+        <ul>
+            <li th:each="group : ${allGroups}"
+                th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">
+                <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>
+            </li>
+        </ul>
+
+        <h3>Действия с группами</h3>
+        <a href="/groups/create" class="button">Создать новую группу</a>
+
+        <h3>Поиск всех груп</h3>
+        <a href="/groups/all" class="button"> Найти </a>
+    </aside>
 </div>
-
-<div>
-    <p>Sort by:
-        <a th:href="@{/groups/my(sortBy='name', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Name</a> |
-        <a th:href="@{/groups/my(sortBy='createdAt', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Creation
-            Date</a>
-    </p>
-</div>
-
-<p>Total Items: <span th:text="${totalItems}"></span></p>
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>My Groups</title>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            background-color: #f0f2f5;-->
+<!--            color: #1c1e21;-->
+<!--        }-->
+
+<!--        .navbar {-->
+<!--            background-color: #ffffff;-->
+<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
+<!--            padding: 10px 0;-->
+<!--            position: sticky;-->
+<!--            top: 0;-->
+<!--            z-index: 1000;-->
+<!--        }-->
+
+<!--        .navbar-content {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: center;-->
+<!--            max-width: 1200px;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 0 20px;-->
+<!--        }-->
+
+<!--        .logo {-->
+<!--            color: #1877f2;-->
+<!--            font-size: 24px;-->
+<!--            font-weight: bold;-->
+<!--            text-decoration: none;-->
+<!--        }-->
+
+<!--        .nav-links a {-->
+<!--            color: #65676b;-->
+<!--            text-decoration: none;-->
+<!--            margin-left: 20px;-->
+<!--            font-weight: 600;-->
+<!--        }-->
+
+<!--        .nav-links a:hover {-->
+<!--            color: #1877f2;-->
+<!--        }-->
+
+<!--        .container {-->
+<!--            display: flex;-->
+<!--            max-width: 1200px;-->
+<!--            margin: 20px auto;-->
+<!--            padding: 0 20px;-->
+<!--        }-->
+
+<!--        .main-content {-->
+<!--            flex: 1;-->
+<!--            margin-right: 20px;-->
+<!--        }-->
+
+<!--        .sidebar {-->
+<!--            width: 300px;-->
+<!--            background-color: #ffffff;-->
+<!--            border-radius: 8px;-->
+<!--            padding: 20px;-->
+<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        h1, h2 {-->
+<!--            color: #1c1e21;-->
+<!--        }-->
+
+<!--        ul {-->
+<!--            list-style-type: none;-->
+<!--            padding: 0;-->
+<!--        }-->
+
+<!--        li {-->
+<!--            margin-bottom: 10px;-->
+<!--        }-->
+
+<!--        a {-->
+<!--            color: #1877f2;-->
+<!--            text-decoration: none;-->
+<!--        }-->
+
+<!--        a:hover {-->
+<!--            text-decoration: underline;-->
+<!--        }-->
+
+<!--        .button {-->
+<!--            background-color: #1877f2;-->
+<!--            color: #ffffff;-->
+<!--            border: none;-->
+<!--            padding: 10px 15px;-->
+<!--            border-radius: 6px;-->
+<!--            font-weight: 600;-->
+<!--            cursor: pointer;-->
+<!--            transition: background-color 0.3s;-->
+<!--        }-->
+
+<!--        .button:hover {-->
+<!--            background-color: #166fe5;-->
+<!--        }-->
+
+<!--        .pagination {-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            margin-top: 20px;-->
+<!--        }-->
+
+<!--        .pagination a {-->
+<!--            margin: 0 5px;-->
+<!--            padding: 5px 10px;-->
+<!--            border: 1px solid #dddfe2;-->
+<!--            border-radius: 4px;-->
+<!--        }-->
+
+<!--        .pagination a:hover {-->
+<!--            background-color: #f0f2f5;-->
+<!--        }-->
+
+<!--        .sort-options {-->
+<!--            margin-top: 20px;-->
+<!--            color: #65676b;-->
+<!--        }-->
+
+<!--        .group-list {-->
+<!--            background-color: #ffffff;-->
+<!--            border-radius: 8px;-->
+<!--            padding: 20px;-->
+<!--            margin-bottom: 20px;-->
+<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        .search-form {-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        .search-form input {-->
+<!--            width: 100%;-->
+<!--            padding: 10px;-->
+<!--            border: 1px solid #dddfe2;-->
+<!--            border-radius: 6px;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<nav class="navbar">-->
+<!--    <div class="navbar-content">-->
+<!--        <a href="#" class="logo">MySocialNetwork</a>-->
+<!--        <div class="nav-links">-->
+<!--            <a href="#">Home</a>-->
+<!--            <a href="#">Profile</a>-->
+<!--            <a href="#">Messages</a>-->
+<!--            <a href="#">Notifications</a>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</nav>-->
+
+<!--<div class="container">-->
+<!--    <main class="main-content">-->
+<!--        <h1>My Groups</h1>-->
+
+<!--        <div class="group-list">-->
+<!--            <h2>Subscription Groups</h2>-->
+<!--            <ul>-->
+<!--                <li th:each="group : ${groups}"-->
+<!--                    th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">-->
+<!--                    <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </div>-->
+
+<!--        <div class="group-list">-->
+<!--            <h2>Interactive Groups</h2>-->
+<!--            <ul>-->
+<!--                <li th:each="group : ${groups}"-->
+<!--                    th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).INTERACTIVE}">-->
+<!--                    <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </div>-->
+
+<!--        <div class="pagination">-->
+<!--                <span th:if="${currentPage > 0}">-->
+<!--                    <a th:href="@{/groups/my(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Previous</a>-->
+<!--                </span>-->
+<!--            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">-->
+<!--                    <a th:href="@{/groups/my(page=${i}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"-->
+<!--                       th:text="${i + 1}"></a>-->
+<!--                </span>-->
+<!--            <span th:if="${currentPage < totalPages - 1}">-->
+<!--                    <a th:href="@{/groups/my(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Next</a>-->
+<!--                </span>-->
+<!--        </div>-->
+
+<!--        <div class="sort-options">-->
+<!--            <p>Sort by:-->
+<!--                <a th:href="@{/groups/my(sortBy='name', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Name</a>-->
+<!--                |-->
+<!--                <a th:href="@{/groups/my(sortBy='createdAt', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Creation-->
+<!--                    Date</a>-->
+<!--            </p>-->
+<!--        </div>-->
+
+<!--        <p>Total Items: <span th:text="${totalItems}"></span></p>-->
+<!--    </main>-->
+
+<!--    <aside class="sidebar">-->
+<!--        <h2>Group Actions</h2>-->
+<!--        <a href="/groups/create" class="button">Create New Group</a>-->
+<!--        <a href="/groups" class="button">Все группы</a>-->
+
+<!--        <h3>Find Groups</h3>-->
+<!--        <form class="search-form" action="/groups/search" method="get">-->
+<!--            <input type="text" name="query" placeholder="Search for groups...">-->
+<!--            <button type="submit" class="button">Search</button>-->
+<!--        </form>-->
+
+<!--        <h3>Предлагаемые группы</h3>-->
+<!--        <ul>-->
+<!--            <li><a href="#">Suggested Group 1</a></li>-->
+<!--            <li><a href="#">Suggested Group 2</a></li>-->
+<!--            <li><a href="#">Suggested Group 3</a></li>-->
+<!--        </ul>-->
+<!--    </aside>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
+
+
+<!--&lt;!&ndash;<!DOCTYPE html>&ndash;&gt;-->
+<!--&lt;!&ndash;<html xmlns:th="http://www.thymeleaf.org">&ndash;&gt;-->
+<!--&lt;!&ndash;<head>&ndash;&gt;-->
+<!--&lt;!&ndash;    <title>My Groups</title>&ndash;&gt;-->
+<!--&lt;!&ndash;    <meta charset="UTF-8">&ndash;&gt;-->
+<!--&lt;!&ndash;    <meta name="viewport" content="width=device-width, initial-scale=1.0">&ndash;&gt;-->
+<!--&lt;!&ndash;</head>&ndash;&gt;-->
+<!--&lt;!&ndash;<body>&ndash;&gt;-->
+<!--&lt;!&ndash;<h1>My Groups</h1>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<h2>Subscription Groups</h2>&ndash;&gt;-->
+<!--&lt;!&ndash;<ul>&ndash;&gt;-->
+<!--&lt;!&ndash;    <li th:each="group : ${groups}"&ndash;&gt;-->
+<!--&lt;!&ndash;        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">&ndash;&gt;-->
+<!--&lt;!&ndash;        <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>&ndash;&gt;-->
+<!--&lt;!&ndash;    </li>&ndash;&gt;-->
+<!--&lt;!&ndash;</ul>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<h2>Interactive Groups</h2>&ndash;&gt;-->
+<!--&lt;!&ndash;<ul>&ndash;&gt;-->
+<!--&lt;!&ndash;    <li th:each="group : ${groups}"&ndash;&gt;-->
+<!--&lt;!&ndash;        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).INTERACTIVE}">&ndash;&gt;-->
+<!--&lt;!&ndash;        <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>&ndash;&gt;-->
+<!--&lt;!&ndash;    </li>&ndash;&gt;-->
+<!--&lt;!&ndash;</ul>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<div>&ndash;&gt;-->
+<!--&lt;!&ndash;        <span th:if="${currentPage > 0}">&ndash;&gt;-->
+<!--&lt;!&ndash;            <a th:href="@{/groups/my(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Previous</a>&ndash;&gt;-->
+<!--&lt;!&ndash;        </span>&ndash;&gt;-->
+<!--&lt;!&ndash;    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">&ndash;&gt;-->
+<!--&lt;!&ndash;            <a th:href="@{/groups/my(page=${i}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"&ndash;&gt;-->
+<!--&lt;!&ndash;               th:text="${i + 1}"></a>&ndash;&gt;-->
+<!--&lt;!&ndash;        </span>&ndash;&gt;-->
+<!--&lt;!&ndash;    <span th:if="${currentPage < totalPages - 1}">&ndash;&gt;-->
+<!--&lt;!&ndash;            <a th:href="@{/groups/my(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Next</a>&ndash;&gt;-->
+<!--&lt;!&ndash;        </span>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<div>&ndash;&gt;-->
+<!--&lt;!&ndash;    <p>Sort by:&ndash;&gt;-->
+<!--&lt;!&ndash;        <a th:href="@{/groups/my(sortBy='name', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Name</a> |&ndash;&gt;-->
+<!--&lt;!&ndash;        <a th:href="@{/groups/my(sortBy='createdAt', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Creation&ndash;&gt;-->
+<!--&lt;!&ndash;            Date</a>&ndash;&gt;-->
+<!--&lt;!&ndash;    </p>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<p>Total Items: <span th:text="${totalItems}"></span></p>&ndash;&gt;-->
+<!--&lt;!&ndash;</body>&ndash;&gt;-->
+<!--&lt;!&ndash;</html>&ndash;&gt;-->

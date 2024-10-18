@@ -24,7 +24,9 @@ public class Group {
     @Column(nullable = false)
     private String name;
 
-    @Column(length = 500)
+    //    @Lob
+//    @Column(columnDefinition = "TEXT")
+    @Column(length = 2500)
     private String description;
 
     @Enumerated(EnumType.STRING)

@@ -1,27 +1,184 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Create Group</title>
+    <title>Создать группу</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #1c1e21;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            color: #1877f2;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+        }
+
+        .nav-links a {
+            color: #65676b;
+            text-decoration: none;
+            padding: 10px 15px;
+            margin-left: 10px;
+            border-radius: 6px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #f0f2f5;
+            color: #1877f2;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1877f2;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        select {
+            background-color: white;
+        }
+
+        button {
+            background-color: #1877f2;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #166fe5;
+        }
+    </style>
 </head>
 <body>
-<h1>Create New Group</h1>
-<form th:action="@{/groups/create}" method="post" th:object="${group}">
-    <div>
-        <label for="name">Name:</label>
-        <input type="text" id="name" th:field="*{name}" required>
+<nav class="navbar">
+    <div class="navbar-content">
+        <a href="#" class="logo">Lucky Social Network</a>
+        <div class="nav-links">
+            <a href="#">Главная</a>
+            <a href="#">Профиль</a>
+            <a href="#">Сообщения</a>
+            <a href="#">Уведомления</a>
+        </div>
     </div>
-    <div>
-        <label for="description">Description:</label>
-        <textarea id="description" th:field="*{description}"></textarea>
-    </div>
-    <div>
-        <label for="type">Type:</label>
-        <select id="type" th:field="*{type}">
-            <option value="SUBSCRIPTION">Subscription</option>
-            <option value="INTERACTIVE">Interactive</option>
-        </select>
-    </div>
-    <button type="submit">Create Group</button>
-</form>
+</nav>
+
+<div class="container">
+    <h1>Создать новую группу</h1>
+    <form th:action="@{/groups/create}" method="post" th:object="${group}">
+        <div class="form-group">
+            <label for="name">Название:</label>
+            <input type="text" id="name" th:field="*{name}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Описание:</label>
+            <textarea id="description" th:field="*{description}"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="type">Тип группы:</label>
+            <select id="type" th:field="*{type}">
+                <option value="SUBSCRIPTION">По подписке</option>
+                <option value="INTERACTIVE">Интерактивная</option>
+            </select>
+        </div>
+        <button type="submit">Создать группу</button>
+    </form>
+</div>
 </body>
+
 </html>
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Create Group</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Create New Group</h1>-->
+<!--<form th:action="@{/groups/create}" method="post" th:object="${group}">-->
+<!--    <div>-->
+<!--        <label for="name">Name:</label>-->
+<!--        <input type="text" id="name" th:field="*{name}" required>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <label for="description">Description:</label>-->
+<!--        <textarea id="description" th:field="*{description}"></textarea>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <label for="type">Type:</label>-->
+<!--        <select id="type" th:field="*{type}">-->
+<!--            <option value="SUBSCRIPTION">Subscription</option>-->
+<!--            <option value="INTERACTIVE">Interactive</option>-->
+<!--        </select>-->
+<!--    </div>-->
+<!--    <button type="submit">Create Group</button>-->
+<!--</form>-->
+<!--</body>-->
+<!--</html>-->

@@ -110,6 +110,16 @@ public class GroupService {
         return post;
     }
 
+    @Transactional(readOnly = true)
+    public boolean canUserPostInGroup(User user, Group group) {
+        if (group.getType() == Group.GroupType.SUBSCRIPTION) {
+            return user.equals(group.getOwner());
+        } else if (group.getType() == Group.GroupType.INTERACTIVE) {
+            return group.getMembers().contains(user);
+        }
+        return false;
+    }
+
     @Transactional
     public void updateGroupAvatar(Group group, String avatarDropboxPath) {
         group.setAvatarDropboxPath(avatarDropboxPath);
@@ -121,8 +131,6 @@ public class GroupService {
         group.setIsPrivate(!group.getIsPrivate());
         groupRepository.save(group);
     }
-
-    // Метод для подписки на группу (только для SUBSCRIPTION типа)
 
 
     // отписки от группы (только для SUBSCRIPTION типа)
@@ -167,6 +175,11 @@ public class GroupService {
         Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         return groupRepository.findByMembersId(currentUserId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isUserMemberOfGroup(Long userId, Long groupId) {
+        return groupRepository.existsByIdAndMembersId(groupId, userId);
     }
     // Другие методы...
 }

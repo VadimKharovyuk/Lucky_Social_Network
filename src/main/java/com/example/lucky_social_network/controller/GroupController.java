@@ -7,10 +7,11 @@ import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -45,8 +46,10 @@ public class GroupController {
             Model model) {
 
         Page<Group> groupPage = groupService.getCurrentUserGroups(page, size, sortBy, sortDirection);
+        List<Group> allGroups = groupService.getAllGroups(); // Новый метод в GroupService
 
         model.addAttribute("groups", groupPage.getContent());
+        model.addAttribute("allGroups", allGroups);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", groupPage.getTotalPages());
         model.addAttribute("totalItems", groupPage.getTotalElements());
@@ -56,7 +59,7 @@ public class GroupController {
         return "groups/my-groups";
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public String listGroups(Model model) {
         model.addAttribute("groups", groupService.getAllGroups());
         return "groups/list";
@@ -78,26 +81,42 @@ public class GroupController {
 
     @GetMapping("/{groupId}")
     public String showGroup(@PathVariable Long groupId, Model model) {
-        model.addAttribute("group", groupService.getGroupById(groupId));
+        Group group = groupService.getGroupById(groupId);
+        User currentUser = userService.getCurrentUser();
+
+        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
+        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
+
+        model.addAttribute("group", group);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("isMember", isMember);
+        model.addAttribute("canPost", canPost);
+
         return "groups/view";
     }
 
 
     @PostMapping("/{groupId}/leave")
-    public String leaveGroup(@PathVariable Long groupId, @AuthenticationPrincipal User currentUser) {
+    public String leaveGroup(@PathVariable Long groupId) {
         Group group = groupService.getGroupById(groupId);
+        User currentUser = userService.getCurrentUser();
+
         if (group.getType() == Group.GroupType.INTERACTIVE) {
             groupService.leaveGroup(group, currentUser);
         } else {
             groupService.unsubscribeFromGroup(group, currentUser);
         }
+
         return "redirect:/groups/" + groupId;
     }
 
     @PostMapping("/{groupId}/post")
-    public String createPost(@PathVariable Long groupId, @RequestParam String content, @AuthenticationPrincipal User currentUser) {
+    public String createPost(@PathVariable Long groupId, @RequestParam String content) {
         Group group = groupService.getGroupById(groupId);
+        User currentUser = userService.getCurrentUser();
+
         groupService.createPost(group, currentUser, content);
+
         return "redirect:/groups/" + groupId;
     }
 }
