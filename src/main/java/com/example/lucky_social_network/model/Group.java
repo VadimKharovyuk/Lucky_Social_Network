@@ -57,7 +57,8 @@ public class Group {
     @Column(nullable = false)
     private Long postsCount = 0L;
 
-    private String avatarDropboxPath;
+    @Column
+    private String imgurImageUrl;
 
     private Boolean isPrivate = false;
 

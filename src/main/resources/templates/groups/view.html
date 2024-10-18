@@ -110,6 +110,24 @@
             color: #ff0000;
             font-weight: 600;
         }
+
+        .group-header {
+            position: relative;
+            height: 600px;
+            overflow: hidden;
+        }
+
+        .group-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .group-info {
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 0 0 8px 8px;
+        }
     </style>
 </head>
 <body>
@@ -126,10 +144,16 @@
 </nav>
 
 <div class="container">
-    <h1 th:text="${group.name}">Group Name</h1>
-    <p th:text="${group.description}">Group Description</p>
-    <p>Тип: <span th:text="${group.type}"></span></p>
-    <p>Участники: <span th:text="${group.membersCount}"></span></p>
+    <div class="group-header">
+        <img th:src="@{/groups/{id}/photo(id=${group.id})}" alt="Group photo">
+    </div>
+    <div class="group-info">
+        <h1 th:text="${group.name}">Group Name</h1>
+        <p th:text="${group.description}">Group Description</p>
+        <p>Тип: <span th:text="${group.type}"></span></p>
+        <p>Участники: <span th:text="${group.membersCount}"></span></p>
+        <a th:if="${isOwner}" th:href="@{/groups/update/{id}(id=${group.id})}" class="update-button">Обновить группу</a>
+    </div>
 
     <form th:if="${!isMember}" th:action="@{/groups/{id}/join(id=${group.id})}" method="post">
         <button type="submit">Присоединиться к группе</button>

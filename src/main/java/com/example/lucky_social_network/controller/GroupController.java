@@ -1,5 +1,6 @@
 package com.example.lucky_social_network.controller;
 
+import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.Group;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.GroupService;
@@ -7,10 +8,17 @@ import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -21,6 +29,78 @@ public class GroupController {
 
     private final GroupService groupService;
     private final UserService userService;
+
+    @GetMapping("/{groupId}")
+    public String showGroup(@PathVariable Long groupId, Model model) {
+        Group group = groupService.getGroupById(groupId);
+        User currentUser = userService.getCurrentUser();
+
+        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
+        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
+        boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
+
+        model.addAttribute("group", group);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("isMember", isMember);
+        model.addAttribute("canPost", canPost);
+        model.addAttribute("isOwner", isOwner);
+
+        return "groups/view";
+    }
+
+    @GetMapping("/update/{groupId}")
+    public String showUpdateForm(@PathVariable Long groupId, Model model) {
+        try {
+            Group group = groupService.getGroupById(groupId);
+            User currentUser = userService.getCurrentUser();
+            boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
+
+            if (!isOwner) {
+                return "redirect:/groups/" + groupId + "?error=Not+authorized";
+            }
+
+            model.addAttribute("group", group);
+            return "groups/updateGroup";
+        } catch (ResourceNotFoundException e) {
+            return "redirect:/groups?error=Group+not+found";
+        }
+    }
+
+    @GetMapping("/{groupId}/photo")
+    public ResponseEntity<byte[]> getGroupPhoto(@PathVariable Long groupId) {
+        byte[] photoBytes = groupService.getGroupPhoto(groupId);
+        if (photoBytes != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG); // или другой подходящий тип
+            return new ResponseEntity<>(photoBytes, headers, HttpStatus.OK);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/update/{groupId}")
+    public String updateGroup(
+            @PathVariable Long groupId,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) MultipartFile photo,
+            RedirectAttributes redirectAttributes) {
+        try {
+            byte[] photoData = photo != null && !photo.isEmpty() ? photo.getBytes() : null;
+            Group updatedGroup = groupService.updateGroup(groupId, name, description, photoData);
+            redirectAttributes.addFlashAttribute("message", "Group updated successfully");
+            return "redirect:/groups/" + updatedGroup.getId();
+        } catch (IOException e) {
+            log.error("Error processing photo upload", e);
+            redirectAttributes.addFlashAttribute("error", "Error uploading photo");
+        } catch (ResourceNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", "Group not found");
+        } catch (RuntimeException e) {
+            log.error("Error updating group", e);
+            redirectAttributes.addFlashAttribute("error", "Error updating group");
+        }
+        return "redirect:/groups/update/" + groupId;
+    }
 
 
     @PostMapping("/{groupId}/join")
@@ -46,7 +126,7 @@ public class GroupController {
             Model model) {
 
         Page<Group> groupPage = groupService.getCurrentUserGroups(page, size, sortBy, sortDirection);
-        List<Group> allGroups = groupService.getAllGroups(); // Новый метод в GroupService
+        List<Group> allGroups = groupService.getAllGroups();
 
         model.addAttribute("groups", groupPage.getContent());
         model.addAttribute("allGroups", allGroups);
@@ -79,21 +159,7 @@ public class GroupController {
         return "redirect:/groups";
     }
 
-    @GetMapping("/{groupId}")
-    public String showGroup(@PathVariable Long groupId, Model model) {
-        Group group = groupService.getGroupById(groupId);
-        User currentUser = userService.getCurrentUser();
 
-        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
-        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
-
-        model.addAttribute("group", group);
-        model.addAttribute("currentUser", currentUser);
-        model.addAttribute("isMember", isMember);
-        model.addAttribute("canPost", canPost);
-
-        return "groups/view";
-    }
 
 
     @PostMapping("/{groupId}/leave")
@@ -119,4 +185,6 @@ public class GroupController {
 
         return "redirect:/groups/" + groupId;
     }
+
+
 }

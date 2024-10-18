@@ -14,6 +14,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,6 +28,52 @@ public class GroupService {
     private final GroupRepository groupRepository;
 
     private final UserService userService;
+    private final ImgurService imgurService;
+
+    @Transactional
+    public Group updateGroup(Long groupId, String name, String description, byte[] photoData) {
+        Group group = getGroupById(groupId);
+
+        if (name != null && !name.trim().isEmpty()) {
+            group.setName(name);
+        }
+
+        if (description != null) {
+            group.setDescription(description);
+        }
+
+        if (photoData != null && photoData.length > 0) {
+            String imageUrl = imgurService.uploadImage(photoData);
+            if (imageUrl != null) {
+                group.setImgurImageUrl(imageUrl);
+            } else {
+                log.error("Failed to upload image for group with id: {}", groupId);
+                throw new RuntimeException("Failed to upload image to Imgur");
+            }
+        }
+
+        Group updatedGroup = groupRepository.save(group);
+        log.info("Updated group with id: {}", groupId);
+        return updatedGroup;
+    }
+
+    public byte[] getGroupPhoto(Long groupId) {
+        Group group = getGroupById(groupId);
+        if (group.getImgurImageUrl() == null) {
+            log.info("No photo found for group with id: {}", groupId);
+            return null;
+        }
+
+        try {
+            URL url = new URL(group.getImgurImageUrl());
+            try (InputStream in = url.openStream()) {
+                return in.readAllBytes();
+            }
+        } catch (IOException e) {
+            log.error("Error fetching photo for group with id: {}", groupId, e);
+            return null;
+        }
+    }
 
     @Transactional
     public Group createGroup(Group group, User owner) {
@@ -37,6 +86,7 @@ public class GroupService {
         group.setCreatedAt(LocalDateTime.now());
         group.setMembersCount(1L);
         group.getMembers().add(owner);
+
 
         Group savedGroup = groupRepository.save(group);
         log.info("Group created successfully with id: {}", savedGroup.getId());
@@ -120,9 +170,10 @@ public class GroupService {
         return false;
     }
 
+
     @Transactional
     public void updateGroupAvatar(Group group, String avatarDropboxPath) {
-        group.setAvatarDropboxPath(avatarDropboxPath);
+        group.setImgurImageUrl(avatarDropboxPath);
         groupRepository.save(group);
     }
 
@@ -181,5 +232,10 @@ public class GroupService {
     public boolean isUserMemberOfGroup(Long userId, Long groupId) {
         return groupRepository.existsByIdAndMembersId(groupId, userId);
     }
-    // Другие методы...
+
+    @Transactional(readOnly = true)
+    public boolean isUserOwnerOfGroup(Long userId, Long groupId) {
+        return groupRepository.existsByIdAndOwnerId(groupId, userId);
+    }
+
 }

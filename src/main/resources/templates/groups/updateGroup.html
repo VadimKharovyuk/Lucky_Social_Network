@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update Group</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1877f2;
+            margin-bottom: 20px;
+        }
+
+        form div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        input[type="file"] {
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            padding: 5px;
+        }
+
+        img {
+            max-width: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #1877f2;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #166fe5;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Update Group</h1>
+    <form th:action="@{/groups/update/{id}(id=${group.id})}" method="post" enctype="multipart/form-data">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" th:value="${group.name}">
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" th:text="${group.description}"></textarea>
+        </div>
+        <div>
+            <label for="photo">Photo:</label>
+            <input type="file" id="photo" name="photo">
+        </div>
+        <div>
+            <img th:if="${group.imgurImageUrl}" th:src="${group.imgurImageUrl}" alt="Current group photo">
+        </div>
+        <button type="submit">Update Group</button>
+    </form>
+</div>
+</body>
+</html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Update Group</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Update Group</h1>-->
+<!--<form th:action="@{/groups/update/{id}(id=${group.id})}" method="post" enctype="multipart/form-data">-->
+<!--    <div>-->
+<!--        <label for="name">Name:</label>-->
+<!--        <input type="text" id="name" name="name" th:value="${group.name}">-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <label for="description">Description:</label>-->
+<!--        <textarea id="description" name="description" th:text="${group.description}"></textarea>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <label for="photo">Photo:</label>-->
+<!--        <input type="file" id="photo" name="photo">-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <img th:if="${group.imgurImageUrl}" th:src="${group.imgurImageUrl}" alt="Current group photo"-->
+<!--             style="max-width: 200px;">-->
+<!--    </div>-->
+<!--    <button type="submit">Update Group</button>-->
+<!--</form>-->
+<!--</body>-->
+<!--</html>-->
