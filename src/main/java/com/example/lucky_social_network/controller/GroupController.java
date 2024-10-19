@@ -32,6 +32,18 @@ public class GroupController {
     private final UserService userService;
     private final GroupContentRepository groupContentRepository;
 
+    @PostMapping("/{groupId}/delete-post/{postId}")
+    public String deletePostByIdInGroup(@PathVariable Long groupId, @PathVariable Long postId, RedirectAttributes redirectAttributes) {
+        try {
+            groupService.deletePostInGroup(postId);
+            redirectAttributes.addFlashAttribute("message", "Пост успешно удален");
+        } catch (Exception e) {
+            log.error("Error deleting post", e);
+            redirectAttributes.addFlashAttribute("error", "Ошибка при удалении поста");
+        }
+        return "redirect:/groups/" + groupId;
+    }
+
     @GetMapping("/{groupId}")
     public String showGroup(@PathVariable Long groupId, Model model) {
         Group group = groupService.getGroupById(groupId);
@@ -54,23 +66,6 @@ public class GroupController {
         return "groups/view";
     }
 
-//    @GetMapping("/{groupId}")
-//    public String showGroup(@PathVariable Long groupId, Model model) {
-//        Group group = groupService.getGroupById(groupId);
-//        User currentUser = userService.getCurrentUser();
-//
-//        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
-//        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
-//        boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
-//
-//        model.addAttribute("group", group);
-//        model.addAttribute("currentUser", currentUser);
-//        model.addAttribute("isMember", isMember);
-//        model.addAttribute("canPost", canPost);
-//        model.addAttribute("isOwner", isOwner);
-//
-//        return "groups/view";
-//    }
 
     // Метод для отображения фото группы
     @GetMapping("/{groupId}/photo")

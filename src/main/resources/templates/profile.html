@@ -86,7 +86,7 @@
             <label for="lastName">Фамилия:</label>
             <input type="text" class="form-control" id="lastName" th:field="${user.lastName}" required>
           </div>
-          
+
 
           <div class="form-group">
             <label for="email">Email:</label>
@@ -109,18 +109,6 @@
             <input type="text" class="form-control" id="location" th:field="${user.location}">
           </div>
 
-          <!-- Поля для семейного положения и партнера -->
-          <div class="form-group">
-            <label for="relationshipStatus">Семейное положение:</label>
-            <select class="form-control" id="relationshipStatus" name="relationshipStatus">
-              <option value="">Выберите семейное положение</option>
-              <option th:each="status : ${relationshipStatuses}"
-                      th:value="${status}"
-                      th:text="${status}"
-                      th:selected="${user.relationshipStatus != null and user.relationshipStatus.contains(status)}">
-              </option>
-            </select>
-          </div>
           <div class="form-group" id="partnerSelectGroup" style="display: none;">
             <label for="partnerSelect">Партнер:</label>
             <select class="form-control" id="partnerSelect" name="partnerId">
@@ -150,26 +138,6 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-  // Показ/скрытие выбора партнера
-  document.getElementById('relationshipStatus').addEventListener('change', function() {
-    var partnerSelectGroup = document.getElementById('partnerSelectGroup');
-    if (this.value === 'Женат/Замужем' || this.value === 'В отношениях') {
-      partnerSelectGroup.style.display = 'block';
-    } else {
-      partnerSelectGroup.style.display = 'none';
-      document.getElementById('partnerSelect').value = '';
-    }
-  });
-
-  // Показ спиннера при отправке формы
-  document.querySelector('form').addEventListener('submit', function() {
-    var saveButton = document.getElementById('saveButton');
-    var loadingSpinner = document.getElementById('loadingSpinner');
-    loadingSpinner.style.display = 'inline-block';
-    saveButton.disabled = true;
-  });
-</script>
 </body>
 </html>
 

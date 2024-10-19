@@ -1,11 +1,10 @@
 package com.example.lucky_social_network.service;
 
-import com.dropbox.core.DbxException;
 import com.example.lucky_social_network.exception.FriendshipNotFoundException;
 import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.UserRepository;
-import com.example.lucky_social_network.service.picService.DropboxService;
+import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -18,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -31,11 +28,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SubscriptionService subscriptionService;
-    private final DropboxService dropboxService;
+    private final ImgurService imgurService;
 
 
-
-    public User updateUser(User user, String relationshipStatus, Long partnerId) {
+    public User updateUser(User user) {
         User existingUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -48,24 +44,6 @@ public class UserService {
 
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());
-
-
-        // Обновляем семейное положение
-
-        if (relationshipStatus != null) {
-            existingUser.setRelationshipStatus(relationshipStatus.isEmpty()
-                    ? new ArrayList<>()
-                    : new ArrayList<>(Collections.singletonList(relationshipStatus)));
-        }
-        // Обновляем партнера
-        if (partnerId != null) {
-            User partner = userRepository.findById(partnerId)
-                    .orElseThrow(() -> new RuntimeException("Partner not found"));
-            existingUser.setPartner(partner);
-        } else {
-            existingUser.setPartner(null);
-        }
-
 
         return userRepository.save(existingUser);
     }
@@ -170,25 +148,23 @@ public class UserService {
         return user1.getFriends().stream().anyMatch(friend -> friend.getId().equals(userId2));
     }
 
-
     public String getUserAvatarUrl(User user) {
-        if (user.getAvatarDropboxPath() != null) {
-            try {
-                return dropboxService.getTemporaryLink(user.getAvatarDropboxPath());
-            } catch (DbxException e) {
-                // Обработка ошибок
-                log.error("Error getting Dropbox link for avatar: " + e.getMessage());
-                return null; // или URL аватара по умолчанию
-            }
+        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+            return user.getAvatarUrl();
         }
-        return null; // или URL аватара по умолчанию
+        return getDefaultAvatarUrl(); // Метод, возвращающий URL аватара по умолчанию
     }
 
-    public void updateAvatarDropboxPath(Long userId, String dropboxPath) {
-        User user = getUserById(userId);
-        user.setAvatarDropboxPath(dropboxPath);
-        userRepository.save(user);
+    private String getDefaultAvatarUrl() {
+        // Возвращает URL аватара по умолчанию
+        return "https://example.com/default-avatar.png";
     }
+
+//    public void updateAvatarDropboxPath(Long userId, String dropboxPath) {
+//        User user = getUserById(userId);
+//        user.setAvatarDropboxPath(dropboxPath);
+//        userRepository.save(user);
+//    }
 
 
     public Long getCurrentUserId() {
@@ -221,4 +197,10 @@ public class UserService {
     }
 
 
+    public void updateAvatarUrl(Long userId, String imageUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        user.setAvatarUrl(imageUrl);
+        userRepository.save(user);
+    }
 }

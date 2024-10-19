@@ -197,6 +197,39 @@
             color: red;
             margin-top: 10px;
         }
+
+        .delete-post-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .delete-post-btn:hover {
+            background-color: #ff3333;
+        }
+
+        .post-image {
+            max-width: 100%;
+            height: 540px; /* Фиксированная высота */
+            object-fit: cover; /* Заполняет контейнер, сохраняя пропорции и обрезая при необходимости */
+            border-radius: 8px; /* Скругленные углы */
+            margin-top: 10px; /* Отступ сверху */
+            display: block; /* Блочный элемент */
+        }
+
+        .post-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Центрирование содержимого */
+        }
+
+        .post-content p {
+            width: 100%; /* Полная ширина для текста */
+            margin-bottom: 10px; /* Отступ перед изображением */
+        }
     </style>
 </head>
 <body>
@@ -231,7 +264,16 @@
     <form th:if="${isMember}" th:action="@{/groups/{id}/leave(id=${group.id})}" method="post">
         <button type="submit">Покинуть группу</button>
     </form>
-    
+
+    <h3>Создать новый пост</h3>
+    <form th:if="${canPost}" th:action="@{/groups/{id}/post(id=${group.id})}" method="post"
+          enctype="multipart/form-data" class="post-form">
+        <textarea name="content" required placeholder="Напишите что-нибудь..."></textarea>
+        <input type="file" name="image" accept="image/*" onchange="previewImage(event)">
+        <img id="image-preview" alt="Preview">
+        <button type="submit">Опубликовать</button>
+    </form>
+
     <h2>Посты</h2>
     <ul class="posts-list" th:if="${not #lists.isEmpty(posts)}">
         <li th:each="post : ${posts}" class="post-item">
@@ -245,19 +287,21 @@
                     <span th:text="${post.author.firstName + ' ' + post.author.lastName}"></span>
                     <span th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span>
                 </small>
+                <form th:if="${isOwner || currentUser.id == post.author.id}"
+                      th:action="@{/groups/{groupId}/delete-post/{postId}(groupId=${group.id},postId=${post.id})}"
+                      method="post" style="display: inline;">
+                    <br><br>
+                    <button type="submit" class="delete-post-btn"
+                            onclick="return confirm('Вы уверены, что хотите удалить этот пост?');">
+                        Удалить
+                    </button>
+                </form>
             </div>
         </li>
     </ul>
     <p th:if="${#lists.isEmpty(posts)}">В этой группе пока нет постов.</p>
 
-    <h3>Создать новый пост</h3>
-    <form th:if="${canPost}" th:action="@{/groups/{id}/post(id=${group.id})}" method="post"
-          enctype="multipart/form-data" class="post-form">
-        <textarea name="content" required placeholder="Напишите что-нибудь..."></textarea>
-        <input type="file" name="image" accept="image/*" onchange="previewImage(event)">
-        <img id="image-preview" alt="Preview">
-        <button type="submit">Опубликовать</button>
-    </form>
+
     <p th:if="${!canPost}" class="error-message">У вас нет разрешения на публикацию в этой группе.</p>
 </div>
 

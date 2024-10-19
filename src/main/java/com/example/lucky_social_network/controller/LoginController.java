@@ -3,7 +3,6 @@ package com.example.lucky_social_network.controller;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,7 +40,7 @@ public class LoginController {
             User user = userService.findByUsername(username);
             userService.updateLastLogin(user);
 
-            return "redirect:/home";
+            return "redirect:/posts";
         } catch (Exception e) {
             model.addAttribute("error", "Неверное имя пользователя или пароль");
             return "login";

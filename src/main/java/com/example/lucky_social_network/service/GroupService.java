@@ -33,6 +33,18 @@ public class GroupService {
     private final GroupContentRepository groupContentRepository;
 
 
+    public void deletePostInGroup(Long postId) {
+        GroupPost post = groupContentRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Пост не найден"));
+
+        Group group = post.getGroup();
+        group.getPosts().remove(post);
+        group.setPostsCount(group.getPostsCount() - 1);
+
+        groupContentRepository.delete(post);
+        groupRepository.save(group);
+    }
+
     @Transactional
     public Group updateGroup(Long groupId, String name, String description, byte[] photoData) {
         Group group = getGroupById(groupId);

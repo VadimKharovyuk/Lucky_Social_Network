@@ -1,6 +1,5 @@
 package com.example.lucky_social_network.controller;
 
-import com.dropbox.core.DbxException;
 import com.example.lucky_social_network.dto.PostCreationDto;
 import com.example.lucky_social_network.model.Notification;
 import com.example.lucky_social_network.model.Post;
@@ -11,6 +10,7 @@ import com.example.lucky_social_network.service.NotificationService;
 import com.example.lucky_social_network.service.PostService;
 import com.example.lucky_social_network.service.UserService;
 import com.example.lucky_social_network.service.picService.DropboxService;
+import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -35,11 +35,44 @@ public class ProfileController {
     private final PostService postService;
     private final DropboxService dropboxService;
     private final NotificationService notificationService;
+    private final ImgurService imgurService;
+
+
+    @PostMapping("/update")
+    public String updateProfile(@ModelAttribute User updatedUser,
+                                @RequestParam("avatarFile") MultipartFile avatarFile,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            // Обновляем основную информацию пользователя
+            userService.updateUser(updatedUser);
+
+            // Если пользователь загрузил новый аватар, обновляем его
+            if (!avatarFile.isEmpty()) {
+                byte[] imageData = avatarFile.getBytes();
+                String imageUrl = imgurService.uploadImage(imageData);
+                if (imageUrl != null) {
+                    userService.updateAvatarUrl(updatedUser.getId(), imageUrl);
+                } else {
+                    throw new RuntimeException("Не удалось получить URL изображения от Imgur");
+                }
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Профиль успешно обновлен.");
+            return "redirect:/profile";
+        } catch (IOException e) {
+            log.error("Ошибка при чтении файла аватара: ", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при загрузке аватара.");
+            return "redirect:/profile?error=avatar_upload_failed";
+        } catch (Exception e) {
+            log.error("Ошибка при обновлении профиля: ", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при обновлении профиля.");
+            return "redirect:/profile?error=profile_update_failed";
+        }
+    }
 
 
     @GetMapping("/{userId}")
     public String getUserProfile(@PathVariable Long userId, Model model) {
-
         try {
             User user = userService.getUserProfileById(userId);
             Long currentUserId = getCurrentUserId();
@@ -74,7 +107,6 @@ public class ProfileController {
             model.addAttribute("notifications", notifications);
             model.addAttribute("isEmailVerified", user.getEmailVerified());
 
-
             return "user-profile";
         } catch (Exception e) {
             log.error("Error processing profile request for userId: " + userId, e);
@@ -101,34 +133,7 @@ public class ProfileController {
 
 //обновиить профиль
 
-    @PostMapping("/update")
-    public String updateProfile(@ModelAttribute User updatedUser,
-                                @RequestParam("avatarFile") MultipartFile avatarFile,
-                                @RequestParam(required = false) String relationshipStatus,
-                                @RequestParam(required = false) Long partnerId,
-                                RedirectAttributes redirectAttributes) {
-        try {
-            // Обновляем основную информацию пользователя
-            userService.updateUser(updatedUser, relationshipStatus, partnerId);
 
-            // Если пользователь загрузил новый аватар, обновляем его
-            if (!avatarFile.isEmpty()) {
-                String dropboxPath = dropboxService.uploadFile(avatarFile);
-                userService.updateAvatarDropboxPath(updatedUser.getId(), dropboxPath);
-            }
-
-            redirectAttributes.addFlashAttribute("successMessage", "Профиль успешно обновлен.");
-            return "redirect:/profile";
-        } catch (IOException e) {
-            log.error("Ошибка при загрузке аватара: ", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при загрузке аватара.");
-            return "redirect:/profile?error=avatar_upload_failed";
-        } catch (DbxException e) {
-            log.error("Ошибка при загрузке аватара в Dropbox: ", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при сохранении аватара.");
-            return "redirect:/profile?error=dropbox_upload_failed";
-        }
-    }
 
 
     private Long getCurrentUserId() {

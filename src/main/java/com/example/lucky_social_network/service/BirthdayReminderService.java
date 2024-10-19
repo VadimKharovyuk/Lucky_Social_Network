@@ -5,7 +5,6 @@ import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,22 +23,22 @@ public class BirthdayReminderService {
 
     private final EmailService emailService;
 
-    @Scheduled(cron = "0 0 0 * * *") // Запускается каждый день в полночь
-    public void sendBirthdayReminders() {
-        LocalDate today = LocalDate.now();
-        List<User> users = userRepository.findAll();
-
-        for (User user : users) {
-            if (user.getDateOfBirth() != null) {
-                LocalDate birthday = user.getDateOfBirth().withYear(today.getYear());
-                long daysUntilBirthday = ChronoUnit.DAYS.between(today, birthday);
-
-                if (daysUntilBirthday >= 0 && daysUntilBirthday <= 5) {
-                    sendBirthdayReminder(user, daysUntilBirthday);
-                }
-            }
-        }
-    }
+//    @Scheduled(cron = "0 0 0 * * *") // Запускается каждый день в полночь
+//    public void sendBirthdayReminders() {
+//        LocalDate today = LocalDate.now();
+//        List<User> users = userRepository.findAll();
+//
+//        for (User user : users) {
+//            if (user.getDateOfBirth() != null) {
+//                LocalDate birthday = user.getDateOfBirth().withYear(today.getYear());
+//                long daysUntilBirthday = ChronoUnit.DAYS.between(today, birthday);
+//
+//                if (daysUntilBirthday >= 0 && daysUntilBirthday <= 5) {
+//                    sendBirthdayReminder(user, daysUntilBirthday);
+//                }
+//            }
+//        }
+//    }
 
     private void sendBirthdayReminder(User user, long daysUntilBirthday) {
         String subject = "Birthday Reminder";

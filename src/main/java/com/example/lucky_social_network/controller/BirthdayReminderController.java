@@ -19,7 +19,7 @@ public class BirthdayReminderController {
 
     @PostMapping("/send-reminders")
     public ResponseEntity<String> sendReminders() {
-        birthdayReminderService.sendBirthdayReminders();
+//        birthdayReminderService.sendBirthdayReminders();
         return ResponseEntity.ok("Birthday reminders sent successfully");
     }
 

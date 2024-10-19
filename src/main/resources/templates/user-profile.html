@@ -445,9 +445,12 @@
     <div class="profile-container">
         <div class="profile-header">
             <div class="profile-header">
-                <img th:if="${user.avatarDropboxPath != null}"
+                <img th:if="${avatarUrl != null}"
                      th:src="${avatarUrl}"
                      alt="User Avatar" class="profile-avatar">
+                <img th:unless="${avatarUrl != null}"
+                     src="/path/to/default/avatar.png"
+                     alt="Default Avatar" class="profile-avatar">
             </div>
 
 
@@ -482,15 +485,6 @@
                     <div>День рождения: <span th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}"></span>
                     </div>
                     <div>Город: <span th:text="${user.location}"></span></div>
-
-                    <div>
-                        Семейное положение:
-                        <span th:if="${user.relationshipStatus != null and !user.relationshipStatus.isEmpty()}"
-                              th:text="${user.relationshipStatus.get(0)}"></span>
-                        <span th:if="${user.relationshipStatus == null or user.relationshipStatus.isEmpty()}">Не указано</span>
-
-                        <!--                         <span th:text="${user.partner.username }">Партнер</span>-->
-                    </div>
                     <br>
                     <br>
                     <div>О себе : <span th:text="${user.getBio()}"></span></div>
