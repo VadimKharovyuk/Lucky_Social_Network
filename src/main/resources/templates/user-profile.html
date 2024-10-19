@@ -343,51 +343,91 @@
             font-size: 0.9em;
             color: #666;
         }
-
         .post {
             background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
             margin-bottom: 20px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-image {
+            margin-bottom: 15px;
+        }
+
+        .post-image img {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 4px;
         }
 
         .post-content {
             margin-bottom: 10px;
         }
 
-        .post-content a {
-            color: #1c1e21;
-            text-decoration: none;
-        }
-
-        .post-content a:hover {
-            text-decoration: underline;
+        .post-content p {
+            color: #24292e;
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 0;
         }
 
         .post-meta {
-            font-size: 0.9em;
-            color: #65676b;
+            font-size: 14px;
+            color: #586069;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .post-timestamp {
+            margin-right: 10px;
         }
 
         .post-location {
             margin-top: 5px;
         }
 
-        .post-actions {
-            margin-top: 10px;
-            display: flex;
-            justify-content: space-between;
+        .post-location i {
+            margin-right: 5px;
+            color: #0366d6;
         }
 
         .map-link {
-            color: #1877f2;
+            color: #0366d6;
             text-decoration: none;
+            margin-left: 5px;
         }
 
         .map-link:hover {
             text-decoration: underline;
         }
+
+        .post-actions {
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background-color: #d73a49;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #cb2431;
+        }
+
+
     </style>
 </head>
 <body>
@@ -527,18 +567,31 @@
         <!-- Форма создания поста (только для владельца профиля) -->
         <div class="posts-container" th:if="${currentUser != null && currentUser.id == user.id}">
             <div class="post-form">
-                <form th:action="@{/posts/create}" method="post" th:object="${postCreationDto}">
-                    <input type="hidden" name="userId" th:value="${currentUser.id}"/>
-                    <textarea th:field="*{content}" class="post-input" placeholder="Что у вас нового?"></textarea>
+                <form th:action="@{/posts/create}" method="post" th:object="${postCreationDto}"
+                      enctype="multipart/form-data">
+                    <input type="hidden" name="userId" th:value="${user.id}"/>
+
+                    <div>
+                        <label for="content">Содержание поста:</label>
+                        <textarea th:field="*{content}" id="content" class="post-input" placeholder="Что у вас нового?"
+                                  maxlength="600"></textarea>
+                    </div>
 
                     <!-- Поля для геолокации -->
                     <div class="geolocation-container">
                         <input type="hidden" th:field="*{latitude}" id="latitude"/>
                         <input type="hidden" th:field="*{longitude}" id="longitude"/>
-                        <input type="text" th:field="*{locationName}" id="locationName"
-                               placeholder="Название местоположения" class="form-control"/>
+                        <div>
+                            <label for="locationName">Название местоположения:</label>
+                            <input type="text" th:field="*{locationName}" id="locationName"
+                                   placeholder="Название местоположения" class="form-control"/>
+                        </div>
                         <button type="button" onclick="getLocation()" class="btn btn-secondary">Добавить геолокацию
                         </button>
+                        <div>
+                            <label for="image">Загрузить изображение:</label>
+                            <input type="file" th:field="*{image}" id="image" name="image" accept="image/*">
+                        </div>
                         <span id="locationStatus"></span>
                     </div>
 
@@ -555,12 +608,15 @@
             <h2>Посты пользователя</h2>
             <div th:if="${userPosts != null and not #lists.isEmpty(userPosts)}">
                 <div th:each="post : ${userPosts}" class="post">
+                    <div class="post-image" th:if="${post.imageUrl != null}">
+                        <img th:src="${post.imageUrl}" alt="Post image">
+                    </div>
                     <div class="post-content">
-                        <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.content}"></a>
+                        <p th:text="${post.content}"></p>
                     </div>
                     <div class="post-meta">
-                <span class="post-timestamp"
-                      th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span>
+                        <span class="post-timestamp"
+                              th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span>
 
                         <!-- Отображение геолокации -->
                         <div th:if="${post.latitude != null and post.longitude != null}" class="post-location">
@@ -574,8 +630,6 @@
                         </div>
 
                         <div class="post-actions">
-                            <!--                            <a th:href="@{/posts/{id}(id=${post.id})}" class="btn btn-primary btn-sm">Просмотреть-->
-                            <!--                                пост</a>-->
                             <form th:if="${post.author.id == #authentication.principal.id}"
                                   th:action="@{/posts/delete/{postId}(postId=${post.id})}" method="post">
                                 <button type="submit" class="btn btn-danger btn-sm">Удалить</button>

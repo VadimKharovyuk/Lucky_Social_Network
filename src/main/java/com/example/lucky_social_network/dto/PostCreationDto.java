@@ -1,6 +1,7 @@
 package com.example.lucky_social_network.dto;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class PostCreationDto {
@@ -8,4 +9,6 @@ public class PostCreationDto {
     private Double latitude;
     private Double longitude;
     private String locationName;
+
+    private MultipartFile image;
 }

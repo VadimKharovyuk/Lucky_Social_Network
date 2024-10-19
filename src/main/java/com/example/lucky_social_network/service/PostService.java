@@ -4,12 +4,14 @@ import com.example.lucky_social_network.dto.PostCreationDto;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.PostRepository;
+import com.example.lucky_social_network.service.picService.ImgurService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final ImgurService imgurService;
 
 
     @Transactional
@@ -30,16 +33,23 @@ public class PostService {
         post.setLatitude(postDto.getLatitude());
         post.setLongitude(postDto.getLongitude());
         post.setLocationName(postDto.getLocationName());
+
+        // Загрузка изображения, если оно предоставлено
+        if (postDto.getImage() != null && !postDto.getImage().isEmpty()) {
+            try {
+                byte[] imageData = postDto.getImage().getBytes();
+                String imageUrl = imgurService.uploadImage(imageData);
+                post.setImageUrl(imageUrl);
+            } catch (IOException e) {
+                log.error("Ошибка при загрузке изображения", e);
+                // Здесь вы можете решить, как обрабатывать ошибку. Например:
+                // throw new RuntimeException("Ошибка при загрузке изображения", e);
+            }
+        }
+
         return postRepository.save(post);
     }
-//    @Transactional
-//    public Post createPost(User author, String content) {
-//        Post post = new Post();
-//        post.setAuthor(author);
-//        post.setContent(content);
-//        post.setTimestamp(LocalDateTime.now());
-//        return postRepository.save(post);
-//    }
+
 
     public Optional<Post> getPostById(Long id) {
         return postRepository.findById(id);

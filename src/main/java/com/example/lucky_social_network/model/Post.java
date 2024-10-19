@@ -28,6 +28,9 @@ public class Post {
     @Column(nullable = false , length = 600)
     private String content;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+    
     @Column(nullable = false)
     private LocalDateTime timestamp;
 

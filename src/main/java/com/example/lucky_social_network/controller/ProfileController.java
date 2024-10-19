@@ -9,7 +9,6 @@ import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.NotificationService;
 import com.example.lucky_social_network.service.PostService;
 import com.example.lucky_social_network.service.UserService;
-import com.example.lucky_social_network.service.picService.DropboxService;
 import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,7 @@ public class ProfileController {
 
     private final UserService userService;
     private final PostService postService;
-    private final DropboxService dropboxService;
+
     private final NotificationService notificationService;
     private final ImgurService imgurService;
 
