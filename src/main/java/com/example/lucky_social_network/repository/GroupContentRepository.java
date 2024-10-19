@@ -18,6 +18,7 @@ public interface GroupContentRepository extends JpaRepository<GroupPost, Long> {
     // Получаем посты группы, отсортированные по дате (самые новые первые)
     List<GroupPost> findByGroupIdOrderByTimestampDesc(Long groupId);
 
+
     // Посчитать количество постов в группе
     long countByGroupId(Long groupId);
 

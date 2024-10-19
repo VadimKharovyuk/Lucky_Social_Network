@@ -42,8 +42,7 @@ public class PostService {
                 post.setImageUrl(imageUrl);
             } catch (IOException e) {
                 log.error("Ошибка при загрузке изображения", e);
-                // Здесь вы можете решить, как обрабатывать ошибку. Например:
-                // throw new RuntimeException("Ошибка при загрузке изображения", e);
+
             }
         }
 
@@ -100,5 +99,9 @@ public class PostService {
             log.info("Decremented like count for post {}: {}", savedPost.getId(), savedPost.getLikeCount());
         }
 
+    }
+
+    public void save(Post repost) {
+        postRepository.save(repost);
     }
 }

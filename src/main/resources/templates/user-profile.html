@@ -343,6 +343,7 @@
             font-size: 0.9em;
             color: #666;
         }
+
         .post {
             background-color: #fff;
             border: 1px solid #e1e4e8;
@@ -427,6 +428,39 @@
             background-color: #cb2431;
         }
 
+        .post-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .post-link:hover {
+            text-decoration: underline;
+        }
+
+        .post-content {
+            margin-bottom: 10px;
+        }
+
+        .repost-info {
+            display: flex;
+            align-items: center;
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .repost-info svg {
+            margin-right: 5px;
+        }
+
+        .repost-info a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .repost-info a:hover {
+            text-decoration: underline;
+        }
 
     </style>
 </head>
@@ -567,6 +601,7 @@
         <!-- Форма создания поста (только для владельца профиля) -->
         <div class="posts-container" th:if="${currentUser != null && currentUser.id == user.id}">
             <div class="post-form">
+
                 <form th:action="@{/posts/create}" method="post" th:object="${postCreationDto}"
                       enctype="multipart/form-data">
                     <input type="hidden" name="userId" th:value="${user.id}"/>
@@ -608,16 +643,28 @@
             <h2>Посты пользователя</h2>
             <div th:if="${userPosts != null and not #lists.isEmpty(userPosts)}">
                 <div th:each="post : ${userPosts}" class="post">
+
+                    <div th:if="${post.isRepost}" class="repost-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-share" viewBox="0 0 16 16">
+                            <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                        </svg>
+                        <span>Reposted from group:
+        <a th:href="@{/groups/{groupId}(groupId=${post.originalGroupPost.group.id})}"
+           th:text="${post.originalGroupPost.group.name}"></a>
+    </span>
+                    </div>
                     <div class="post-image" th:if="${post.imageUrl != null}">
                         <img th:src="${post.imageUrl}" alt="Post image">
                     </div>
                     <div class="post-content">
-                        <p th:text="${post.content}"></p>
+                        <a th:href="@{/posts/{id}(id=${post.id})}" class="post-link">
+                            <p th:text="${post.content}"></p>
+                        </a>
                     </div>
                     <div class="post-meta">
                         <span class="post-timestamp"
                               th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span>
-
                         <!-- Отображение геолокации -->
                         <div th:if="${post.latitude != null and post.longitude != null}" class="post-location">
                             <i class="fas fa-map-marker-alt"></i>
@@ -628,7 +675,6 @@
                             <a th:href="@{'https://www.google.com/maps/search/?api=1&query=' + ${post.latitude} + ',' + ${post.longitude}}"
                                target="_blank" class="map-link">Открыть карту</a>
                         </div>
-
                         <div class="post-actions">
                             <form th:if="${post.author.id == #authentication.principal.id}"
                                   th:action="@{/posts/delete/{postId}(postId=${post.id})}" method="post">
@@ -643,6 +689,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 

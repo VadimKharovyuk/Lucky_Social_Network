@@ -42,6 +42,20 @@ public class GroupPost {
     @Column(nullable = false)
     private Long commentsCount = 0L;
 
+    private Long repostsCount = 0L;
+
+    public Long getRepostsCount() {
+        return repostsCount != null ? repostsCount : 0L;
+    }
+
+    public void setRepostsCount(Long repostsCount) {
+        this.repostsCount = repostsCount != null ? repostsCount : 0L;
+    }
+
+    public void incrementRepostsCount() {
+        this.repostsCount = (this.repostsCount != null ? this.repostsCount : 0L) + 1;
+    }
+
     // Можно добавить связи для комментариев и лайков, если они нужны
     // @OneToMany(mappedBy = "groupPost", cascade = CascadeType.ALL, orphanRemoval = true)
     // private Set<GroupPostComment> comments = new HashSet<>();

@@ -30,7 +30,7 @@ public class Post {
 
     @Column(name = "image_url")
     private String imageUrl;
-    
+
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
@@ -48,4 +48,12 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
+
+
+    @Column(name = "is_repost", nullable = false)
+    private boolean isRepost = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "original_group_post_id")
+    private GroupPost originalGroupPost;
 }

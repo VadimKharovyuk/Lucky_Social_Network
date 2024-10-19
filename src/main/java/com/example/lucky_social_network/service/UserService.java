@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -202,5 +203,9 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         user.setAvatarUrl(imageUrl);
         userRepository.save(user);
+    }
+
+    public Optional<User> findById(Long userId) {
+        return userRepository.findById(userId);
     }
 }

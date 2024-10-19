@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -197,29 +198,6 @@ public class GroupService {
         return savedPost;
     }
 
-//    @Transactional
-//    public GroupPost createPost(Group group, User author, String content) {
-//        if (group.getType() == Group.GroupType.SUBSCRIPTION && !author.equals(group.getOwner())) {
-//            throw new IllegalStateException("Only the owner can post in a subscription group");
-//        }
-//
-//        if (group.getType() == Group.GroupType.INTERACTIVE && !group.getMembers().contains(author)) {
-//            throw new IllegalStateException("Only members can post in an interactive group");
-//        }
-//
-//        GroupPost post = new GroupPost();
-//        post.setGroup(group);
-//        post.setAuthor(author);
-//        post.setContent(content);
-//        post.setTimestamp(LocalDateTime.now());
-//
-//        group.getPosts().add(post);
-//        group.setPostsCount(group.getPostsCount() + 1);
-//        groupRepository.save(group);
-//
-//        return post;
-//    }
-
     @Transactional(readOnly = true)
     public boolean canUserPostInGroup(User user, Group group) {
         if (group.getType() == Group.GroupType.SUBSCRIPTION) {
@@ -298,4 +276,35 @@ public class GroupService {
         return groupRepository.existsByIdAndOwnerId(groupId, userId);
     }
 
+
+    @Transactional
+    public Group save(Group group) {
+        return groupRepository.save(group);
+    }
+
+    public Group findById(Long groupId) {
+        Optional<Group> group = groupRepository.findById(groupId);
+        return group.orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isMember(Long userId, Long groupId) {
+        Optional<Group> groupOptional = groupRepository.findById(groupId);
+        Optional<User> userOptional = userService.findById(userId);
+
+        if (groupOptional.isPresent() && userOptional.isPresent()) {
+            Group group = groupOptional.get();
+            User user = userOptional.get();
+
+            // Проверяем, является ли пользователь владельцем группы
+            if (group.getOwner().equals(user)) {
+                return true;
+            }
+
+            // Проверяем, есть ли пользователь в списке участников группы
+            return group.getMembers().contains(user);
+        }
+
+        return false;
+    }
 }

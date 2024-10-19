@@ -3,9 +3,12 @@ package com.example.lucky_social_network.controller;
 import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.Group;
 import com.example.lucky_social_network.model.GroupPost;
+import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.GroupContentRepository;
+import com.example.lucky_social_network.service.GroupContentService;
 import com.example.lucky_social_network.service.GroupService;
+import com.example.lucky_social_network.service.PostService;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -31,6 +38,41 @@ public class GroupController {
     private final GroupService groupService;
     private final UserService userService;
     private final GroupContentRepository groupContentRepository;
+    public final GroupContentService groupContentService;
+    private final PostService postService;
+
+
+    @PostMapping("/{groupId}/repost/{postId}")
+    public String repostFromGroup(@PathVariable Long groupId, @PathVariable Long postId,
+                                  Authentication authentication) {
+        String username = authentication.getName();
+        User currentUser = userService.findByUsername(username);
+
+        GroupPost originalPost = groupContentService.findById(postId);
+
+        if (originalPost != null && currentUser != null) {
+            if (groupService.isMember(currentUser.getId(), groupId)) {
+                Post repost = new Post();
+                repost.setContent(originalPost.getContent());
+                repost.setAuthor(currentUser);
+                repost.setTimestamp(LocalDateTime.now());
+                repost.setImageUrl(originalPost.getImgurImageUrl());
+                repost.setRepost(true);
+                repost.setOriginalGroupPost(originalPost);
+
+                postService.save(repost);
+
+                originalPost.incrementRepostsCount();
+                groupContentService.save(originalPost);
+            } else {
+                return "redirect:/error";
+            }
+        } else {
+            return "redirect:/error";
+        }
+
+        return "redirect:/groups/" + groupId;
+    }
 
     @PostMapping("/{groupId}/delete-post/{postId}")
     public String deletePostByIdInGroup(@PathVariable Long groupId, @PathVariable Long postId, RedirectAttributes redirectAttributes) {
@@ -43,7 +85,6 @@ public class GroupController {
         }
         return "redirect:/groups/" + groupId;
     }
-
     @GetMapping("/{groupId}")
     public String showGroup(@PathVariable Long groupId, Model model) {
         Group group = groupService.getGroupById(groupId);
@@ -53,18 +94,47 @@ public class GroupController {
         boolean canPost = groupService.canUserPostInGroup(currentUser, group);
         boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
 
-        // Получаем посты группы, отсортированные по дате (самые новые первые)
         List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
 
         model.addAttribute("group", group);
-        model.addAttribute("posts", posts);  // Добавляем посты в модель
+        model.addAttribute("posts", posts);
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("isMember", isMember);
         model.addAttribute("canPost", canPost);
         model.addAttribute("isOwner", isOwner);
 
+        Map<Long, Boolean> canRepostMap = new HashMap<>();
+        for (GroupPost post : posts) {
+            // Разрешаем репост, если пользователь является членом группы и не автором поста
+            boolean canRepost = isMember && !post.getAuthor().getId().equals(currentUser.getId());
+            canRepostMap.put(post.getId(), canRepost);
+        }
+        model.addAttribute("canRepostMap", canRepostMap);
+
         return "groups/view";
     }
+
+//    @GetMapping("/{groupId}")
+//    public String showGroup(@PathVariable Long groupId, Model model) {
+//        Group group = groupService.getGroupById(groupId);
+//        User currentUser = userService.getCurrentUser();
+//
+//        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
+//        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
+//        boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
+//
+//        // Получаем посты группы, отсортированные по дате (самые новые первые)
+//        List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
+//
+//        model.addAttribute("group", group);
+//        model.addAttribute("posts", posts);  // Добавляем посты в модель
+//        model.addAttribute("currentUser", currentUser);
+//        model.addAttribute("isMember", isMember);
+//        model.addAttribute("canPost", canPost);
+//        model.addAttribute("isOwner", isOwner);
+//
+//        return "groups/view";
+//    }
 
 
     // Метод для отображения фото группы

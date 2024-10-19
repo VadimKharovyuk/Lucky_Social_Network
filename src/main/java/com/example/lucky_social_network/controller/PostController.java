@@ -32,6 +32,8 @@ public class PostController {
     private final SubscriptionService subscriptionService;
     private final CommentService commentService;
     private final LikeService likeService;
+    private final GroupService groupService;
+    private final GroupContentService groupContentService;
 
 
     @GetMapping
@@ -71,6 +73,7 @@ public class PostController {
 
             // Добавляем текущего пользователя
             model.addAttribute("currentUserId", currentUser.getId());
+
 
             return "posts/view";
         } else {
