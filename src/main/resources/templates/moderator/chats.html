@@ -6,60 +6,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
+            font-family: Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
         }
-
         .container {
-            width: 80%;
-            margin: auto;
-            overflow: hidden;
+            max-width: 900px;
+            margin: 20px auto;
             padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
         h1 {
-            color: #2c3e50;
-            text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #2c3e50;
+            color: #1877f2;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
 
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #166fe5;
+        }
         ul {
             list-style-type: none;
             padding: 0;
         }
-
         li {
-            background: #fff;
+            background-color: #f0f2f5;
             margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 6px;
         }
-
-        li:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        }
-
         a {
-            color: #3498db;
+            color: #385898;
             text-decoration: none;
             font-weight: bold;
         }
-
         a:hover {
-            color: #2980b9;
+            text-decoration: underline;
         }
-
         span {
-            color: #7f8c8d;
-            font-size: 0.9em;
+            color: #606770;
+            font-size: 12px;
             margin-left: 10px;
         }
     </style>
@@ -67,9 +78,18 @@
 <body>
 <div class="container">
     <h1>Users with Chats</h1>
+
+    <form th:action="@{/moderator/chats}" method="get">
+        <input type="text" name="search" th:value="${search}" placeholder="Search by name or username">
+        <button type="submit">Search</button>
+    </form>
+
     <ul>
         <li th:each="user : ${users}">
-            <a th:href="@{/moderator/chat(userId=${user.id})}" th:text="${user.username}"></a>
+            <a th:href="@{/moderator/chat(userId=${user.id})}"
+               th:text="${user.lastName != null and user.firstName != null}
+                         ? ${user.lastName + ' ' + user.firstName}
+                         : ${user.username}"></a>
             <span th:text="'(ID: ' + ${user.id} + ')'"></span>
         </li>
     </ul>
@@ -82,40 +102,31 @@
 <!--<html xmlns:th="http://www.thymeleaf.org">-->
 <!--<head>-->
 <!--    <title>Moderator - Chats</title>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
 <!--    <style>-->
-<!--        body {-->
-<!--            font-family: Arial, sans-serif;-->
-<!--            line-height: 1.6;-->
-<!--            margin: 0;-->
-<!--            padding: 20px;-->
-<!--        }-->
-
-<!--        ul {-->
-<!--            list-style-type: none;-->
-<!--            padding: 0;-->
-<!--        }-->
-
-<!--        li {-->
-<!--            margin-bottom: 10px;-->
-<!--        }-->
-
-<!--        a {-->
-<!--            color: #333;-->
-<!--            text-decoration: none;-->
-<!--        }-->
-
-<!--        a:hover {-->
-<!--            color: #666;-->
-<!--        }-->
+<!--  -->
 <!--    </style>-->
 <!--</head>-->
 <!--<body>-->
-<!--<h1>Users with Chats</h1>-->
-<!--<ul>-->
-<!--    <li th:each="user : ${users}">-->
-<!--        <a th:href="@{/moderator/chat(userId=${user.id})}" th:text="${user.username}"></a>-->
-<!--        <span th:text="'(ID: ' + ${user.id} + ')'"></span>-->
-<!--    </li>-->
-<!--</ul>-->
+<!--<div class="container">-->
+<!--    <h1>Users with Chats</h1>-->
+
+<!--    <form th:action="@{/moderator/chats}" method="get">-->
+<!--        <input type="text" name="search" th:value="${search}" placeholder="Search by name or username">-->
+<!--        <button type="submit">Search</button>-->
+<!--    </form>-->
+
+<!--    <ul>-->
+<!--        <li th:each="user : ${users}">-->
+<!--            <a th:href="@{/moderator/chat(userId=${user.id})}"-->
+<!--               th:text="${user.lastName != null and user.firstName != null}-->
+<!--                         ? ${user.lastName + ' ' + user.firstName}-->
+<!--                         : ${user.username}"></a>-->
+<!--            <span th:text="'(ID: ' + ${user.id} + ')'"></span>-->
+<!--        </li>-->
+<!--    </ul>-->
+<!--</div>-->
 <!--</body>-->
 <!--</html>-->
+

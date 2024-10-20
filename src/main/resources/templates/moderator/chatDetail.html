@@ -104,7 +104,11 @@
     </ul>
 </nav>
 <div class="container">
-    <h2>Chat Partners for <span th:text="${user.username}"></span></h2>
+  <h2>Chat Partners for
+    <span th:text="${user.lastName != null and user.firstName != null}
+                    ? ${user.lastName + ' ' + user.firstName}
+                    : ${user.username}"></span>
+  </h2>
     <ul>
         <li th:each="partner : ${chatPartners}">
             <a th:href="@{/moderator/chat-history(user1Id=${user.id},user2Id=${partner.id})}"
@@ -116,48 +120,3 @@
 </div>
 </body>
 </html>
-
-
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--    <title>Moderator - Chat Detail</title>-->
-<!--    <style>-->
-<!--        body {-->
-<!--            font-family: Arial, sans-serif;-->
-<!--            line-height: 1.6;-->
-<!--            margin: 0;-->
-<!--            padding: 20px;-->
-<!--        }-->
-
-<!--        ul {-->
-<!--            list-style-type: none;-->
-<!--            padding: 0;-->
-<!--        }-->
-
-<!--        li {-->
-<!--            margin-bottom: 10px;-->
-<!--        }-->
-
-<!--        a {-->
-<!--            color: #333;-->
-<!--            text-decoration: none;-->
-<!--        }-->
-
-<!--        a:hover {-->
-<!--            color: #666;-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--<h1>Chat Partners for <span th:text="${user.username}"></span></h1>-->
-<!--<ul>-->
-<!--    <li th:each="partner : ${chatPartners}">-->
-<!--        <a th:href="@{/moderator/chat-history(user1Id=${user.id},user2Id=${partner.id})}"-->
-<!--           th:text="${partner.username}"></a>-->
-<!--        <span th:text="'(ID: ' + ${partner.id} + ')'"></span>-->
-<!--    </li>-->
-<!--</ul>-->
-<!--<a th:href="@{/moderator/chats}">Back to Users List</a>-->
-<!--</body>-->
-<!--</html>-->

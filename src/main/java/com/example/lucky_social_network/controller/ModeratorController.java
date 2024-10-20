@@ -3,6 +3,7 @@ package com.example.lucky_social_network.controller;
 import com.example.lucky_social_network.model.Message;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.ChatService;
+import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,20 @@ import java.util.List;
 public class ModeratorController {
 
     private final ChatService chatService;
+    private final UserService userService;
+
+    @GetMapping("/chats")
+    public String viewChats(@RequestParam(required = false) String search, Model model) {
+        List<User> users;
+        if (search != null && !search.isEmpty()) {
+            users = chatService.searchUsersWithChats(search);
+        } else {
+            users = chatService.getAllUsersWithChats();
+        }
+        model.addAttribute("users", users);
+        model.addAttribute("search", search);
+        return "moderator/chats";
+    }
 
     @GetMapping("/chat-history")
     public String viewChatHistory(@RequestParam Long user1Id, @RequestParam Long user2Id, Model model) {
@@ -34,12 +49,6 @@ public class ModeratorController {
         return "moderator/chatHistory";
     }
 
-    @GetMapping("/chats")
-    public String viewChats(Model model) {
-        List<User> usersWithChats = chatService.getAllUsersWithChats();
-        model.addAttribute("users", usersWithChats);
-        return "moderator/chats";
-    }
 
     @GetMapping("/chat")
     public String viewChat(@RequestParam Long userId, Model model) {

@@ -73,6 +73,10 @@ public class ChatService {
         // Например, увеличить счетчик предупреждений или отправить уведомление
         log.info("User {} has been warned", user.getUsername());
     }
+
+    public List<User> searchUsersWithChats(String searchTerm) {
+        return userRepository.findByLastNameOrFirstNameOrUsernameContainingIgnoreCase(searchTerm);
+    }
 }
 
 

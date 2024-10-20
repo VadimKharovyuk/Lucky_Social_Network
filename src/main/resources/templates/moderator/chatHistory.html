@@ -86,12 +86,22 @@
     </style>
 </head>
 <body>
-<h1>Chat History: <span th:text="${user1.username}"></span> and <span th:text="${user2.username}"></span></h1>
+<h1>Chat History:
+    <span th:text="${user1.lastName != null and user1.firstName != null}
+                    ? ${user1.lastName + ' ' + user1.firstName}
+                    : ${user1.username}"></span>
+    and
+    <span th:text="${user2.lastName != null and user2.firstName != null}
+                    ? ${user2.lastName + ' ' + user2.firstName}
+                    : ${user2.username}"></span>
+</h1>
 
 <ul th:if="${!chatHistory.isEmpty()}">
     <li th:each="message : ${chatHistory}"
         th:class="${message.sender.id == user1.id ? 'message-sent' : 'message-received'}">
-        <strong th:text="${message.sender.username}"></strong>:
+        <strong th:text="${message.sender.lastName != null and message.sender.firstName != null}
+                  ? ${message.sender.lastName + ' ' + message.sender.firstName}
+                  : ${message.sender.username}"></strong>:
         <span th:text="${message.content}"></span>
         <div class="timestamp" th:text="${#temporals.format(message.timestamp, 'yyyy-MM-dd HH:mm')}"></div>
         <div class="actions">
