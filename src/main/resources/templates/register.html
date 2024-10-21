@@ -99,6 +99,68 @@
       transform: translateY(-3px);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
+
+    .alert {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 8px;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .alert-danger {
+      background: rgba(220, 53, 69, 0.2);
+      color: #fff;
+      border-left: 4px solid #dc3545;
+    }
+
+    .alert-success {
+      background: rgba(40, 167, 69, 0.2);
+      color: #fff;
+      border-left: 4px solid #28a745;
+    }
+
+    .form-control.is-invalid {
+      border: 2px solid rgba(220, 53, 69, 0.5);
+      background-image: none;
+    }
+
+    .invalid-feedback {
+      color: #ffd700;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Анимация встряхивания для формы при ошибке */
+    .shake {
+      animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+    }
+
+    @keyframes shake {
+      10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+      }
+      20%, 80% {
+        transform: translate3d(2px, 0, 0);
+      }
+      30%, 50%, 70% {
+        transform: translate3d(-4px, 0, 0);
+      }
+      40%, 60% {
+        transform: translate3d(4px, 0, 0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -119,15 +181,46 @@
 <div class="main-container">
   <div class="form-container">
     <h2 class="mb-4">Регистрация</h2>
-    <form th:action="@{/register}" th:object="${user}" method="post">
+
+    <!-- Сообщения об ошибках -->
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+    <!-- Сообщение об успехе -->
+    <div th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></div>
+
+    <form th:action="@{/register}" th:object="${user}" method="post" id="registrationForm">
       <div class="mb-3">
         <label for="username" class="form-label">Имя пользователя:</label>
-        <input type="text" class="form-control" id="username" th:field="*{username}" required>
+        <input type="text"
+               class="form-control"
+               th:classappend="${error != null} ? 'is-invalid'"
+               id="username"
+               th:field="*{username}"
+               required
+               minlength="3"
+               maxlength="20"
+               pattern="^[a-zA-Z0-9_]+$"
+               title="Используйте только буквы, цифры и знак подчеркивания">
+        <div class="invalid-feedback">
+          Это имя пользователя уже занято. Пожалуйста, выберите другое.
+        </div>
       </div>
+
       <div class="mb-3">
         <label for="password" class="form-label">Пароль:</label>
-        <input type="password" class="form-control" id="password" th:field="*{password}" required>
+        <input type="password"
+               class="form-control"
+               id="password"
+               th:field="*{password}"
+               required
+               minlength="6"
+               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"
+               title="Пароль должен содержать минимум 6 символов, включая буквы и цифры">
+        <div class="invalid-feedback">
+          Пароль должен содержать минимум 6 символов, включая буквы и цифры
+        </div>
       </div>
+
       <div class="mb-3">
         <label for="gender" class="form-label">Пол:</label>
         <select class="form-select" id="gender" th:field="*{gender}">
@@ -135,11 +228,43 @@
           <option value="FEMALE">Женский</option>
         </select>
       </div>
+
       <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
     </form>
+
+    <div class="mt-3 text-center">
+      <p>Уже есть аккаунт? <a th:href="@{/login}" class="text-warning">Войдите</a></p>
+    </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Добавляем анимацию встряхивания при ошибке
+  document.addEventListener('DOMContentLoaded', function () {
+    const errorAlert = document.querySelector('.alert-danger');
+    const form = document.querySelector('#registrationForm');
+
+    if (errorAlert) {
+      form.classList.add('shake');
+      // Удаляем класс после окончания анимации
+      form.addEventListener('animationend', function () {
+        form.classList.remove('shake');
+      });
+    }
+
+    // Автоматически скрываем сообщения через 5 секунд
+    setTimeout(function () {
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(function (alert) {
+        alert.style.opacity = '0';
+        alert.style.transition = 'opacity 0.5s ease-out';
+        setTimeout(function () {
+          alert.style.display = 'none';
+        }, 500);
+      });
+    }, 5000);
+  });
+</script>
 </body>
 </html>

@@ -5,8 +5,11 @@ import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 
@@ -23,11 +26,28 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public String registerUser(User user) {
-        user.setCreatedAt(LocalDate.now());
-        user.setEmailVerified(false);
-        user.setIsPrivate(false);
-        userService.registerNewUser(user);
-        return "redirect:/login";
+    public String registerUser(@ModelAttribute("user") User user,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes,
+                               Model model) {
+        // Проверяем, существует ли пользователь с таким именем
+        if (userService.isUsernameExists(user.getUsername())) {
+            model.addAttribute("error", "Пользователь с именем '" + user.getUsername() + "' уже существует. Пожалуйста, выберите другое имя.");
+            return "register";
+        }
+
+        try {
+            user.setCreatedAt(LocalDate.now());
+            user.setEmailVerified(false);
+            user.setIsPrivate(false);
+            userService.registerNewUser(user);
+
+            redirectAttributes.addFlashAttribute("success", "Регистрация успешно завершена!");
+            return "redirect:/login";
+
+        } catch (Exception e) {
+            model.addAttribute("error", "Ошибка при регистрации: " + e.getMessage());
+            return "register";
+        }
     }
 }

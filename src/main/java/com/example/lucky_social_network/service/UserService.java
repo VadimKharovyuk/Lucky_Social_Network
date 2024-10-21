@@ -192,7 +192,7 @@ public class UserService {
 
         throw new IllegalStateException("Unexpected principal type: " + principal.getClass());
     }
-    
+
     public List<User> searchUsers(String searchTerm) {
         return userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(searchTerm, searchTerm);
     }
@@ -214,5 +214,9 @@ public class UserService {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
-    
+
+    public boolean isUsernameExists(String username) {
+        return userRepository.findByUsername(username).isPresent();
+
+    }
 }
