@@ -44,22 +44,7 @@ public class UserListController {
 
         return "user-list";
     }
-
-
-//    @GetMapping("/list")
-//    public String getUserList(Model model) {
-//        Long currentUserId = getCurrentUserId();
-//
-//        // Получаем текущего пользователя
-//        User currentUser = userService.getUserById(currentUserId);
-//        model.addAttribute("currentUser", currentUser);
-//
-//        List<User> users = userService.getAllUsers();
-//        model.addAttribute("users", users);
-//        model.addAttribute("currentUserId", getCurrentUserId());
-//
-//        return "user-list";
-//    }
+    
 
     @PostMapping("/addFriend")
     public String addFriend(@RequestParam Long userId, @RequestParam Long friendId, RedirectAttributes redirectAttributes) {

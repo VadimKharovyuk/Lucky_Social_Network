@@ -1,0 +1,125 @@
+<!-- ticket-details.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Ticket Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .ticket-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ticket-header {
+            background-color: #f0f2f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .ticket-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .ticket-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .status-open {
+            background-color: #ffd700;
+        }
+
+        .status-in-progress {
+            background-color: #1e90ff;
+            color: white;
+        }
+
+        .status-resolved {
+            background-color: #32cd32;
+            color: white;
+        }
+
+        .status-closed {
+            background-color: #a9a9a9;
+            color: white;
+        }
+
+        .admin-response {
+            background-color: #e6f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1877f2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .no-response {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<div class="ticket-container">
+    <div class="ticket-header">
+        <h1 th:text="'Ticket #' + ${ticket.id}"></h1>
+        <p>
+            <strong>Status:</strong>
+            <span class="ticket-status"
+                  th:classappend="'status-' + ${#strings.toLowerCase(ticket.status)}"
+                  th:text="${ticket.status}">
+                </span>
+        </p>
+        <p><strong>Created:</strong>
+            <span th:text="${#temporals.format(ticket.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+        </p>
+    </div>
+
+    <div class="ticket-content">
+        <h2>Your Message:</h2>
+        <p th:text="${ticket.subject}"></p>
+        <div th:text="${ticket.message}"></div>
+    </div>
+
+    <!-- Ответ администратора -->
+    <div th:if="${ticket.adminResponse}" class="admin-response">
+        <h2>Admin Response:</h2>
+        <div th:text="${ticket.adminResponse}"></div>
+        <p th:if="${ticket.assignedAdmin}" class="admin-info">
+            <small>
+                Responded by:
+                <span th:text="${ticket.assignedAdmin.user.username}"></span>
+            </small>
+        </p>
+    </div>
+
+    <!-- Если нет ответа -->
+    <div th:if="${ticket.adminResponse == null}" class="no-response">
+        <p>Администратор еще не ответил на ваш тикет. Пожалуйста, ожидайте ответа.</p>
+    </div>
+
+    <a href="/user/tickets" class="back-button">Back to My Tickets</a>
+</div>
+</body>
+</html>

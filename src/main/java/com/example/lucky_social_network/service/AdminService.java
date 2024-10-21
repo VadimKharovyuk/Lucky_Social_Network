@@ -7,6 +7,7 @@ import com.example.lucky_social_network.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,4 +86,23 @@ public class AdminService {
     public void removeAdmin(Long adminId) {
         adminRepository.deleteById(adminId);
     }
+
+    public Admin getAdminByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        return adminRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Admin not found for user: " + username));
+    }
+
+    public boolean isUserAdmin(String username) {
+        try {
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+            return adminRepository.findByUser(user).isPresent();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
 }

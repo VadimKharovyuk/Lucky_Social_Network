@@ -3,7 +3,6 @@ package com.example.lucky_social_network.controller;
 import com.example.lucky_social_network.dto.PostCreationDto;
 import com.example.lucky_social_network.model.Notification;
 import com.example.lucky_social_network.model.Post;
-import com.example.lucky_social_network.model.RelationshipStatusConstants;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.NotificationService;
@@ -125,7 +124,6 @@ public class ProfileController {
             model.addAttribute("avatarUrl", avatarUrl);
         }
         model.addAttribute("avatarUrl", avatarUrl);
-        model.addAttribute("relationshipStatuses", RelationshipStatusConstants.getAllStatuses());
         model.addAttribute("user", user);
         return "profile";
     }

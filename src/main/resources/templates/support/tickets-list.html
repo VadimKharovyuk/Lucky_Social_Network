@@ -1,0 +1,137 @@
+<!-- tickets-list.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Support Tickets</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .tickets-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ticket-item {
+            background-color: #f0f2f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ticket-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .status-open {
+            background-color: #ffd700;
+        }
+
+        .status-in-progress {
+            background-color: #1e90ff;
+            color: white;
+        }
+
+        .status-resolved {
+            background-color: #32cd32;
+            color: white;
+        }
+
+        .status-closed {
+            background-color: #a9a9a9;
+            color: white;
+        }
+
+        .ticket-link {
+            text-decoration: none;
+            color: #1877f2;
+        }
+
+        .ticket-link:hover {
+            text-decoration: underline;
+        }
+
+        .create-ticket-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1877f2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 8px 16px;
+            margin: 0 4px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #1877f2;
+        }
+
+        .pagination a.active {
+            background-color: #1877f2;
+            color: white;
+            border: 1px solid #1877f2;
+        }
+    </style>
+</head>
+<body>
+<div class="tickets-container">
+    <h1>My Support Tickets</h1>
+
+    <a href="/user/tickets/form" class="create-ticket-btn">Create New Ticket</a>
+
+    <div th:if="${tickets.empty}">
+        <p>You don't have any support tickets yet.</p>
+    </div>
+
+    <div th:each="ticket : ${tickets}" class="ticket-item">
+        <div>
+            <h3>
+                <a th:href="@{/user/tickets/{id}(id=${ticket.id})}"
+                   class="ticket-link"
+                   th:text="${ticket.subject}">
+                </a>
+            </h3>
+            <small th:text="${'Created: ' + #temporals.format(ticket.createdAt, 'dd-MM-yyyy HH:mm')}"></small>
+        </div>
+        <div>
+                <span class="ticket-status"
+                      th:classappend="'status-' + ${#strings.toLowerCase(ticket.status)}"
+                      th:text="${ticket.status}">
+                </span>
+        </div>
+    </div>
+
+    <div class="pagination" th:if="${totalPages > 1}">
+        <a th:if="${currentPage > 0}"
+           th:href="@{/user/tickets(page=${currentPage - 1})}">
+            Previous
+        </a>
+
+        <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+           th:href="@{/user/tickets(page=${pageNum})}"
+           th:text="${pageNum + 1}"
+           th:class="${pageNum == currentPage} ? 'active' : ''">
+        </a>
+
+        <a th:if="${currentPage < totalPages - 1}"
+           th:href="@{/user/tickets(page=${currentPage + 1})}">
+            Next
+        </a>
+    </div>
+</div>
+</body>
+</html>

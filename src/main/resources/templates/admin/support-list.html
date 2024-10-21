@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Support Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Боковая панель */
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: #1877f2;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .stat-card.open {
+            border-left: 4px solid #ffd700;
+        }
+
+        .stat-card.in-progress {
+            border-left: 4px solid #1e90ff;
+        }
+
+        .stat-card.resolved {
+            border-left: 4px solid #32cd32;
+        }
+
+        .stat-card.total {
+            border-left: 4px solid #a9a9a9;
+        }
+
+        /* Основной контент */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tickets-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tickets-table th, .tickets-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tickets-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .tickets-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .ticket-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-open {
+            background-color: #ffd700;
+        }
+
+        .status-in-progress {
+            background-color: #1e90ff;
+            color: white;
+        }
+
+        .status-resolved {
+            background-color: #32cd32;
+            color: white;
+        }
+
+        .status-closed {
+            background-color: #a9a9a9;
+            color: white;
+        }
+
+        .action-button {
+            padding: 6px 12px;
+            background-color: #1877f2;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background-color: #166fe5;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 8px 16px;
+            margin: 0 4px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #1877f2;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background-color: #f0f2f5;
+            transform: translateY(-2px);
+        }
+
+        .pagination a.active {
+            background-color: #1877f2;
+            color: white;
+            border-color: #1877f2;
+        }
+    </style>
+</head>
+<body>
+<div class="layout-container">
+    <!-- Боковая панель со статистикой -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Support Statistics</h2>
+        </div>
+
+        <div class="stat-card total">
+            <h3>Total Tickets</h3>
+            <p th:text="${totalItems}">0</p>
+        </div>
+
+        <div class="stat-card open">
+            <h3>Open Tickets</h3>
+            <p th:text="${openTickets}">0</p>
+        </div>
+
+        <div class="stat-card in-progress">
+            <h3>In Progress</h3>
+            <p th:text="${inProgressTickets}">0</p>
+        </div>
+
+        <div class="stat-card resolved">
+            <h3>Resolved</h3>
+            <p th:text="${resolvedTickets}">0</p>
+        </div>
+    </aside>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="dashboard-container">
+            <h1>Support Tickets Dashboard</h1>
+
+            <!-- Таблица тикетов -->
+            <table class="tickets-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Last Response</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ticket : ${tickets}">
+                    <td th:text="${ticket.id}"></td>
+                    <td th:text="${ticket.user.username}"></td>
+                    <td th:text="${ticket.subject}"></td>
+                    <td>
+                        <span class="ticket-status"
+                              th:classappend="'status-' + ${#strings.toLowerCase(ticket.status)}"
+                              th:text="${ticket.status}">
+                        </span>
+                    </td>
+                    <td th:text="${#temporals.format(ticket.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
+                    <td>
+                        <span th:if="${ticket.adminResponse != null}">
+                            <span th:text="${ticket.assignedAdmin?.user.username ?: 'Unknown'}"></span>
+                        </span>
+                        <span th:unless="${ticket.adminResponse != null}">No response yet</span>
+                    </td>
+                    <td>
+                        <a class="action-button"
+                           th:href="@{/admin/support/tickets/{id}(id=${ticket.id})}">
+                            View & Reply
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- Пагинация -->
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/admin/support/list(page=${currentPage - 1})}">
+                    Previous
+                </a>
+
+                <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                   th:href="@{/admin/support/list(page=${pageNum})}"
+                   th:text="${pageNum + 1}"
+                   th:class="${pageNum == currentPage} ? 'active' : ''">
+                </a>
+
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{/admin/support/list(page=${currentPage + 1})}">
+                    Next
+                </a>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
