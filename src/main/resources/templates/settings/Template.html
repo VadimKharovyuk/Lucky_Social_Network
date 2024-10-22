@@ -304,35 +304,50 @@
                         </div>
                         <div class="mb-4">
                             <h5>Создать новый тикет</h5>
-                            <form>
+                            <form th:action="@{/settings}" th:object="${ticket}" method="post">
+                                <!-- Общие ошибки -->
+                                <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
                                 <div class="mb-3">
-                                    <label class="form-label">Тема</label>
-                                    <input type="text" class="form-control" required>
+                                    <label for="subject" class="form-label">Тема</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="subject"
+                                           th:field="*{subject}"
+                                           th:classappend="${#fields.hasErrors('subject')} ? 'is-invalid'"
+                                           required>
+                                    <div class="invalid-feedback"
+                                         th:if="${#fields.hasErrors('subject')}"
+                                         th:errors="*{subject}">
+                                    </div>
                                 </div>
+
                                 <div class="mb-3">
-                                    <label class="form-label">Описание проблемы</label>
-                                    <textarea class="form-control" rows="4" required></textarea>
+                                    <label for="message" class="form-label">Описание проблемы</label>
+                                    <textarea class="form-control"
+                                              id="message"
+                                              rows="4"
+                                              th:field="*{message}"
+                                              th:classappend="${#fields.hasErrors('message')} ? 'is-invalid'"
+                                              required>
+        </textarea>
+                                    <div class="invalid-feedback"
+                                         th:if="${#fields.hasErrors('message')}"
+                                         th:errors="*{message}">
+                                    </div>
                                 </div>
+
                                 <button type="submit" class="btn btn-primary">Отправить</button>
                             </form>
                         </div>
-                        <div>
-                            <h5>Ваши тикеты</h5>
-                            <div class="list-group bg-transparent">
-                                <a href="#" class="list-group-item bg-transparent text-white border-light">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Проблема с загрузкой фото</h6>
-                                        <small>3 дня назад</small>
-                                    </div>
-                                    <p class="mb-1">Статус: В обработке</p>
-                                </a>
-                                <a href="#" class="list-group-item bg-transparent text-white border-light">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Вопрос по настройкам</h6>
-                                        <small>5 дней назад</small>
-                                    </div>
-                                    <p class="mb-1">Статус: Решено</p>
-                                </a>
+                        <div class="mt-4">
+                            <div class="card bg-transparent border-light">
+                                <div class="card-body">
+                                    <p class="text-white">Просмотрите историю ваших обращений в службу поддержки</p>
+                                    <a href="/user/tickets" class="btn btn-primary">
+                                        Перейти к списку тикетов
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -453,24 +468,24 @@
     </div>
 </div>
 
-<!-- Модальное окно для подтверждения изменений -->
-<div class="modal fade" id="confirmChanges" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content bg-dark text-white">
-            <div class="modal-header border-0">
-                <h5 class="modal-title">Подтверждение изменений</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Вы уверены, что хотите сохранить изменения?
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary">Подтвердить</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!--&lt;!&ndash; Модальное окно для подтверждения изменений &ndash;&gt;-->
+<!--<div class="modal fade" id="confirmChanges" tabindex="-1">-->
+<!--    <div class="modal-dialog">-->
+<!--        <div class="modal-content bg-dark text-white">-->
+<!--            <div class="modal-header border-0">-->
+<!--                <h5 class="modal-title">Подтверждение изменений</h5>-->
+<!--                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                Вы уверены, что хотите сохранить изменения?-->
+<!--            </div>-->
+<!--            <div class="modal-footer border-0">-->
+<!--                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>-->
+<!--                <button type="button" class="btn btn-primary">Подтвердить</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -485,14 +500,14 @@
         }
     });
 
-    // Подтверждение изменений
-    document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const modal = new bootstrap.Modal(document.getElementById('confirmChanges'));
-            modal.show();
-        });
-    });
+    // // Подтверждение изменений
+    // document.querySelectorAll('form').forEach(form => {
+    //     form.addEventListener('submit', function (e) {
+    //         e.preventDefault();
+    //         const modal = new bootstrap.Modal(document.getElementById('confirmChanges'));
+    //         modal.show();
+    //     });
+    // });
 </script>
 </body>
 </html>
