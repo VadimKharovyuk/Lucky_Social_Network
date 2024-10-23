@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои альбомы</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Навигация */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1877f2;
+            text-decoration: none;
+            margin-right: 24px;
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .nav-link {
+            color: #65676b;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-link:hover {
+            background-color: #f2f2f2;
+            color: #1c1e21;
+        }
+
+        /* Основной контейнер */
+        .container {
+            display: flex;
+            max-width: 1920px;
+            margin: 56px auto 0;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Боковая панель */
+        .sidebar {
+            width: 300px;
+            position: sticky;
+            top: 76px;
+            height: calc(100vh - 76px);
+            padding-right: 8px;
+            overflow-y: auto;
+        }
+
+        .side-nav {
+            background: transparent;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .side-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #1c1e21;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+        }
+
+        .side-nav-link:hover {
+            background-color: #e4e6eb;
+        }
+
+        .side-nav-link.active {
+            background-color: #e7f3ff;
+            color: #1877f2;
+        }
+
+        .side-nav-link i {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        /* Основной контент */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Сетка альбомов */
+        .albums-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .album-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .album-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .album-card a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .album-cover {
+            height: 220px;
+            background: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .album-card:hover .album-cover {
+            background: #e4e6eb;
+        }
+
+        .album-cover i {
+            font-size: 48px;
+            color: #1877f2;
+            transition: transform 0.3s ease;
+        }
+
+        .album-card:hover .album-cover i {
+            transform: scale(1.1);
+        }
+
+        .album-info {
+            padding: 16px;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        .album-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1c1e21;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .album-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #65676b;
+            font-size: 14px;
+        }
+
+        .album-meta i {
+            transition: transform 0.3s ease;
+        }
+
+        .album-card:hover .album-meta i {
+            transform: scale(1.1);
+        }
+
+        /* Пустое состояние */
+        .no-albums {
+            background: white;
+            border-radius: 12px;
+            padding: 48px 24px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 32px auto;
+        }
+
+        .no-albums-icon {
+            font-size: 64px;
+            color: #1877f2;
+            margin-bottom: 24px;
+        }
+
+        .no-albums-icon i {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .no-albums h2 {
+            font-size: 24px;
+            color: #1c1e21;
+            margin-bottom: 12px;
+        }
+
+        .no-albums p {
+            color: #65676b;
+            margin-bottom: 24px;
+        }
+
+        .create-first-album-btn {
+            display: inline-flex;
+            align-items: center;
+            background: #1877f2;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .create-first-album-btn:hover {
+            background: #1666d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(24, 119, 242, 0.2);
+        }
+
+        .create-first-album-btn i {
+            margin-right: 8px;
+        }
+
+        /* Кнопка создания */
+        .create-album-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: #1877f2;
+            color: white;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .create-album-btn:hover {
+            background: #1666d8;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .side-nav-link span {
+                display: none;
+            }
+
+            .side-nav-link i {
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .albums-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Навигация -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">Lucky Social</a>
+    <div class="navbar-menu">
+        <a href="/" class="nav-link" title="Главная">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/messages" class="nav-link" title="Сообщения">
+            <i class="fas fa-envelope"></i>
+        </a>
+        <a href="/notifications" class="nav-link" title="Уведомления">
+            <i class="fas fa-bell"></i>
+        </a>
+        <a href="/profile" class="nav-link" title="Профиль">
+            <i class="fas fa-user"></i>
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+        <nav class="side-nav">
+            <a href="/profile" class="side-nav-link">
+                <i class="fas fa-user"></i>
+                <span>Моя страница</span>
+            </a>
+            <a href="/news" class="side-nav-link">
+                <i class="fas fa-newspaper"></i>
+                <span>Новости</span>
+            </a>
+            <a href="/messages" class="side-nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Сообщения</span>
+            </a>
+            <a href="/friends" class="side-nav-link">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+            </a>
+            <a href="/groups" class="side-nav-link">
+                <i class="fas fa-users-rectangle"></i>
+                <span>Группы</span>
+            </a>
+            <a href="/photos" class="side-nav-link active">
+                <i class="fas fa-images"></i>
+                <span>Фотографии</span>
+            </a>
+            <a href="/notifications" class="side-nav-link">
+                <i class="fas fa-bell"></i>
+                <span>Уведомления</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+        <!-- Проверка наличия альбомов -->
+        <div th:if="${albums.empty}" class="no-albums">
+            <div class="no-albums-icon">
+                <i class="fas fa-images"></i>
+            </div>
+            <h2>У вас пока нет альбомов</h2>
+            <p>Создайте свой первый альбом и начните добавлять фотографии</p>
+            <a href="/albums/create" class="create-first-album-btn">
+                <i class="fas fa-plus"></i>
+                Создать альбом
+            </a>
+        </div>
+
+        <!-- Сетка альбомов -->
+        <div th:if="${!albums.empty}" class="albums-grid">
+            <div th:each="album : ${albums}" class="album-card">
+                <a th:href="@{/albums/{id}(id=${album.id})}">
+                    <div class="album-cover">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <div class="album-info">
+                        <h3 class="album-title" th:text="${album.title}">Название альбома</h3>
+                        <div class="album-meta">
+                            <span th:text="${album.photoCount + ' фото'}">0 фото</span>
+                            <span th:if="${album.isPrivate}" title="Приватный альбом">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Кнопка создания альбома -->
+        <a href="/albums/create" class="create-album-btn" title="Создать новый альбом">
+            <i class="fas fa-plus"></i>
+        </a>
+    </main>
+</div>
+</body>
+</html>

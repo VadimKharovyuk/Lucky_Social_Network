@@ -1,266 +1,540 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Мои группы</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои группы - Lucky Social Network</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            color: #1c1e21;
+        /* Базовые стили остаются такими же как в предыдущих примерах */
+        [Предыдущие базовые стили для body, navbar, container, sidebar...
+
+        ]
+
+        /* Дополнительные стили для страницы групп */
+        .groups-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
         }
 
-        .navbar {
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 10px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .navbar-content {
+        .section-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f2f5;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+            justify-content: space-between;
         }
 
-        .logo {
-            color: #1877f2;
-            font-size: 24px;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .nav-links a {
-            color: #65676b;
-            text-decoration: none;
-            margin-left: 20px;
+        .section-header h2 {
+            font-size: 18px;
             font-weight: 600;
+            color: #1c1e21;
+            margin: 0;
         }
 
-        .nav-links a:hover {
+        .section-content {
+            padding: 16px;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .group-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.2s;
+            border: 1px solid #e4e6eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .group-card:hover {
+            background: #f0f2f5;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .group-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #e4e6eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .group-avatar i {
+            font-size: 20px;
             color: #1877f2;
+        }
+
+        .group-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .group-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .group-type {
+            font-size: 13px;
+            color: #65676b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Фильтры и поиск */
+        .filters {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            padding: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 15px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            background: white;
+            color: #1c1e21;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #e7f3ff;
+            border-color: #1877f2;
+            color: #1877f2;
+        }
+
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: white;
+            color: #1c1e21;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .pagination a:hover, .pagination a.active {
+            background: #e7f3ff;
+            color: #1877f2;
+        }
+
+        /* Правая панель */
+        .right-sidebar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            position: sticky;
+            top: 76px;
+        }
+
+        .right-sidebar h3 {
+            font-size: 16px;
+            color: #1c1e21;
+            margin-bottom: 12px;
+        }
+
+        .right-sidebar ul {
+            margin-bottom: 20px;
+        }
+
+        .right-sidebar li {
+            margin-bottom: 8px;
+        }
+
+        .right-sidebar a {
+            color: #1c1e21;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .right-sidebar a:hover {
+            background: #f0f2f5;
+        }
+
+        .create-group-btn {
+            width: 100%;
+            padding: 8px 16px;
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .create-group-btn:hover {
+            background: #1666d8;
+            transform: translateY(-2px);
+        }
+
+        /* Боковая панель */
+        .sidebar {
+            width: 300px;
+            position: sticky;
+            top: 76px;
+            height: calc(100vh - 76px);
+            padding-right: 8px;
+            overflow-y: auto;
+        }
+
+        .side-nav {
+            background: transparent;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .side-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #1c1e21;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+        }
+
+        .side-nav-link:hover {
+            background-color: #e4e6eb;
+        }
+
+        .side-nav-link.active {
+            background-color: #e7f3ff;
+            color: #1877f2;
+        }
+
+        .side-nav-link i {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-size: 20px;
         }
 
         .container {
             display: flex;
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 20px;
+            max-width: 1920px;
+            margin: 56px auto 0;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .side-nav-link span {
+                display: none;
+            }
+
+            .side-nav-link i {
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar, .right-sidebar {
+                display: none;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .main-content {
+                margin: 0;
+            }
         }
 
         .main-content {
             flex: 1;
-            margin-right: 20px;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        .sidebar {
-            width: 300px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        h1, h2, h3 {
-            color: #1c1e21;
-        }
-
-        ul {
-            list-style-type: none;
+        * {
+            margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        li {
-            margin-bottom: 10px;
-        }
-
-        .button {
-            background-color: #1877f2;
-            color: #ffffff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .button:hover {
-            background-color: #166fe5;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .pagination a {
-            margin: 0 5px;
-            padding: 5px 10px;
-            border: 1px solid #dddfe2;
-            border-radius: 4px;
-        }
-
-        .pagination a:hover {
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #f0f2f5;
+            color: #1c1e21;
+            line-height: 1.5;
+            min-height: 100vh;
         }
 
-        .sort-options {
-            margin-top: 20px;
-            color: #65676b;
-        }
-
-        .group-list {
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-form {
-            margin-bottom: 20px;
-        }
-
-        .search-form input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-
-        .group-list ul {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .group-list li {
-            margin-bottom: 0;
-        }
-
-        .group-list .button {
-            width: 100%;
-            text-align: left;
+        .group-name {
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 200px;
+            max-width: 100%;
         }
     </style>
 </head>
 <body>
 <nav class="navbar">
-    <div class="navbar-content">
-        <a href="#" class="logo">Lucky Social Network</a>
-        <div class="nav-links">
-            <a href="#">Главная</a>
-            <a href="#">Профиль</a>
-            <a href="#">Сообщения</a>
-            <a href="#">Уведомления</a>
-        </div>
+    <a href="/" class="navbar-brand">Lucky Social</a>
+    <div class="navbar-menu">
+        <a href="/" class="nav-link">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/messages" class="nav-link">
+            <i class="fas fa-envelope"></i>
+        </a>
+        <a href="/notifications" class="nav-link">
+            <i class="fas fa-bell"></i>
+        </a>
+        <a href="/profile" class="nav-link">
+            <i class="fas fa-user"></i>
+        </a>
     </div>
 </nav>
 
 <div class="container">
+    <aside class="sidebar">
+        <nav class="side-nav">
+            <a href="/profile" class="side-nav-link">
+                <i class="fas fa-user"></i>
+                <span>Моя страница</span>
+            </a>
+            <a href="/news" class="side-nav-link">
+                <i class="fas fa-newspaper"></i>
+                <span>Новости</span>
+            </a>
+            <a href="/messages" class="side-nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Сообщения</span>
+            </a>
+            <a href="/friends" class="side-nav-link">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+            </a>
+            <a href="/groups" class="side-nav-link active">
+                <i class="fas fa-users-rectangle"></i>
+                <span>Группы</span>
+            </a>
+            <a href="/photos" class="side-nav-link">
+                <i class="fas fa-images"></i>
+                <span>Фотографии</span>
+            </a>
+            <a href="/notifications" class="side-nav-link">
+                <i class="fas fa-bell"></i>
+                <span>Уведомления</span>
+            </a>
+        </nav>
+    </aside>
+
     <main class="main-content">
-        <h1>Мои группы</h1>
-
-        <div class="group-list">
-            <h2>Группы по подписке</h2>
-            <ul>
-                <li th:each="group : ${groups}"
-                    th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">
-                    <button class="button"
-                            th:onclick="'window.location.href=\'' + @{/groups/{id}(id=${group.id})} + '\''"
-                            th:text="${group.name}"></button>
-                </li>
-            </ul>
-        </div>
-
-        <div class="group-list">
-            <div class="group-list">
-                <h2>Интерактивные группы</h2>
-                <ul>
-                    <li th:each="group : ${groups}"
-                        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).INTERACTIVE}">
-                        <button class="button"
-                                th:onclick="'window.location.href=\'' + @{/groups/{id}(id=${group.id})} + '\''"
-                                th:text="${group.name}"></button>
-                    </li>
-                </ul>
+        <!-- Фильтры и поиск -->
+        <div class="filters">
+            <input type="text"
+                   class="search-input"
+                   placeholder="Поиск по группам...">
+            <div class="filter-buttons">
+                <button class="filter-btn active">Все группы</button>
+                <button class="filter-btn">По подписке</button>
+                <button class="filter-btn">Интерактивные</button>
+                <button class="filter-btn">
+                    <i class="fas fa-sort-alpha-down"></i>
+                    По названию
+                </button>
+                <button class="filter-btn">
+                    <i class="fas fa-calendar"></i>
+                    По дате
+                </button>
             </div>
         </div>
 
+        <!-- Группы по подписке -->
+        <section class="groups-section">
+            <div class="section-header">
+                <h2>Группы по подписке</h2>
+                <span th:text="${subscriptionGroups.size() + ' групп'}"></span>
+            </div>
+            <div class="section-content">
+                <div class="groups-grid">
+                    <a th:each="group : ${groups}"
+                       th:if="${group.type.name() == 'SUBSCRIPTION'}"
+                       th:href="@{/groups/{id}(id=${group.id})}"
+                       class="group-card">
+                        <div class="group-avatar">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="group-info">
+                            <div class="group-name" th:text="${group.name}"></div>
+                            <div class="group-type">
+                                <i class="fas fa-tag"></i>
+                                <span>По подписке</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Интерактивные группы -->
+        <section class="groups-section">
+            <div class="section-header">
+                <h2>Интерактивные группы</h2>
+                <span th:text="${interactiveGroups.size() + ' групп'}"></span>
+            </div>
+            <div class="section-content">
+                <div class="groups-grid">
+                    <a th:each="group : ${groups}"
+                       th:if="${group.type.name() == 'INTERACTIVE'}"
+                       th:href="@{/groups/{id}(id=${group.id})}"
+                       class="group-card">
+                        <div class="group-avatar">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="group-info">
+                            <div class="group-name" th:text="${group.name}"></div>
+                            <div class="group-type">
+                                <i class="fas fa-tag"></i>
+                                <span>Интерактивная</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Пагинация -->
         <div class="pagination">
-                <span th:if="${currentPage > 0}">
-                    <a th:href="@{/groups/my(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Предыдущая</a>
-                </span>
-            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                    <a th:href="@{/groups/my(page=${i}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"
-                       th:text="${i + 1}"></a>
-                </span>
-            <span th:if="${currentPage < totalPages - 1}">
-                    <a th:href="@{/groups/my(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Следующая</a>
-                </span>
-        </div>
+            <a th:if="${currentPage > 0}"
+               th:href="@{/groups/my(page=${currentPage - 1})}">
+                <i class="fas fa-chevron-left"></i>
+            </a>
 
-        <div class="sort-options">
-            <p>Сортировать по:
-                <a th:href="@{/groups/my(sortBy='name', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Названию</a>
-                |
-                <a th:href="@{/groups/my(sortBy='createdAt', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Дате
-                    создания</a>
-            </p>
-        </div>
+            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+               th:href="@{/groups/my(page=${i})}"
+               th:text="${i + 1}"
+               th:class="${currentPage == i ? 'active' : ''}">
+            </a>
 
-        <p>Всего элементов: <span th:text="${totalItems}"></span></p>
+            <a th:if="${currentPage < totalPages - 1}"
+               th:href="@{/groups/my(page=${currentPage + 1})}">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
     </main>
 
-    <aside class="sidebar">
-        <h2>Поиск групп</h2>
-        <form class="search-form" action="/groups/search" method="get">
-            <input type="text" name="query" placeholder="Поиск групп...">
-            <button type="submit" class="button">Поиск</button>
-        </form>
+    <!-- Правая панель -->
+    <aside class="right-sidebar">
+        <h3>Быстрые действия</h3>
+        <a href="/groups/create" class="create-group-btn">
+            <i class="fas fa-plus"></i>
+            Создать группу
+        </a>
 
-        <h3>Все группы</h3>
+        <h3>Популярные группы</h3>
         <ul>
-            <li th:each="group : ${allGroups}">
-                <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>
+            <li th:each="group : ${popularGroups}">
+                <a th:href="@{/groups/{id}(id=${group.id})}">
+                    <i class="fas fa-users"></i>
+                    <span th:text="${group.name}"></span>
+                </a>
             </li>
         </ul>
-
-        <h3>Группы по подписке</h3>
-        <ul>
-            <li th:each="group : ${allGroups}"
-                th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">
-                <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>
-            </li>
-        </ul>
-
-        <h3>Действия с группами</h3>
-        <a href="/groups/create" class="button">Создать новую группу</a>
-
-        <h3>Поиск всех груп</h3>
-        <a href="/groups/all" class="button"> Найти </a>
     </aside>
 </div>
+
+<script>
+    // Активация фильтров
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelector('.filter-btn.active')?.classList.remove('active');
+            btn.classList.add('active');
+        });
+    });
+
+    // Живой поиск
+    const searchInput = document.querySelector('.search-input');
+    const groupCards = document.querySelectorAll('.group-card');
+
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        groupCards.forEach(card => {
+            const groupName = card.querySelector('.group-name').textContent.toLowerCase();
+            card.style.display = groupName.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>
 </body>
 </html>
-
 
 <!--<!DOCTYPE html>-->
 <!--<html xmlns:th="http://www.thymeleaf.org">-->

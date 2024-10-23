@@ -10,10 +10,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/user/tickets")
@@ -21,6 +19,42 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class UserTicketController {
     private final SupportTicketService supportTicketService;
     private final UserService userService;
+
+
+    @PostMapping("/delete/{ticketId}")
+    public String deleteTicket(@AuthenticationPrincipal UserDetails userDetails,
+                               @PathVariable Long ticketId,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            // Получаем текущего пользователя
+            User user = userService.getUserByUsername(userDetails.getUsername());
+
+            // Проверяем существование тикета и права на его удаление
+            SupportTicket ticket = supportTicketService.getTicketById(ticketId);
+
+            if (ticket == null) {
+                redirectAttributes.addFlashAttribute("error", "Тикет не найден");
+                return "redirect:/user/tickets";
+            }
+
+            // Проверяем, принадлежит ли тикет текущему пользователю
+            if (!ticket.getUser().getId().equals(user.getId())) {
+                redirectAttributes.addFlashAttribute("error", "У вас нет прав на удаление этого тикета");
+                return "redirect:/user/tickets";
+            }
+
+            // Удаляем тикет
+            supportTicketService.deleteticketId(ticketId);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Тикет успешно удален");
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка при удалении тикета: " + e.getMessage());
+        }
+
+        return "redirect:/user/tickets";
+    }
+
 
     // Список всех тикетов пользователя
     @GetMapping

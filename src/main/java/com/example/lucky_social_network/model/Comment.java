@@ -34,4 +34,8 @@ public class Comment {
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
+
+    @ManyToOne
+    @JoinColumn(name = "photo_id")
+    private Photo photo;
 }

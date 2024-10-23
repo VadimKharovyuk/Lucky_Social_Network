@@ -150,6 +150,26 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
+
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-preview:hover .profile-avatar {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -158,11 +178,25 @@
         <!-- Боковое меню -->
         <div class="col-md-3 mb-4">
             <div class="settings-card">
-                <div class="text-center mb-4">
-                    <div class="avatar-preview mx-auto">
-                        <img src="/api/placeholder/150/150" alt="Profile Picture">
+                <div class="settings-card">
+                    <div class="text-center mb-4">
+                        <div class="avatar-preview mx-auto">
+                            <!-- Условное отображение аватара -->
+                            <img th:if="${avatarUrl != null}"
+                                 th:src="${avatarUrl}"
+                                 alt="Profile Picture"
+                                 class="profile-avatar">
+
+                            <!-- Заглушка, если аватар отсутствует -->
+                            <img th:unless="${avatarUrl != null}"
+                                 src="/api/placeholder/150/150"
+                                 alt="Default Profile Picture"
+                                 class="profile-avatar">
+                        </div>
+
+                        <h5 th:text="${user.firstName}" class="mb-2">Username</h5>
                     </div>
-                    <h5 th:text="${user.username}" class="mb-2">Username</h5>
+                    
                 </div>
                 <div class="nav flex-column nav-pills" role="tablist">
                     <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#profile">

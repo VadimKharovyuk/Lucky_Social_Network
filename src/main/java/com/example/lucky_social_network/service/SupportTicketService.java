@@ -143,4 +143,7 @@ public class SupportTicketService {
         return supportTicketRepository.countByStatus(status);
     }
 
+    public void deleteticketId(Long ticketId) {
+        supportTicketRepository.deleteById(ticketId);
+    }
 }

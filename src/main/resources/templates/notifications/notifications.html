@@ -4,115 +4,513 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notifications</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        h1 {
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+            background-color: #edeef0;
             color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #2f5378;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            height: 48px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            color: white;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 24px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .header-nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 48px auto 0;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .nav-menu {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            color: #2a5885;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background-color: #f5f6f8;
+        }
+
+        .nav-item.active {
+            background-color: #f0f2f5;
+            color: #2a5885;
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            width: 24px;
+            margin-right: 10px;
+        }
+
+        .nav-counter {
+            position: absolute;
+            right: 12px;
+            background: #5181b8;
+            color: white;
+            border-radius: 12px;
+            padding: 0 6px;
+            font-size: 12px;
+            line-height: 18px;
+            min-width: 18px;
             text-align: center;
-            margin-bottom: 30px;
+        }
+
+        /* Notifications Content */
+        .content {
+            flex-grow: 1;
+            max-width: 800px;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #2c3e50;
         }
 
         .notification {
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            background: white;
+            border-radius: 8px;
             padding: 15px;
-            margin-bottom: 15px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+            position: relative;
         }
 
         .notification:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
-        .unread {
-            background-color: #e8f4fd;
-            border-left: 5px solid #3498db;
+        .notification.unread {
+            background-color: #edf3fa;
         }
 
-        .notification p {
-            margin: 0 0 10px 0;
-            font-size: 16px;
+        .notification.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #5181b8;
+            border-radius: 4px 0 0 4px;
         }
 
-        .notification small {
-            color: #7f8c8d;
+        .notification-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .notification-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            background-color: #e1e4e8;
+        }
+
+        .notification-message {
             font-size: 14px;
+            color: #2c3e50;
+            margin-bottom: 8px;
         }
 
-        form {
-            margin-top: 10px;
-        }
-
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-
-            .notification {
-                padding: 10px;
-            }
+        .notification-time {
+            font-size: 12px;
+            color: #818c99;
         }
 
         .comment-content {
-            background-color: #f9f9f9;
-            border-left: 3px solid #3498db;
-            padding: 10px;
-            margin-top: 10px;
-            font-style: italic;
+            background-color: #f7f8fa;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #2c3e50;
         }
 
         .post-link {
-            display: block;
-            margin-top: 5px;
-            color: #3498db;
+            display: inline-block;
+            margin-top: 10px;
+            color: #2a5885;
             text-decoration: none;
+            font-size: 14px;
         }
 
         .post-link:hover {
             text-decoration: underline;
         }
+
+        .mark-read-btn {
+            background-color: #5181b8;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+
+        .mark-read-btn:hover {
+            background-color: #4a76a8;
+        }
+
+        .notification-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        /* Right Sidebar */
+        .right-sidebar {
+            width: 230px;
+            flex-shrink: 0;
+        }
+
+        .friends-online {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .friends-online-title {
+            font-size: 14px;
+            color: #818c99;
+            margin-bottom: 10px;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            text-decoration: none;
+            color: #2a5885;
+        }
+
+        .friend-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background-color: #e1e4e8;
+        }
+
+        .friend-name {
+            font-size: 13px;
+        }
+
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: #4bb34b;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+
     </style>
 </head>
 <body>
-<h1>Your Notifications</h1>
-<div th:each="notification : ${notifications}" th:class="${notification.read ? 'notification' : 'notification unread'}">
-    <p th:text="${notification.message}"></p>
-    <small th:text="${#temporals.format(notification.createdAt, 'dd-MM-yyyy HH:mm')}"></small>
-    <div th:if="${notification.commentContent}" class="comment-content">
-        <p th:text="${notification.commentContent}"></p>
-        <small>Comment by: <span th:text="${notification.commentAuthorName}"></span></small>
+<header>
+    <div class="header-container">
+        <a href="/" class="logo">Lucky Social Network</a>
+        <nav class="header-nav">
+            <a href="/"><i class="fas fa-home"></i></a>
+            <a href="/notifications"><i class="fas fa-bell"></i></a>
+            <a href="/messages"><i class="fas fa-envelope"></i></a>
+            <a href="/profile"><i class="fas fa-user"></i></a>
+        </nav>
     </div>
-    <a th:if="${notification.postId}" th:href="@{/posts/{id}(id=${notification.postId})}" class="post-link">
-        View Post
-    </a>
-    <form th:if="${!notification.read}" th:action="@{/notifications/{id}/read(id=${notification.id})}" method="post">
-        <button type="submit">Mark as Read</button>
-    </form>
+</header>
+
+<div class="main-container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <nav class="nav-menu">
+            <a href="/profile" class="nav-item">
+                <i class="fas fa-user"></i>
+                Моя страница
+            </a>
+            <a href="/news" class="nav-item">
+                <i class="fas fa-newspaper"></i>
+                Новости
+                <span class="nav-counter">12</span>
+            </a>
+            <a href="/messages" class="nav-item">
+                <i class="fas fa-envelope"></i>
+                Сообщения
+                <span class="nav-counter">3</span>
+            </a>
+            <a href="/friends" class="nav-item">
+                <i class="fas fa-users"></i>
+                Друзья
+                <span class="nav-counter">2</span>
+            </a>
+            <a href="/groups" class="nav-item">
+                <i class="fas fa-users-rectangle"></i>
+                Группы
+            </a>
+            <a href="/photos" class="nav-item">
+                <i class="fas fa-images"></i>
+                Фотографии
+            </a>
+            <a href="/notifications" class="nav-item active">
+                <i class="fas fa-bell"></i>
+                Уведомления
+                <span class="nav-counter">5</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+        <h1 class="page-title">Уведомления</h1>
+
+        <div th:each="notification : ${notifications}"
+             th:class="${notification.read ? 'notification' : 'notification unread'}">
+            <div class="notification-header">
+                <div class="notification-avatar"></div>
+                <div>
+                    <div class="notification-message" th:text="${notification.message}"></div>
+                    <div class="notification-time"
+                         th:text="${#temporals.format(notification.createdAt, 'dd-MM-yyyy HH:mm')}">
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${notification.commentContent}" class="comment-content">
+                <p th:text="${notification.commentContent}"></p>
+                <small>Автор: <span th:text="${notification.commentAuthorName}"></span></small>
+            </div>
+
+            <a th:if="${notification.postId}"
+               th:href="@{/posts/{id}(id=${notification.postId})}"
+               class="post-link">
+                Перейти к записи
+            </a>
+
+            <div class="notification-actions" th:if="${!notification.read}">
+                <form th:action="@{/notifications/{id}/read(id=${notification.id})}" method="post">
+                    <button type="submit" class="mark-read-btn">Отметить как прочитанное</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="right-sidebar">
+        <div class="friends-online">
+            <div class="friends-online-title">Друзья онлайн (3)</div>
+            <a href="#" class="friend-item">
+                <div class="friend-avatar"></div>
+                <div class="friend-name">Анна Петрова</div>
+                <div class="online-indicator"></div>
+            </a>
+            <a href="#" class="friend-item">
+                <div class="friend-avatar"></div>
+                <div class="friend-name">Иван Сидоров</div>
+                <div class="online-indicator"></div>
+            </a>
+            <a href="#" class="friend-item">
+                <div class="friend-avatar"></div>
+                <div class="friend-name">Мария Иванова</div>
+                <div class="online-indicator"></div>
+            </a>
+        </div>
+    </aside>
 </div>
 </body>
-</html>
+</html><!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Notifications</title>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            line-height: 1.6;-->
+<!--            color: #333;-->
+<!--            max-width: 800px;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 20px;-->
+<!--            background-color: #f4f4f4;-->
+<!--        }-->
+
+<!--        h1 {-->
+<!--            color: #2c3e50;-->
+<!--            text-align: center;-->
+<!--            margin-bottom: 30px;-->
+<!--        }-->
+
+<!--        .notification {-->
+<!--            border: 1px solid #ddd;-->
+<!--            border-radius: 5px;-->
+<!--            padding: 15px;-->
+<!--            margin-bottom: 15px;-->
+<!--            background-color: #fff;-->
+<!--            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);-->
+<!--            transition: all 0.3s ease;-->
+<!--        }-->
+
+<!--        .notification:hover {-->
+<!--            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);-->
+<!--        }-->
+
+<!--        .unread {-->
+<!--            background-color: #e8f4fd;-->
+<!--            border-left: 5px solid #3498db;-->
+<!--        }-->
+
+<!--        .notification p {-->
+<!--            margin: 0 0 10px 0;-->
+<!--            font-size: 16px;-->
+<!--        }-->
+
+<!--        .notification small {-->
+<!--            color: #7f8c8d;-->
+<!--            font-size: 14px;-->
+<!--        }-->
+
+<!--        form {-->
+<!--            margin-top: 10px;-->
+<!--        }-->
+
+<!--        button {-->
+<!--            background-color: #3498db;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 8px 12px;-->
+<!--            border-radius: 3px;-->
+<!--            cursor: pointer;-->
+<!--            transition: background-color 0.3s ease;-->
+<!--        }-->
+
+<!--        button:hover {-->
+<!--            background-color: #2980b9;-->
+<!--        }-->
+
+<!--        @media (max-width: 600px) {-->
+<!--            body {-->
+<!--                padding: 10px;-->
+<!--            }-->
+
+<!--            .notification {-->
+<!--                padding: 10px;-->
+<!--            }-->
+<!--        }-->
+
+<!--        .comment-content {-->
+<!--            background-color: #f9f9f9;-->
+<!--            border-left: 3px solid #3498db;-->
+<!--            padding: 10px;-->
+<!--            margin-top: 10px;-->
+<!--            font-style: italic;-->
+<!--        }-->
+
+<!--        .post-link {-->
+<!--            display: block;-->
+<!--            margin-top: 5px;-->
+<!--            color: #3498db;-->
+<!--            text-decoration: none;-->
+<!--        }-->
+
+<!--        .post-link:hover {-->
+<!--            text-decoration: underline;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Your Notifications</h1>-->
+<!--<div th:each="notification : ${notifications}" th:class="${notification.read ? 'notification' : 'notification unread'}">-->
+<!--    <p th:text="${notification.message}"></p>-->
+<!--    <small th:text="${#temporals.format(notification.createdAt, 'dd-MM-yyyy HH:mm')}"></small>-->
+<!--    <div th:if="${notification.commentContent}" class="comment-content">-->
+<!--        <p th:text="${notification.commentContent}"></p>-->
+<!--        <small>Comment by: <span th:text="${notification.commentAuthorName}"></span></small>-->
+<!--    </div>-->
+<!--    <a th:if="${notification.postId}" th:href="@{/posts/{id}(id=${notification.postId})}" class="post-link">-->
+<!--        View Post-->
+<!--    </a>-->
+<!--    <form th:if="${!notification.read}" th:action="@{/notifications/{id}/read(id=${notification.id})}" method="post">-->
+<!--        <button type="submit">Mark as Read</button>-->
+<!--    </form>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->

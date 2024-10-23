@@ -462,6 +462,144 @@
             text-decoration: underline;
         }
 
+        .albums-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1c1e21;
+            margin: 0;
+        }
+
+        .create-album-btn {
+            padding: 8px 12px;
+            background: #1877f2;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .create-album-btn:hover {
+            background: #1666d8;
+            transform: translateY(-1px);
+        }
+
+        .albums-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .album-card {
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s;
+        }
+
+        .album-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .album-cover {
+            aspect-ratio: 1;
+            background: #f0f2f5;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .album-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .album-cover i {
+            font-size: 32px;
+            color: #1877f2;
+        }
+
+        .album-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .album-meta {
+            font-size: 13px;
+            color: #65676b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .privacy-badge {
+            color: #1877f2;
+        }
+
+        .no-albums {
+            padding: 32px;
+            text-align: center;
+            color: #65676b;
+        }
+
+        .no-albums i {
+            font-size: 48px;
+            color: #1877f2;
+            margin-bottom: 16px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+        }
+
+        .page-link {
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #1c1e21;
+            transition: all 0.2s;
+        }
+
+        .page-link:hover, .page-link.active {
+            background: #e7f3ff;
+            color: #1877f2;
+        }
+
+        @media (max-width: 768px) {
+            .albums-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -501,8 +639,9 @@
     <aside class="left-sidebar">
         <a href="/home" class="menu-item">Моя Страница</a>
         <a href="/users/friends" class="menu-item">Друзья</a>
-        <a href="/posts" class="menu-item">Новости</a>
+        <a href="/albums" class="menu-item">Мои Фото</a>
         <a href="/chat/list" class="menu-item">Сообщения</a>
+        <a href="/posts" class="menu-item">Новости</a>
         <a href="/groups/my" class="menu-item">Группы</a>
         <div class="menu-item notifications">
             <a href="/notifications">
@@ -597,8 +736,77 @@
                 <div class="stat-label">Контакты</div>
             </div>
 
-
         </div>
+
+
+        <div class="albums-section">
+            <div class="section-header">
+                <h2>Альбомы</h2>
+                <span th:if="${totalAlbums > 0}" th:text="${totalAlbums + ' альбомов'}"></span>
+                <a th:if="${user.id == currentUser.id}"
+                   href="/albums/create"
+                   class="create-album-btn">
+                    <i class="fas fa-plus"></i>
+                    Создать альбом
+                </a>
+            </div>
+
+            <!-- Если нет альбомов -->
+            <div th:if="${#lists.isEmpty(albums)}" class="no-albums">
+                <i class="fas fa-images"></i>
+                <p th:if="${user.id == currentUser.id}">У вас пока нет альбомов</p>
+                <p th:unless="${user.id == currentUser.id}">У пользователя пока нет альбомов</p>
+            </div>
+
+            <!-- Сетка альбомов -->
+            <div th:if="${not #lists.isEmpty(albums)}" class="albums-grid">
+                <a th:each="album : ${albums}"
+                   th:href="@{/albums/{id}(id=${album.id})}"
+                   class="album-card">
+                    <div class="album-cover">
+                        <!-- Если у альбома есть фото, показываем первое -->
+                        <img th:if="${not #lists.isEmpty(album.photos)}"
+                             th:src="${album.photos[0].photoUrl}"
+                             alt="Album cover">
+                        <!-- Если фото нет, показываем иконку -->
+                        <i th:unless="${not #lists.isEmpty(album.photos)}"
+                           class="fas fa-images"></i>
+                    </div>
+                    <div class="album-info">
+                        <div class="album-title" th:text="${album.title}">Название альбома</div>
+                        <div class="album-meta">
+                            <span th:text="${album.photoCount + ' фото'}">0 фото</span>
+                            <span th:if="${album.isPrivate}" class="privacy-badge">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Пагинация -->
+            <div th:if="${totalPages > 1}" class="pagination">
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/users/{id}(id=${user.id},page=${currentPage - 1})}"
+                   class="page-link">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+
+                <a th:each="page : ${#numbers.sequence(0, totalPages - 1)}"
+                   th:href="@{/users/{id}(id=${user.id},page=${page})}"
+                   th:text="${page + 1}"
+                   th:class="${page == currentPage ? 'page-link active' : 'page-link'}">
+                </a>
+
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{/users/{id}(id=${user.id},page=${currentPage + 1})}"
+                   class="page-link">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+
         <!-- Форма создания поста (только для владельца профиля) -->
         <div class="posts-container" th:if="${currentUser != null && currentUser.id == user.id}">
             <div class="post-form">
@@ -636,7 +844,9 @@
                     </div>
                 </form>
 
+
             </div>
+
         </div>
 
         <!-- Отображение постов пользователя -->

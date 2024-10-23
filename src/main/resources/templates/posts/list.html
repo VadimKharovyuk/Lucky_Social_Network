@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Все посты - Lucky Social Network</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -12,52 +13,108 @@
       margin: 0;
       padding: 0;
     }
+
     .container {
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
+      display: flex;
+      gap: 20px;
     }
+
     header {
-      background-color: #ffffff;
+      background-color: #2f5378;
       box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       z-index: 100;
+      color: white;
     }
+
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px 0;
     }
+
     .logo {
-      color: #1877f2;
+      color: #ffffff;
       font-size: 24px;
       font-weight: bold;
     }
+
     .nav-links {
       list-style-type: none;
       display: flex;
       margin: 0;
       padding: 0;
     }
+
     .nav-links li {
       margin-left: 20px;
     }
+
     .nav-links a {
       text-decoration: none;
-      color: #050505;
+      color: #ffffff;
     }
+
     main {
       margin-top: 70px;
+      flex-grow: 1;
     }
+
+    aside {
+      margin-top: 70px;
+      width: 250px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-nav {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      padding: 10px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      text-decoration: none;
+      color: #2a5885;
+      transition: background-color 0.2s;
+    }
+
+    .sidebar-nav a:hover {
+      background-color: #f5f6f8;
+      border-radius: 4px;
+    }
+
+    .sidebar-nav i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-nav .counter {
+      margin-left: auto;
+      background: #5181b8;
+      color: white;
+      border-radius: 12px;
+      padding: 2px 6px;
+      font-size: 12px;
+    }
+
     h1 {
       color: #1c1e21;
       font-size: 24px;
       margin-bottom: 20px;
     }
+
     .post {
       background-color: #ffffff;
       border-radius: 8px;
@@ -65,14 +122,17 @@
       margin-bottom: 20px;
       padding: 12px;
     }
+
     .post h2 {
       margin: 0 0 10px 0;
       font-size: 18px;
     }
+
     .post h2 a {
       color: #1c1e21;
       text-decoration: none;
     }
+
     .post-meta {
       color: #65676b;
       font-size: 13px;
@@ -126,31 +186,230 @@
   </div>
 </header>
 
-<main class="container">
-  <h1>Все посты</h1>
-
-  <div th:each="post : ${posts}" class="post">
-    <h2><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.content}"></a></h2>
-    <p class="post-meta">Автор: <span th:text="${post.author.username}"></span></p>
-    <p class="post-meta">Лайки: <span th:text="${post.likeCount}"></span></p>
-
-    <div class="post-actions">
-      <button class="action-button">
-        <i class="far fa-thumbs-up"></i> Нравится
-      </button>
-      <a th:href="@{/posts/{id}(id=${post.id})}" class="action-button">
-        <i class="far fa-comment"></i> Комментировать
+<div class="container">
+  <aside>
+    <div class="sidebar-nav">
+      <a href="/profile">
+        <i class="fas fa-user"></i>
+        Моя страница
       </a>
-      <button class="action-button">
-        <i class="fas fa-share"></i> Поделиться
-      </button>
+      <a href="/posts">
+        <i class="fas fa-newspaper"></i>
+        Новости
+        <span class="counter">12</span>
+      </a>
+      <a href="/messages">
+        <i class="fas fa-envelope"></i>
+        Сообщения
+        <span class="counter">3</span>
+      </a>
+      <a href="/users/friends">
+        <i class="fas fa-users"></i>
+        Друзья
+        <span class="counter">2</span>
+      </a>
+      <a href="/groups/my">
+        <i class="fas fa-users-rectangle"></i>
+        Группы
+      </a>
+      <a href="/photos">
+        <i class="fas fa-images"></i>
+        Фотографии
+      </a>
+      <a href="/music">
+        <i class="fas fa-music"></i>
+        Музыка
+      </a>
+      <a href="/notifications">
+        <i class="fas fa-bell"></i>
+        Уведомления
+        <span class="counter">5</span>
+      </a>
     </div>
+  </aside>
 
-    <!-- Сообщение для неаутентифицированных пользователей -->
-    <p th:if="${currentUserId == null}" class="comment-form">
-      Пожалуйста, <a th:href="@{/login}">войдите</a>, чтобы добавить комментарий.
-    </p>
-  </div>
-</main>
+  <main>
+    <h1>Все посты</h1>
+    <div th:each="post : ${posts}" class="post">
+      <h2><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.content}"></a></h2>
+      <p class="post-meta">Автор: <span th:text="${post.author.username}"></span></p>
+      <p class="post-meta">Лайки: <span th:text="${post.likeCount}"></span></p>
+
+      <div class="post-actions">
+        <button class="action-button">
+          <i class="far fa-thumbs-up"></i> Нравится
+        </button>
+        <a th:href="@{/posts/{id}(id=${post.id})}" class="action-button">
+          <i class="far fa-comment"></i> Комментировать
+        </a>
+        <button class="action-button">
+          <i class="fas fa-share"></i> Поделиться
+        </button>
+      </div>
+
+      <p th:if="${currentUserId == null}" class="comment-form">
+        Пожалуйста, <a th:href="@{/login}">войдите</a>, чтобы добавить комментарий.
+      </p>
+    </div>
+  </main>
+</div>
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>Все посты - Lucky Social Network</title>-->
+<!--  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">-->
+<!--  <style>-->
+<!--    body {-->
+<!--      font-family: 'Roboto', sans-serif;-->
+<!--      background-color: #f0f2f5;-->
+<!--      margin: 0;-->
+<!--      padding: 0;-->
+<!--    }-->
+<!--    .container {-->
+<!--      max-width: 1000px;-->
+<!--      margin: 0 auto;-->
+<!--      padding: 20px;-->
+<!--    }-->
+<!--    header {-->
+<!--      background-color: #ffffff;-->
+<!--      box-shadow: 0 2px 4px rgba(0, 0, 0, .1);-->
+<!--      position: fixed;-->
+<!--      top: 0;-->
+<!--      left: 0;-->
+<!--      right: 0;-->
+<!--      z-index: 100;-->
+<!--    }-->
+<!--    nav {-->
+<!--      display: flex;-->
+<!--      justify-content: space-between;-->
+<!--      align-items: center;-->
+<!--      padding: 10px 0;-->
+<!--    }-->
+<!--    .logo {-->
+<!--      color: #1877f2;-->
+<!--      font-size: 24px;-->
+<!--      font-weight: bold;-->
+<!--    }-->
+<!--    .nav-links {-->
+<!--      list-style-type: none;-->
+<!--      display: flex;-->
+<!--      margin: 0;-->
+<!--      padding: 0;-->
+<!--    }-->
+<!--    .nav-links li {-->
+<!--      margin-left: 20px;-->
+<!--    }-->
+<!--    .nav-links a {-->
+<!--      text-decoration: none;-->
+<!--      color: #050505;-->
+<!--    }-->
+<!--    main {-->
+<!--      margin-top: 70px;-->
+<!--    }-->
+<!--    h1 {-->
+<!--      color: #1c1e21;-->
+<!--      font-size: 24px;-->
+<!--      margin-bottom: 20px;-->
+<!--    }-->
+<!--    .post {-->
+<!--      background-color: #ffffff;-->
+<!--      border-radius: 8px;-->
+<!--      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);-->
+<!--      margin-bottom: 20px;-->
+<!--      padding: 12px;-->
+<!--    }-->
+<!--    .post h2 {-->
+<!--      margin: 0 0 10px 0;-->
+<!--      font-size: 18px;-->
+<!--    }-->
+<!--    .post h2 a {-->
+<!--      color: #1c1e21;-->
+<!--      text-decoration: none;-->
+<!--    }-->
+<!--    .post-meta {-->
+<!--      color: #65676b;-->
+<!--      font-size: 13px;-->
+<!--      margin: 5px 0;-->
+<!--    }-->
+
+<!--    .post-actions {-->
+<!--      display: flex;-->
+<!--      justify-content: space-between;-->
+<!--      border-top: 1px solid #dadde1;-->
+<!--      margin-top: 10px;-->
+<!--      padding-top: 10px;-->
+<!--    }-->
+
+<!--    .action-button {-->
+<!--      background: none;-->
+<!--      border: none;-->
+<!--      color: #65676b;-->
+<!--      cursor: pointer;-->
+<!--      font-size: 14px;-->
+<!--      padding: 5px 10px;-->
+<!--    }-->
+
+<!--    .action-button:hover {-->
+<!--      background-color: #f2f2f2;-->
+<!--      border-radius: 4px;-->
+<!--    }-->
+
+<!--    .comment-form {-->
+<!--      margin-top: 10px;-->
+<!--    }-->
+
+<!--    .comment-form a {-->
+<!--      color: #1877f2;-->
+<!--      text-decoration: none;-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--  <div class="container">-->
+<!--    <nav>-->
+<!--      <div class="logo">Lucky Social Network</div>-->
+<!--      <ul class="nav-links">-->
+<!--        <li><a href="/">Главная</a></li>-->
+<!--        <li><a href="/home">Профиль</a></li>-->
+<!--        <li><a href="/">Сообщения</a></li>-->
+<!--        <li><a href="#settings">Настройки</a></li>-->
+<!--      </ul>-->
+<!--    </nav>-->
+<!--  </div>-->
+<!--</header>-->
+
+<!--<main class="container">-->
+<!--  <h1>Все посты</h1>-->
+
+<!--  <div th:each="post : ${posts}" class="post">-->
+<!--    <h2><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.content}"></a></h2>-->
+<!--    <p class="post-meta">Автор: <span th:text="${post.author.username}"></span></p>-->
+<!--    <p class="post-meta">Лайки: <span th:text="${post.likeCount}"></span></p>-->
+
+<!--    <div class="post-actions">-->
+<!--      <button class="action-button">-->
+<!--        <i class="far fa-thumbs-up"></i> Нравится-->
+<!--      </button>-->
+<!--      <a th:href="@{/posts/{id}(id=${post.id})}" class="action-button">-->
+<!--        <i class="far fa-comment"></i> Комментировать-->
+<!--      </a>-->
+<!--      <button class="action-button">-->
+<!--        <i class="fas fa-share"></i> Поделиться-->
+<!--      </button>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Сообщение для неаутентифицированных пользователей &ndash;&gt;-->
+<!--    <p th:if="${currentUserId == null}" class="comment-form">-->
+<!--      Пожалуйста, <a th:href="@{/login}">войдите</a>, чтобы добавить комментарий.-->
+<!--    </p>-->
+<!--  </div>-->
+<!--</main>-->
+<!--</body>-->
+<!--</html>-->

@@ -125,4 +125,10 @@ public class User {
         MODERATOR
 
     }
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Album> albums = new HashSet<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Photo> photos = new HashSet<>();
 }

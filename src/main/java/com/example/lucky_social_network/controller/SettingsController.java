@@ -4,6 +4,7 @@ import com.example.lucky_social_network.model.SupportTicket;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.SupportTicketService;
 import com.example.lucky_social_network.service.UserService;
+import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,12 +24,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class SettingsController {
     private final UserService userService;
     private final SupportTicketService supportTicketService;
+    private final ImgurService imgurService;
 
     @GetMapping
     public String settings(Model model) {
         User user = userService.getCurrentUser();
+        String avatarUrl = userService.getUserAvatarUrl(user);
 
-
+        // Добавляем URL аватара в модель
+        model.addAttribute("avatarUrl", avatarUrl);
         model.addAttribute("ticket", new SupportTicket());
         model.addAttribute("user", user);
 

@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -31,4 +29,8 @@ public class Like {
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
+
+    @ManyToOne
+    @JoinColumn(name = "photo_id")
+    private Photo photo;
 }

@@ -1,16 +1,17 @@
 package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.dto.PostCreationDto;
+import com.example.lucky_social_network.model.Album;
 import com.example.lucky_social_network.model.Notification;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
-import com.example.lucky_social_network.service.CustomUserDetails;
-import com.example.lucky_social_network.service.NotificationService;
-import com.example.lucky_social_network.service.PostService;
-import com.example.lucky_social_network.service.UserService;
+import com.example.lucky_social_network.service.*;
 import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -31,9 +32,9 @@ public class ProfileController {
 
     private final UserService userService;
     private final PostService postService;
-
     private final NotificationService notificationService;
     private final ImgurService imgurService;
+    private final AlbumService albumService;
 
 
     @PostMapping("/update")
@@ -68,9 +69,10 @@ public class ProfileController {
         }
     }
 
-
     @GetMapping("/{userId}")
-    public String getUserProfile(@PathVariable Long userId, Model model) {
+    public String getUserProfile(@PathVariable Long userId,
+                                 @PageableDefault(size = 6) Pageable albumPageable,
+                                 Model model) {
         try {
             User user = userService.getUserProfileById(userId);
             Long currentUserId = getCurrentUserId();
@@ -88,6 +90,7 @@ public class ProfileController {
             // Получаем список уведомлений для текущего пользователя
             List<Notification> notifications = notificationService.getUserNotifications(currentUserId);
 
+            Page<Album> userAlbums = albumService.getPublicAlbumsByUserId(userId, albumPageable);
             LocalDate today = LocalDate.now();
             if (user.getDateOfBirth() != null &&
                     user.getDateOfBirth().getMonth() == today.getMonth() &&
@@ -105,12 +108,61 @@ public class ProfileController {
             model.addAttribute("notifications", notifications);
             model.addAttribute("isEmailVerified", user.getEmailVerified());
 
+            model.addAttribute("albums", userAlbums.getContent());
+            model.addAttribute("totalAlbums", userAlbums.getTotalElements());
+            model.addAttribute("totalPages", userAlbums.getTotalPages());
+            model.addAttribute("currentPage", userAlbums.getNumber());
+
             return "user-profile";
         } catch (Exception e) {
             log.error("Error processing profile request for userId: " + userId, e);
             throw new RuntimeException("Error processing profile request", e);
         }
     }
+
+
+//    @GetMapping("/{userId}")
+//    public String getUserProfile(@PathVariable Long userId, Model model) {
+//        try {
+//            User user = userService.getUserProfileById(userId);
+//            Long currentUserId = getCurrentUserId();
+//            User currentUser = userService.getUserById(currentUserId);
+//
+//            // Получаем URL аватара пользователя
+//            String avatarUrl = userService.getUserAvatarUrl(user);
+//
+//            boolean areFriends = userService.areFriends(currentUserId, userId);
+//            List<Post> userPosts = postService.getPostsByAuthor(user);
+//
+//            // Получаем количество непрочитанных уведомлений
+//            long unreadNotificationCount = notificationService.getUnreadNotificationCount(currentUserId);
+//
+//            // Получаем список уведомлений для текущего пользователя
+//            List<Notification> notifications = notificationService.getUserNotifications(currentUserId);
+//
+//            LocalDate today = LocalDate.now();
+//            if (user.getDateOfBirth() != null &&
+//                    user.getDateOfBirth().getMonth() == today.getMonth() &&
+//                    user.getDateOfBirth().getDayOfMonth() == today.getDayOfMonth()) {
+//                model.addAttribute("isBirthday", true);
+//            }
+//
+//            model.addAttribute("currentUser", currentUser);
+//            model.addAttribute("areFriends", areFriends);
+//            model.addAttribute("user", user);
+//            model.addAttribute("avatarUrl", avatarUrl);
+//            model.addAttribute("postCreationDto", new PostCreationDto());
+//            model.addAttribute("userPosts", userPosts);
+//            model.addAttribute("notificationCount", unreadNotificationCount);
+//            model.addAttribute("notifications", notifications);
+//            model.addAttribute("isEmailVerified", user.getEmailVerified());
+//
+//            return "user-profile";
+//        } catch (Exception e) {
+//            log.error("Error processing profile request for userId: " + userId, e);
+//            throw new RuntimeException("Error processing profile request", e);
+//        }
+//    }
 
     //профиль пользователя
     @GetMapping

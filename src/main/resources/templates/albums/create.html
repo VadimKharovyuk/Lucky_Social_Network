@@ -1,0 +1,487 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Social Network</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            line-height: 1.5;
+        }
+
+        /* Верхняя навигация */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1877f2;
+            text-decoration: none;
+            margin-right: 24px;
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .nav-link {
+            color: #65676b;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background-color: #f2f2f2;
+            color: #1c1e21;
+        }
+
+        /* Основной контейнер */
+        .container {
+            display: flex;
+            max-width: 1920px;
+            margin: 56px auto 0;
+            padding: 20px;
+            gap: 20px;
+            min-height: calc(100vh - 56px);
+        }
+
+        /* Боковая панель */
+        .sidebar {
+            width: 300px;
+            position: sticky;
+            top: 76px;
+            height: calc(100vh - 76px);
+            padding-right: 8px;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #bcc0c4;
+            border-radius: 4px;
+        }
+
+        .side-nav {
+            background: transparent;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .side-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #1c1e21;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+        }
+
+        .side-nav-link:hover {
+            background-color: #e4e6eb;
+        }
+
+        .side-nav-link.active {
+            background-color: #e7f3ff;
+            color: #1877f2;
+        }
+
+        .side-nav-link i {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        .side-nav-link.active i {
+            color: #1877f2;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: #e41e3f;
+            color: white;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 6px;
+        }
+
+        /* Основной контент */
+        .main-content {
+            flex: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Стили для сетки альбомов */
+        .albums-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .album-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .album-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .album-cover {
+            height: 200px;
+            background: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .album-cover i {
+            font-size: 48px;
+            color: #1877f2;
+        }
+
+        .album-info {
+            padding: 16px;
+        }
+
+        .album-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1c1e21;
+            margin-bottom: 8px;
+        }
+
+        .album-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #65676b;
+            font-size: 14px;
+        }
+
+        /* Кнопка создания */
+        .create-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: #1877f2;
+            color: white;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 24px;
+        }
+
+        .create-btn:hover {
+            background: #1666d8;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .side-nav-link span {
+                display: none;
+            }
+
+            .side-nav-link i {
+                margin-right: 0;
+            }
+
+            .badge {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .albums-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-container h2 {
+            font-size: 20px;
+            color: #1c1e21;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 15px;
+            color: #1c1e21;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #1c1e21;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .privacy-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 12px;
+            background: #f7f8fa;
+            border-radius: 6px;
+        }
+
+        .privacy-toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: #1877f2;
+        }
+
+        .privacy-toggle label {
+            font-size: 15px;
+            color: #1c1e21;
+            user-select: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: #1666d8;
+        }
+
+        .error-message {
+            background: #ffebe9;
+            border: 1px solid #ffa199;
+            color: #cf222e;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .error-message p {
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+<!-- Навигационная панель -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">Lucky Social</a>
+    <div class="navbar-menu">
+        <a href="/" class="nav-link">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/messages" class="nav-link">
+            <i class="fas fa-envelope"></i>
+        </a>
+        <a href="/notifications" class="nav-link">
+            <i class="fas fa-bell"></i>
+        </a>
+        <a href="/profile" class="nav-link">
+            <i class="fas fa-user"></i>
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+        <nav class="side-nav">
+            <a href="/profile" class="side-nav-link">
+                <i class="fas fa-user"></i>
+                <span>Моя страница</span>
+            </a>
+            <a href="/posts" class="side-nav-link">
+                <i class="fas fa-newspaper"></i>
+                <span>Новости</span>
+            </a>
+            <a href="/messages" class="side-nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Сообщения</span>
+                <div class="badge">3</div>
+            </a>
+            <a href="/users/friends" class="side-nav-link">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+                <div class="badge">2</div>
+            </a>
+            <a href="/groups/my" class="side-nav-link">
+                <i class="fas fa-users-rectangle"></i>
+                <span>Группы</span>
+            </a>
+            <a href="/albums" class="side-nav-link active">
+                <i class="fas fa-images"></i>
+                <span>Фотографии</span>
+            </a>
+            <a href="/notifications" class="side-nav-link">
+                <i class="fas fa-bell"></i>
+                <span>Уведомления</span>
+                <div class="badge">5</div>
+            </a>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <div class="form-container">
+            <h2>Создание нового альбома</h2>
+
+            <!-- Отображение ошибок -->
+            <div th:if="${error}" class="error-message">
+                <p th:text="${error}">Error message</p>
+            </div>
+
+            <form th:action="@{/albums/create}" method="post">
+                <div class="form-group">
+                    <label for="title">Название альбома*</label>
+                    <input type="text"
+                           id="title"
+                           name="title"
+                           class="form-control"
+                           required
+                           maxlength="100"
+                           placeholder="Введите название альбома">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Описание</label>
+                    <textarea id="description"
+                              name="description"
+                              class="form-control"
+                              rows="3"
+                              maxlength="500"
+                              placeholder="Добавьте описание альбома"></textarea>
+                </div>
+
+                <div class="privacy-toggle">
+                    <input type="checkbox"
+                           id="isPrivate"
+                           name="isPrivate"
+                           value="true">
+                    <label for="isPrivate">Сделать альбом приватным</label>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-plus"></i> Создать альбом
+                </button>
+            </form>
+
+        </div>
+
+        <script>
+            // Валидация формы на стороне клиента
+            document.querySelector('form').addEventListener('submit', function (e) {
+                const title = document.getElementById('title').value.trim();
+                if (!title) {
+                    e.preventDefault();
+                    alert('Пожалуйста, введите название альбома');
+                }
+            });
+        </script>
+</body>
+</html>
