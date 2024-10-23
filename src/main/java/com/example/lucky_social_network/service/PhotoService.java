@@ -130,17 +130,6 @@ public class PhotoService {
         return listPhoto;
     }
 
-//    public List<Photo> getPhotosByAlbumId(Long albumId, User currentUser) throws AccessDeniedException {
-//        Album album = albumRepository.findById(albumId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
-//
-//        // Проверяем права доступа
-//        if (album.getIsPrivate() && !album.getOwner().getId().equals(currentUser.getId())) {
-//            throw new AccessDeniedException("No access to this album");
-//        }
-//
-//        return photoRepository.findByAlbumIdOrderByUploadedAtDesc(albumId);
-//    }
 
     public Photo getPhotoById(Long photoId, User currentUser) throws AccessDeniedException {
         Photo photo = photoRepository.findById(photoId)
