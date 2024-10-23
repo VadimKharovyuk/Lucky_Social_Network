@@ -124,5 +124,34 @@ public class PhotoService {
 
         return photoRepository.save(photo);
     }
+
+    public List<Photo> getPhotosByAlbumId(Long albumId) {
+        List<Photo> listPhoto = photoRepository.findByAlbumIdOrderByUploadedAtDesc(albumId);
+        return listPhoto;
+    }
+
+//    public List<Photo> getPhotosByAlbumId(Long albumId, User currentUser) throws AccessDeniedException {
+//        Album album = albumRepository.findById(albumId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
+//
+//        // Проверяем права доступа
+//        if (album.getIsPrivate() && !album.getOwner().getId().equals(currentUser.getId())) {
+//            throw new AccessDeniedException("No access to this album");
+//        }
+//
+//        return photoRepository.findByAlbumIdOrderByUploadedAtDesc(albumId);
+//    }
+
+    public Photo getPhotoById(Long photoId, User currentUser) throws AccessDeniedException {
+        Photo photo = photoRepository.findById(photoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Photo not found with id: " + photoId));
+
+        // Проверяем права доступа
+        if (photo.getIsPrivate() && !photo.getAuthor().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("You don't have permission to view this photo");
+        }
+
+        return photo;
+    }
 }
 

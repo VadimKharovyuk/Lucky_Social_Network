@@ -21,6 +21,17 @@ public class AlbumController {
     private final UserService userService;
 
 
+    @GetMapping("/{albumId}")
+    public String getAlbum(@PathVariable Long albumId,
+                           Model model) {
+        User currentUser = userService.getCurrentUser();
+        Album album = albumService.getAlbumById(albumId, currentUser);
+        model.addAttribute("album", album);
+        model.addAttribute("isOwner", albumService.isAlbumOwner(albumId, currentUser));
+        return "albums/view";
+    }
+
+
     @GetMapping
     public String getAllAlbums(Pageable pageable, Model model) {
         User currentUser = userService.getCurrentUser();
@@ -71,15 +82,6 @@ public class AlbumController {
         }
     }
 
-    @GetMapping("/{albumId}")
-    public String getAlbum(@PathVariable Long albumId,
-                           Model model) {
-        User currentUser = userService.getCurrentUser();
-        Album album = albumService.getAlbumById(albumId, currentUser);
-        model.addAttribute("album", album);
-        model.addAttribute("isOwner", albumService.isAlbumOwner(albumId, currentUser));
-        return "albums/view";
-    }
 
     @PostMapping("/{albumId}/delete")
     public String deleteAlbum(@PathVariable Long albumId) {

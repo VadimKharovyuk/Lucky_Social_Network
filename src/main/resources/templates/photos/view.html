@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Просмотр фото - Lucky Social Network</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* Базовые стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            line-height: 1.5;
+        }
+
+        /* Навигация */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1877f2;
+            text-decoration: none;
+            margin-right: 24px;
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .nav-link {
+            color: #65676b;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        /* Контейнер */
+        .container {
+            display: flex;
+            max-width: 1920px;
+            margin: 56px auto 0;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Боковая панель */
+        .sidebar {
+            width: 300px;
+            position: sticky;
+            top: 76px;
+            height: calc(100vh - 76px);
+            padding-right: 8px;
+            overflow-y: auto;
+        }
+
+        .side-nav {
+            background: transparent;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .side-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #1c1e21;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+        }
+
+        .side-nav-link i {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        /* Основной контент */
+        .main-content {
+            flex: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .photo-viewer {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .photo-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .photo-navigation {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .photo-counter {
+            color: #65676b;
+            font-size: 14px;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: #f0f2f5;
+            color: #1c1e21;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #e4e6eb;
+        }
+
+        .nav-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .photo-container {
+            position: relative;
+            text-align: center;
+            background: #f0f2f5;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-container img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .photo-info {
+            padding: 16px;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        .photo-description {
+            color: #1c1e21;
+            margin-bottom: 12px;
+        }
+
+        .photo-meta {
+            color: #65676b;
+            font-size: 13px;
+        }
+
+        .photo-actions {
+            padding: 16px;
+            border-top: 1px solid #f0f2f5;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+
+<!-- Навигация -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">Lucky Social</a>
+    <div class="navbar-menu">
+        <a href="/" class="nav-link">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/messages" class="nav-link">
+            <i class="fas fa-envelope"></i>
+        </a>
+        <a href="/notifications" class="nav-link">
+            <i class="fas fa-bell"></i>
+        </a>
+        <a href="/profile" class="nav-link">
+            <i class="fas fa-user"></i>
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+        <nav class="side-nav">
+            <a href="/profile" class="side-nav-link">
+                <i class="fas fa-user"></i>
+                <span>Моя страница</span>
+            </a>
+            <a href="/news" class="side-nav-link">
+                <i class="fas fa-newspaper"></i>
+                <span>Новости</span>
+            </a>
+            <a href="/messages" class="side-nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Сообщения</span>
+            </a>
+            <a href="/friends" class="side-nav-link">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+            </a>
+            <a href="/groups" class="side-nav-link">
+                <i class="fas fa-users-rectangle"></i>
+                <span>Группы</span>
+            </a>
+            <a href="/photos" class="side-nav-link active">
+                <i class="fas fa-images"></i>
+                <span>Фотографии</span>
+            </a>
+            <a href="/notifications" class="side-nav-link">
+                <i class="fas fa-bell"></i>
+                <span>Уведомления</span>
+            </a>
+        </nav>
+    </aside>
+
+
+    <div class="container">
+        <main class="main-content">
+            <div class="photo-viewer">
+                <div class="photo-header">
+                    <h2 th:text="${album.title}">Название альбома</h2>
+                    <div class="photo-navigation">
+                        <span class="photo-counter"
+                              th:text="${currentIndex + ' из ' + totalPhotos}">
+                            1 из 10
+                        </span>
+
+                        <a th:if="${previousPhoto}"
+                           th:href="@{/albums/{albumId}/photos/{photoId}/view(albumId=${album.id},photoId=${previousPhoto.id})}"
+                           class="nav-btn">
+                            <i class="fas fa-chevron-left"></i>
+                            Предыдущее
+                        </a>
+
+                        <a th:if="${nextPhoto}"
+                           th:href="@{/albums/{albumId}/photos/{photoId}/view(albumId=${album.id},photoId=${nextPhoto.id})}"
+                           class="nav-btn">
+                            Следующее
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="photo-container">
+                    <img th:src="${photo.photoUrl}"
+                         th:alt="${photo.description}">
+                </div>
+
+                <div class="photo-info">
+                    <p th:if="${photo.description}"
+                       class="photo-description"
+                       th:text="${photo.description}">
+                        Описание фото
+                    </p>
+                    <div class="photo-meta">
+                        Добавлено
+                        <span th:text="${#temporals.format(photo.uploadedAt, 'dd-MM-yyyy HH:mm')}">
+                            01-01-2024
+                        </span>
+                    </div>
+                </div>
+
+                <div th:if="${isOwner}" class="photo-actions">
+                    <form th:action="@{/albums/{albumId}/photos/{photoId}/delete(albumId=${album.id},photoId=${photo.id})}"
+                          method="post"
+                          onsubmit="return confirm('Вы уверены, что хотите удалить это фото?')">
+                        <button type="submit" class="action-btn delete-btn">
+                            <i class="fas fa-trash"></i>
+                            Удалить фото
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+</body>
+</html>

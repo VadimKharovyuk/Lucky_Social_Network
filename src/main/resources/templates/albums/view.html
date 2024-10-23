@@ -307,6 +307,14 @@
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
         }
+
+        .photo-card:hover .photo-actions {
+            opacity: 1;
+        }
+
+        .photo-actions button:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -378,6 +386,7 @@
                     </button>
                 </form>
             </div>
+
         </div>
 
         <!-- Секция загрузки -->
@@ -403,10 +412,18 @@
             </form>
         </div>
 
+
         <!-- Сетка фотографий -->
         <div class="photos-grid">
             <div th:each="photo : ${album.photos}" class="photo-card">
-                <img th:src="${photo.photoUrl}" th:alt="${photo.description}">
+                <!-- Добавляем ссылку для перехода к просмотру фото -->
+                <a th:href="@{/albums/{albumId}/photos/{photoId}/view(albumId=${album.id},photoId=${photo.id})}"
+                   class="photo-link">
+                    <img th:src="${photo.photoUrl}"
+                         th:alt="${photo.description}"
+                         class="photo-thumbnail">
+                </a>
+
                 <div th:if="${isOwner}" class="photo-actions">
                     <form th:action="@{/albums/{albumId}/photos/{photoId}/delete(albumId=${album.id},photoId=${photo.id})}"
                           method="post">
@@ -417,6 +434,20 @@
                 </div>
             </div>
         </div>
+        <!--        &lt;!&ndash; Сетка фотографий &ndash;&gt;-->
+        <!--        <div class="photos-grid">-->
+        <!--            <div th:each="photo : ${album.photos}" class="photo-card">-->
+        <!--                <img th:src="${photo.photoUrl}" th:alt="${photo.description}">-->
+        <!--                <div th:if="${isOwner}" class="photo-actions">-->
+        <!--                    <form th:action="@{/albums/{albumId}/photos/{photoId}/delete(albumId=${album.id},photoId=${photo.id})}"-->
+        <!--                          method="post">-->
+        <!--                        <button type="submit">-->
+        <!--                            <i class="fas fa-trash"></i> Удалить-->
+        <!--                        </button>-->
+        <!--                    </form>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
     </main>
 </div>
 
