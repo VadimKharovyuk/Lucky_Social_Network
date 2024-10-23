@@ -31,11 +31,13 @@ public class ChatController {
         User sender = userService.getUserById(senderId);
         User recipient = userService.getUserById(recipientId);
         List<Message> chatHistory = chatService.getChatHistory(senderId, recipientId);
+        User currentUser = userService.getCurrentUser();
 
         model.addAttribute("sender", sender);
         model.addAttribute("recipient", recipient);
         model.addAttribute("chatHistory", chatHistory);
         model.addAttribute("newMessage", new Message());
+        model.addAttribute("currentUser", currentUser);
 
         return "chat";
     }
@@ -56,14 +58,14 @@ public class ChatController {
     }
 
 
-
     @GetMapping("/list")
     public String getUserChats(Model model) {
-
+        User currentUser = userService.getCurrentUser();
         Long currentUserId = getCurrentUserId();  // Получаем ID текущего пользователя
         model.addAttribute("currentUserId", getCurrentUserId());
         List<User> chatUsers = chatService.getUserChats(currentUserId);  // Получаем список чатов
         model.addAttribute("chatUsers", chatUsers);
+        model.addAttribute("currentUser", currentUser);
         return "chatList";  // Возвращаем имя шаблона
     }
 

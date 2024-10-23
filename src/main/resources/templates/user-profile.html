@@ -774,7 +774,7 @@
 <div class="main-container">
     <aside class="left-sidebar">
         <nav class="side-nav">
-            <a href="/home" class="side-nav-link">
+            <a th:href="@{/profile/{id}(id=${currentUser.id})}" class="side-nav-link">
                 <i class="fas fa-user"></i>
                 <span>Моя Страница</span>
             </a>
@@ -876,8 +876,7 @@
 
 
                 <div class="profile-actions">
-                    <!-- Кнопка "Добавить в друзья" -->
-                    <form th:if="${currentUser != null && user != null && currentUser.id != user.id && !user.friends.contains(currentUser)}"
+                    <form th:if="${currentUser != null && user != null && currentUser.id != user.id && !isFriend}"
                           th:action="@{/users/addFriend}" method="post">
                         <input type="hidden" name="userId" th:value="${currentUser.id}">
                         <input type="hidden" name="friendId" th:value="${user.id}">
@@ -907,6 +906,7 @@
             </div>
 
         </div>
+        <br>
 
 
         <div class="albums-section">
@@ -1021,7 +1021,7 @@
 
         <!-- Отображение постов пользователя -->
         <div th:fragment="userPosts">
-            <h2>Посты пользователя</h2>
+            <!--            <h2>Посты пользователя</h2>-->
             <div th:if="${userPosts != null and not #lists.isEmpty(userPosts)}">
                 <div th:each="post : ${userPosts}" class="post">
 

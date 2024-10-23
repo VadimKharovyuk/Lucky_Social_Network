@@ -2,8 +2,8 @@ package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.redis.UserCacheDTO;
 import com.example.lucky_social_network.service.CustomUserDetails;
-import com.example.lucky_social_network.service.PostService;
 import com.example.lucky_social_network.service.SubscriptionService;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class HomeController {
             Long currentUserId = getCurrentUserId();
             log.debug("Fetching home page for user ID: {}", currentUserId);
 
-            User currentUser = userService.getUserProfileById(currentUserId);
+            UserCacheDTO currentUser = userService.getUserProfileById(currentUserId);
             log.debug("Current user: {}", currentUser.getUsername());
 
             Page<Post> newsFeed = subscriptionService.getNewsFeed(currentUserId, PageRequest.of(page, size));

@@ -254,7 +254,7 @@
 <div class="container">
   <aside class="sidebar">
     <nav class="side-nav">
-      <a href="/profile" class="side-nav-link">
+      <a th:href="@{/profile/{id}(id=${currentUser.id})}" class="side-nav-link">
         <i class="fas fa-user"></i>
         <span>Моя страница</span>
       </a>

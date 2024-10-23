@@ -1,23 +1,27 @@
 package com.example.lucky_social_network.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Slf4j
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +30,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -67,6 +72,8 @@ public class User {
     @Column(nullable = false)
     private Integer followersCount = 0;
 
+
+    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "user_friends",
@@ -86,6 +93,7 @@ public class User {
         this.id = id;
     }
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Gender gender;
@@ -96,24 +104,29 @@ public class User {
         FEMALE
     }
 
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "partner_id")
     private User partner;
 
 
-
-
+    @JsonIgnore
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Subscription> subscriptions = new HashSet<>();
-
+    @JsonIgnore
     @OneToMany(mappedBy = "followee", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Subscription> followers = new HashSet<>();
 
-
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     private Set<Role> roles = new HashSet<>();
+
+    // Добавим геттер с логированием
+    public Set<Role> getRoles() {
+        log.debug("Getting roles for user {}: {}", this.id, this.roles);
+        return this.roles;
+    }
 
     public void addRole(Role role) {
         this.roles.add(role);
@@ -126,9 +139,10 @@ public class User {
 
     }
 
+    @JsonIgnore
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Album> albums = new HashSet<>();
-
+    @JsonIgnore
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Photo> photos = new HashSet<>();
 }

@@ -3,10 +3,13 @@ package com.example.lucky_social_network.service;
 import com.example.lucky_social_network.exception.FriendshipNotFoundException;
 import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.redis.UserCacheDTO;
 import com.example.lucky_social_network.repository.UserRepository;
-import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +32,45 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SubscriptionService subscriptionService;
-    private final ImgurService imgurService;
+
+
+    @Cacheable(value = "user_profiles", key = "#userId", unless = "#result == null")
+    public UserCacheDTO getUserProfileById(Long userId) {
+        log.info("Fetching user profile from database for user ID: {}", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+
+        // Проверяем роли перед конвертацией
+        log.info("User {} roles before conversion: {}", userId, user.getRoles());
+
+        UserCacheDTO dto = UserCacheDTO.fromUser(user);
+
+        // Проверяем роли после конвертации
+        log.info("User {} roles after conversion: {}", userId, dto.getRoles());
+
+        return dto;
+    }
+
+    public User getUserFullProfile(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+    }
+
+    @CachePut(value = "user_profiles", key = "#user.id")
+    public UserCacheDTO updateUserProfile(User user) {
+        User savedUser = userRepository.save(user);
+        return UserCacheDTO.fromUser(savedUser);
+    }
+
+    @CacheEvict(value = "user_profiles", key = "#userId")
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    public boolean areFriends(Long userId1, Long userId2) {
+        User user1 = getUserById(userId1);
+        return user1.getFriends().stream().anyMatch(friend -> friend.getId().equals(userId2));
+    }
 
 
     public User updateUser(User user) {
@@ -139,15 +180,7 @@ public class UserService {
         return user.getFriends();
     }
 
-    public User getUserProfileById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
-    }
 
-    public boolean areFriends(Long userId1, Long userId2) {
-        User user1 = getUserById(userId1);
-        return user1.getFriends().stream().anyMatch(friend -> friend.getId().equals(userId2));
-    }
 
     public String getUserAvatarUrl(User user) {
         if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
@@ -161,11 +194,6 @@ public class UserService {
         return "https://example.com/default-avatar.png";
     }
 
-//    public void updateAvatarDropboxPath(Long userId, String dropboxPath) {
-//        User user = getUserById(userId);
-//        user.setAvatarDropboxPath(dropboxPath);
-//        userRepository.save(user);
-//    }
 
 
     public Long getCurrentUserId() {
@@ -218,5 +246,19 @@ public class UserService {
     public boolean isUsernameExists(String username) {
         return userRepository.findByUsername(username).isPresent();
 
+    }
+
+
+    public boolean isBirthdayToday(Long userId) {
+        User user = getUserFullProfile(userId);
+        if (user.getDateOfBirth() == null) {
+            return false;
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalDate birthDate = user.getDateOfBirth();
+
+        return birthDate.getMonth() == today.getMonth() &&
+                birthDate.getDayOfMonth() == today.getDayOfMonth();
     }
 }

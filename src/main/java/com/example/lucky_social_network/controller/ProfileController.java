@@ -5,6 +5,7 @@ import com.example.lucky_social_network.model.Album;
 import com.example.lucky_social_network.model.Notification;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.redis.UserCacheDTO;
 import com.example.lucky_social_network.service.*;
 import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -74,44 +74,48 @@ public class ProfileController {
                                  @PageableDefault(size = 6) Pageable albumPageable,
                                  Model model) {
         try {
-            User user = userService.getUserProfileById(userId);
+            // Получаем кэшированные базовые данные
+            UserCacheDTO userProfile = userService.getUserProfileById(userId);
+
+            // Получаем полную сущность для операций, требующих дополнительные данные
+            User fullUser = userService.getUserFullProfile(userId);
+
             Long currentUserId = getCurrentUserId();
-            User currentUser = userService.getUserById(currentUserId);
+            User currentUser = userService.getUserFullProfile(currentUserId);
 
-            // Получаем URL аватара пользователя
-            String avatarUrl = userService.getUserAvatarUrl(user);
-
-            boolean areFriends = userService.areFriends(currentUserId, userId);
-            List<Post> userPosts = postService.getPostsByAuthor(user);
-
-            // Получаем количество непрочитанных уведомлений
-            long unreadNotificationCount = notificationService.getUnreadNotificationCount(currentUserId);
-
-            // Получаем список уведомлений для текущего пользователя
-            List<Notification> notifications = notificationService.getUserNotifications(currentUserId);
-
-            Page<Album> userAlbums = albumService.getPublicAlbumsByUserId(userId, albumPageable);
-            LocalDate today = LocalDate.now();
-            if (user.getDateOfBirth() != null &&
-                    user.getDateOfBirth().getMonth() == today.getMonth() &&
-                    user.getDateOfBirth().getDayOfMonth() == today.getDayOfMonth()) {
+            // Проверка дня рождения перенесена в сервис
+            boolean isBirthday = userService.isBirthdayToday(userId);
+            if (isBirthday) {
                 model.addAttribute("isBirthday", true);
             }
 
+            // Получаем данные для отображения
+            boolean areFriends = userService.areFriends(currentUserId, userId);
+
+            List<Post> userPosts = postService.getPostsByAuthor(fullUser);
+            long unreadNotificationCount = notificationService.getUnreadNotificationCount(currentUserId);
+            List<Notification> notifications = notificationService.getUserNotifications(currentUserId);
+            Page<Album> userAlbums = albumService.getPublicAlbumsByUserId(userId, albumPageable);
+
+
+            boolean isFriend = userService.areFriends(currentUserId, userId);
+
+            // Добавляем атрибуты в модель
             model.addAttribute("currentUser", currentUser);
             model.addAttribute("areFriends", areFriends);
-            model.addAttribute("user", user);
-            model.addAttribute("avatarUrl", avatarUrl);
+            model.addAttribute("user", userProfile);
+            model.addAttribute("avatarUrl", userProfile.getAvatarUrl());
             model.addAttribute("postCreationDto", new PostCreationDto());
             model.addAttribute("userPosts", userPosts);
             model.addAttribute("notificationCount", unreadNotificationCount);
             model.addAttribute("notifications", notifications);
-            model.addAttribute("isEmailVerified", user.getEmailVerified());
+            model.addAttribute("isEmailVerified", userProfile.getEmailVerified());
 
             model.addAttribute("albums", userAlbums.getContent());
             model.addAttribute("totalAlbums", userAlbums.getTotalElements());
             model.addAttribute("totalPages", userAlbums.getTotalPages());
             model.addAttribute("currentPage", userAlbums.getNumber());
+            model.addAttribute("isFriend", isFriend);
 
             return "user-profile";
         } catch (Exception e) {
@@ -120,49 +124,6 @@ public class ProfileController {
         }
     }
 
-
-//    @GetMapping("/{userId}")
-//    public String getUserProfile(@PathVariable Long userId, Model model) {
-//        try {
-//            User user = userService.getUserProfileById(userId);
-//            Long currentUserId = getCurrentUserId();
-//            User currentUser = userService.getUserById(currentUserId);
-//
-//            // Получаем URL аватара пользователя
-//            String avatarUrl = userService.getUserAvatarUrl(user);
-//
-//            boolean areFriends = userService.areFriends(currentUserId, userId);
-//            List<Post> userPosts = postService.getPostsByAuthor(user);
-//
-//            // Получаем количество непрочитанных уведомлений
-//            long unreadNotificationCount = notificationService.getUnreadNotificationCount(currentUserId);
-//
-//            // Получаем список уведомлений для текущего пользователя
-//            List<Notification> notifications = notificationService.getUserNotifications(currentUserId);
-//
-//            LocalDate today = LocalDate.now();
-//            if (user.getDateOfBirth() != null &&
-//                    user.getDateOfBirth().getMonth() == today.getMonth() &&
-//                    user.getDateOfBirth().getDayOfMonth() == today.getDayOfMonth()) {
-//                model.addAttribute("isBirthday", true);
-//            }
-//
-//            model.addAttribute("currentUser", currentUser);
-//            model.addAttribute("areFriends", areFriends);
-//            model.addAttribute("user", user);
-//            model.addAttribute("avatarUrl", avatarUrl);
-//            model.addAttribute("postCreationDto", new PostCreationDto());
-//            model.addAttribute("userPosts", userPosts);
-//            model.addAttribute("notificationCount", unreadNotificationCount);
-//            model.addAttribute("notifications", notifications);
-//            model.addAttribute("isEmailVerified", user.getEmailVerified());
-//
-//            return "user-profile";
-//        } catch (Exception e) {
-//            log.error("Error processing profile request for userId: " + userId, e);
-//            throw new RuntimeException("Error processing profile request", e);
-//        }
-//    }
 
     //профиль пользователя
     @GetMapping
@@ -179,9 +140,6 @@ public class ProfileController {
         model.addAttribute("user", user);
         return "profile";
     }
-
-//обновиить профиль
-
 
 
 
