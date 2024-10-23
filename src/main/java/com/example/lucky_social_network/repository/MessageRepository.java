@@ -12,9 +12,13 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
-    @Query("SELECT m FROM Message m WHERE (m.sender.id = :senderId AND m.recipient.id = :recipientId) " +
-            "OR (m.sender.id = :recipientId AND m.recipient.id = :senderId) ORDER BY m.timestamp")
-    List<Message> findChatHistory(@Param("senderId") Long senderId, @Param("recipientId") Long recipientId);
+
+    @Query("SELECT m FROM Message m WHERE " +
+            "(m.sender.id = :senderId AND m.recipient.id = :recipientId) OR " +
+            "(m.sender.id = :recipientId AND m.recipient.id = :senderId) " +
+            "ORDER BY m.timestamp")
+    List<Message> findChatHistory(@Param("senderId") Long senderId,
+                                  @Param("recipientId") Long recipientId);
 
 
     @Modifying

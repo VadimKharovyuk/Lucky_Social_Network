@@ -23,24 +23,40 @@ public class ChatController {
     private final ChatService chatService;
     private final UserService userService;
 
-
     @GetMapping("/{senderId}/{recipientId}")
     public String getChatPage(@PathVariable Long senderId,
                               @PathVariable Long recipientId,
                               Model model) {
-        User sender = userService.getUserById(senderId);
+        User currentUser = userService.getCurrentUser(); // текущий пользователь
         User recipient = userService.getUserById(recipientId);
         List<Message> chatHistory = chatService.getChatHistory(senderId, recipientId);
-        User currentUser = userService.getCurrentUser();
 
-        model.addAttribute("sender", sender);
+        model.addAttribute("currentUser", currentUser);
         model.addAttribute("recipient", recipient);
         model.addAttribute("chatHistory", chatHistory);
         model.addAttribute("newMessage", new Message());
-        model.addAttribute("currentUser", currentUser);
 
         return "chat";
     }
+
+
+//    @GetMapping("/{senderId}/{recipientId}")
+//    public String getChatPage(@PathVariable Long senderId,
+//                              @PathVariable Long recipientId,
+//                              Model model) {
+//        User sender = userService.getUserById(senderId);
+//        User recipient = userService.getUserById(recipientId);
+//        List<Message> chatHistory = chatService.getChatHistory(senderId, recipientId);
+//        User currentUser = userService.getCurrentUser();
+//
+//        model.addAttribute("sender", sender);
+//        model.addAttribute("recipient", recipient);
+//        model.addAttribute("chatHistory", chatHistory);
+//        model.addAttribute("newMessage", new Message());
+//        model.addAttribute("currentUser", currentUser);
+//
+//        return "chat";
+//    }
 
     @PostMapping("/send")
     public String sendMessage(@ModelAttribute("newMessage") Message newMessage,

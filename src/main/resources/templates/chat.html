@@ -18,14 +18,11 @@
             color: #1c1e21;
             line-height: 1.5;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Навигация */
         .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
             height: 56px;
             background: #ffffff;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -33,6 +30,7 @@
             display: flex;
             align-items: center;
             padding: 0 16px;
+            flex-shrink: 0;
         }
 
         .navbar-brand {
@@ -66,30 +64,27 @@
             color: #1c1e21;
         }
 
-        /* Контейнер */
-        .container {
-            display: flex;
-            max-width: 1920px;
-            margin: 56px auto 0;
-            padding: 20px;
-            gap: 20px;
-            min-height: calc(100vh - 56px);
+        .nav-link.active {
+            color: #1877f2;
         }
 
-        /* Боковая панель */
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 56px);
+        }
+
         .sidebar {
             width: 300px;
-            position: sticky;
-            top: 76px;
-            height: calc(100vh - 76px);
-            padding-right: 8px;
-            overflow-y: auto;
+            background: transparent;
+            flex-shrink: 0;
         }
 
         .side-nav {
-            background: transparent;
-            border-radius: 8px;
-            overflow: hidden;
+            position: sticky;
+            top: 20px;
         }
 
         .side-nav-link {
@@ -123,28 +118,36 @@
             font-size: 20px;
         }
 
-        /* Основной контент */
         .main-content {
             flex: 1;
             max-width: 800px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
-        /* Чат */
         .chat-container {
             background: white;
             border-radius: 12px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 600px; /* Фиксированная высота чата */
         }
 
-        .chat-header {
+        /* Измените стили для chat-history */
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
             padding: 16px;
-            border-bottom: 1px solid #f0f2f5;
+            background: #f8f9fa;
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            height: calc(600px - 130px); /* Высота чата минус высота header и form */
         }
+        
 
         .chat-header h1 {
             font-size: 18px;
@@ -154,16 +157,19 @@
         }
 
         .chat-history {
-            height: 500px;
+            flex: 1;
             overflow-y: auto;
             padding: 16px;
             background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
         }
 
         .message {
             margin-bottom: 12px;
             max-width: 70%;
             animation: fadeIn 0.3s ease;
+            clear: both;
         }
 
         @keyframes fadeIn {
@@ -177,8 +183,14 @@
             }
         }
 
-        .sender {
+        .message.sender {
+            float: right;
             margin-left: auto;
+        }
+
+        .message.recipient {
+            float: left;
+            margin-right: auto;
         }
 
         .message-content {
@@ -188,7 +200,6 @@
             background: #e7f3ff;
             color: #1c1e21;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
         }
 
         .sender .message-content {
@@ -198,10 +209,6 @@
 
         .recipient .message-content {
             background: #f0f2f5;
-        }
-
-        .message:hover .message-content {
-            transform: translateY(-2px);
         }
 
         .timestamp {
@@ -215,11 +222,11 @@
             text-align: right;
         }
 
-        /* Форма отправки */
         .message-form {
             padding: 16px;
             background: white;
             border-top: 1px solid #f0f2f5;
+            flex-shrink: 0;
         }
 
         .message-input-container {
@@ -262,11 +269,6 @@
 
         .send-button:hover {
             background: #1666d8;
-            transform: translateY(-2px);
-        }
-
-        .send-button i {
-            font-size: 16px;
         }
 
         @media (max-width: 1200px) {
@@ -352,21 +354,20 @@
 
             <div class="chat-history" id="chatHistory">
                 <div th:each="message : ${chatHistory}"
-                     th:class="${message.sender.id == sender.id ? 'message sender' : 'message recipient'}">
+                     th:class="${message.sender.id == currentUser.id ? 'message sender' : 'message recipient'}">
                     <div class="message-content" th:text="${message.content}"></div>
                     <div class="timestamp" th:text="${#temporals.format(message.timestamp, 'dd-MM-yyyy HH:mm')}"></div>
                 </div>
             </div>
 
-            <form class="message-form" th:action="@{/chat/send}" method="post">
-                <input type="hidden" name="senderId" th:value="${sender.id}">
+            <form class="message-form" id="messageForm">
+                <input type="hidden" name="senderId" th:value="${currentUser.id}">
                 <input type="hidden" name="recipientId" th:value="${recipient.id}">
                 <div class="message-input-container">
                         <textarea name="content"
                                   required
                                   placeholder="Введите сообщение..."
-                                  rows="1"
-                                  onInput="this.rows = this.value.split('\n').length"></textarea>
+                                  rows="1"></textarea>
                 </div>
                 <button type="submit" class="send-button">
                     <i class="fas fa-paper-plane"></i>
@@ -376,20 +377,107 @@
         </div>
     </main>
 </div>
+</body>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+<!-- Обновленный JavaScript -->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
         const chatHistory = document.getElementById('chatHistory');
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+        const form = document.getElementById('messageForm');
+        const textarea = form.querySelector('textarea');
+        const senderId = document.querySelector('input[name="senderId"]').value;
+        const recipientId = document.querySelector('input[name="recipientId"]').value;
 
-        const textarea = document.querySelector('textarea');
+        let socket = null;
+
+        // Автоматическая регулировка высоты textarea
         textarea.addEventListener('input', function () {
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
+            this.rows = this.value.split('\n').length;
+        });
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            socket = new WebSocket(`${protocol}//${window.location.host}/chat?userId=${senderId}`);
+
+            socket.onopen = () => {
+                console.log('WebSocket connected');
+            };
+
+            socket.onmessage = (event) => {
+                const message = event.data;
+                console.log('Received message:', message);
+
+                if (message.startsWith('Error:')) {
+                    console.error(message);
+                    return;
+                }
+
+                if (message.startsWith('Message from user')) {
+                    const [_, userId, content] = message.match(/Message from user (\d+): (.+)/);
+                    // Проверяем, что это сообщение от собеседника
+                    if (userId === recipientId) {
+                        addMessageToChat(content, 'recipient');
+                    }
+                }
+            };
+
+            socket.onclose = () => {
+                console.log('WebSocket disconnected');
+                setTimeout(connectWebSocket, 5000);
+            };
+        }
+
+        function addMessageToChat(content, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = content;
+            messageDiv.appendChild(contentDiv);
+
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'timestamp';
+            timestampDiv.textContent = new Date().toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            messageDiv.appendChild(timestampDiv);
+
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // Инициализация
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        connectWebSocket();
+
+        // Обработка отправки сообщения
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const content = textarea.value.trim();
+            if (!content || !socket || socket.readyState !== WebSocket.OPEN) {
+                return;
+            }
+
+            // Отправка сообщения через WebSocket
+            socket.send(`${recipientId}:${content}`);
+
+            // Добавление сообщения в чат
+            addMessageToChat(content, 'sender');
+
+            // Очистка поля ввода
+            textarea.value = '';
+            textarea.style.height = 'auto';
         });
     });
 </script>
-</body>
 </html>
 
 <!--<!DOCTYPE html>-->
