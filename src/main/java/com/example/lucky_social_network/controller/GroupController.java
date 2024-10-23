@@ -231,9 +231,10 @@ public class GroupController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(required = false) String type, // Добавлен параметр типа
             Model model) {
 
-        Page<Group> groupPage = groupService.getCurrentUserGroups(page, size, sortBy, sortDirection);
+        Page<Group> groupPage = groupService.getCurrentUserGroups(page, size, sortBy, sortDirection, type);
         List<Group> allGroups = groupService.getAllGroups();
 
         model.addAttribute("groups", groupPage.getContent());
@@ -243,6 +244,7 @@ public class GroupController {
         model.addAttribute("totalItems", groupPage.getTotalElements());
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("sortDirection", sortDirection);
+        model.addAttribute("currentType", type);
 
         return "groups/my-groups";
     }

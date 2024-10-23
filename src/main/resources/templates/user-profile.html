@@ -600,6 +600,142 @@
             }
         }
 
+        .left-sidebar {
+            width: 300px;
+            position: sticky;
+            top: 76px;
+            height: calc(100vh - 76px);
+            padding-right: 8px;
+            overflow-y: auto;
+        }
+
+        .side-nav {
+            background: transparent;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .side-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #1c1e21;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+        }
+
+        .side-nav-link:hover {
+            background-color: #e4e6eb;
+        }
+
+        .side-nav-link.active {
+            background-color: #e7f3ff;
+            color: #1877f2;
+        }
+
+        .side-nav-link i {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        .notifications {
+            position: relative;
+        }
+
+        .notification-link {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .notification-badge {
+            background: #e41e3f;
+            color: white;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 6px;
+            margin-left: auto;
+        }
+
+        .notification-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-top: 4px;
+            padding: 8px 0;
+            display: none;
+            z-index: 1000;
+        }
+
+        .notifications:hover .notification-list {
+            display: block;
+        }
+
+        .notification-item {
+            padding: 8px 16px;
+        }
+
+        .notification-item a {
+            color: #1c1e21;
+            text-decoration: none;
+            font-size: 14px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .notification-item:hover {
+            background-color: #f0f2f5;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1200px) {
+            .left-sidebar {
+                width: 70px;
+            }
+
+            .side-nav-link span {
+                display: none;
+            }
+
+            .side-nav-link i {
+                margin-right: 0;
+            }
+
+            .notification-badge {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-sidebar {
+                display: none;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -637,23 +773,57 @@
 
 <div class="main-container">
     <aside class="left-sidebar">
-        <a href="/home" class="menu-item">Моя Страница</a>
-        <a href="/users/friends" class="menu-item">Друзья</a>
-        <a href="/albums" class="menu-item">Мои Фото</a>
-        <a href="/chat/list" class="menu-item">Сообщения</a>
-        <a href="/posts" class="menu-item">Новости</a>
-        <a href="/groups/my" class="menu-item">Группы</a>
-        <div class="menu-item notifications">
-            <a href="/notifications">
-                Уведомления
-                <span th:if="${notificationCount > 0}" th:text="${notificationCount}" class="notification-badge"></span>
+        <nav class="side-nav">
+            <a href="/home" class="side-nav-link">
+                <i class="fas fa-user"></i>
+                <span>Моя Страница</span>
             </a>
-            <ul class="notification-list" th:if="${recentNotifications != null and !recentNotifications.empty}">
-                <li th:each="notification : ${recentNotifications}">
-                    <a th:href="@{/notifications/{id}(id=${notification.id})}" th:text="${notification.message}"></a>
-                </li>
-            </ul>
-        </div>
+
+            <a href="/users/friends" class="side-nav-link">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+            </a>
+
+            <a href="/albums" class="side-nav-link">
+                <i class="fas fa-images"></i>
+                <span>Мои Фото</span>
+            </a>
+
+            <a href="/chat/list" class="side-nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Сообщения</span>
+            </a>
+
+            <a href="/posts" class="side-nav-link">
+                <i class="fas fa-newspaper"></i>
+                <span>Новости</span>
+            </a>
+
+            <a href="/groups/my" class="side-nav-link">
+                <i class="fas fa-users-rectangle"></i>
+                <span>Группы</span>
+            </a>
+
+            <div class="side-nav-link notifications">
+                <a href="/notifications" class="notification-link">
+                    <i class="fas fa-bell"></i>
+                    <span>Уведомления</span>
+                    <span th:if="${notificationCount > 0}"
+                          class="notification-badge"
+                          th:text="${notificationCount}">
+                </span>
+                </a>
+
+                <ul class="notification-list"
+                    th:if="${recentNotifications != null and !recentNotifications.empty}">
+                    <li th:each="notification : ${recentNotifications}" class="notification-item">
+                        <a th:href="@{/notifications/{id}(id=${notification.id})}"
+                           th:text="${notification.message}">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     </aside>
 
     <div class="profile-container">

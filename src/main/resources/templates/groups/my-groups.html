@@ -6,10 +6,7 @@
     <title>Мои группы - Lucky Social Network</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Базовые стили остаются такими же как в предыдущих примерах */
-        [Предыдущие базовые стили для body, navbar, container, sidebar...
 
-        ]
 
         /* Дополнительные стили для страницы групп */
         .groups-section {
@@ -342,9 +339,160 @@
             text-overflow: ellipsis;
             max-width: 100%;
         }
+
+        /* Навигационная панель */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .navbar {
+            background: var(--background);
+            box-shadow: 0 1px 3px var(--border);
+        }
+
+        /* Логотип */
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1877f2;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .navbar-brand:hover {
+            color: #1666d8;
+        }
+
+        /* Меню навигации */
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #65676b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background-color: #f2f3f5;
+            color: #1877f2;
+        }
+
+        .nav-link.active {
+            color: #1877f2;
+        }
+
+        .nav-link i {
+            font-size: 20px;
+        }
+
+        /* Уведомления */
+        .nav-link .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #e41e3f;
+            color: white;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            border: 2px solid #ffffff;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 12px;
+            }
+
+            .navbar-brand {
+                font-size: 20px;
+            }
+
+            .nav-link {
+                width: 36px;
+                height: 36px;
+            }
+
+            .nav-link i {
+                font-size: 18px;
+            }
+        }
+
+        /* Анимации */
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .nav-link:active {
+            transform: scale(0.95);
+        }
+
+        .notification-badge {
+            animation: popIn 0.3s ease;
+        }
+
+        /* Дополнительные стили для навигации */
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #1877f2;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Эффект свечения при наведении */
+        .nav-link:hover i {
+            filter: drop-shadow(0 0 2px rgba(24, 119, 242, 0.3));
+        }
+
+
     </style>
 </head>
 <body>
+
 <nav class="navbar">
     <a href="/" class="navbar-brand">Lucky Social</a>
     <div class="navbar-menu">
@@ -360,6 +508,7 @@
         <a href="/profile" class="nav-link">
             <i class="fas fa-user"></i>
         </a>
+    </div>
     </div>
 </nav>
 
@@ -400,34 +549,37 @@
     <main class="main-content">
         <!-- Фильтры и поиск -->
         <div class="filters">
-            <input type="text"
-                   class="search-input"
-                   placeholder="Поиск по группам...">
+            <input type="text" class="search-input" placeholder="Поиск по группам...">
             <div class="filter-buttons">
-                <button class="filter-btn active">Все группы</button>
-                <button class="filter-btn">По подписке</button>
-                <button class="filter-btn">Интерактивные</button>
-                <button class="filter-btn">
+                <a th:href="@{/groups/my(sortBy=${sortBy},sortDirection=${sortDirection})}"
+                   class="filter-btn active">Все группы</a>
+                <a th:href="@{/groups/my(sortBy='type',sortDirection=${sortDirection})}"
+                   class="filter-btn">По подписке</a>
+                <a th:href="@{/groups/my(sortBy='type',sortDirection=${sortDirection})}"
+                   class="filter-btn">Интерактивные</a>
+                <a th:href="@{/groups/my(sortBy='name',sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}"
+                   class="filter-btn">
                     <i class="fas fa-sort-alpha-down"></i>
                     По названию
-                </button>
-                <button class="filter-btn">
+                </a>
+                <a th:href="@{/groups/my(sortBy='createdAt',sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}"
+                   class="filter-btn">
                     <i class="fas fa-calendar"></i>
                     По дате
-                </button>
+                </a>
             </div>
         </div>
 
-        <!-- Группы по подписке -->
+        <!-- Список всех групп -->
         <section class="groups-section">
             <div class="section-header">
-                <h2>Группы по подписке</h2>
-                <span th:text="${subscriptionGroups.size() + ' групп'}"></span>
+                <h2>Мои группы</h2>
+                <span th:text="${totalItems + ' групп'}"></span>
             </div>
             <div class="section-content">
                 <div class="groups-grid">
+                    <!-- Отображаем все группы без фильтрации по типу -->
                     <a th:each="group : ${groups}"
-                       th:if="${group.type.name() == 'SUBSCRIPTION'}"
                        th:href="@{/groups/{id}(id=${group.id})}"
                        class="group-card">
                         <div class="group-avatar">
@@ -437,34 +589,7 @@
                             <div class="group-name" th:text="${group.name}"></div>
                             <div class="group-type">
                                 <i class="fas fa-tag"></i>
-                                <span>По подписке</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Интерактивные группы -->
-        <section class="groups-section">
-            <div class="section-header">
-                <h2>Интерактивные группы</h2>
-                <span th:text="${interactiveGroups.size() + ' групп'}"></span>
-            </div>
-            <div class="section-content">
-                <div class="groups-grid">
-                    <a th:each="group : ${groups}"
-                       th:if="${group.type.name() == 'INTERACTIVE'}"
-                       th:href="@{/groups/{id}(id=${group.id})}"
-                       class="group-card">
-                        <div class="group-avatar">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="group-info">
-                            <div class="group-name" th:text="${group.name}"></div>
-                            <div class="group-type">
-                                <i class="fas fa-tag"></i>
-                                <span>Интерактивная</span>
+                                <span th:text="${group.type}">Тип группы</span>
                             </div>
                         </div>
                     </a>
@@ -473,20 +598,20 @@
         </section>
 
         <!-- Пагинация -->
-        <div class="pagination">
+        <div class="pagination" th:if="${totalPages > 1}">
             <a th:if="${currentPage > 0}"
-               th:href="@{/groups/my(page=${currentPage - 1})}">
+               th:href="@{/groups/my(page=${currentPage - 1},size=${size},sortBy=${sortBy},sortDirection=${sortDirection})}">
                 <i class="fas fa-chevron-left"></i>
             </a>
 
             <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-               th:href="@{/groups/my(page=${i})}"
+               th:href="@{/groups/my(page=${i},size=${size},sortBy=${sortBy},sortDirection=${sortDirection})}"
                th:text="${i + 1}"
                th:class="${currentPage == i ? 'active' : ''}">
             </a>
 
             <a th:if="${currentPage < totalPages - 1}"
-               th:href="@{/groups/my(page=${currentPage + 1})}">
+               th:href="@{/groups/my(page=${currentPage + 1},size=${size},sortBy=${sortBy},sortDirection=${sortDirection})}">
                 <i class="fas fa-chevron-right"></i>
             </a>
         </div>
@@ -500,9 +625,9 @@
             Создать группу
         </a>
 
-        <h3>Популярные группы</h3>
+        <h3>Все группы</h3>
         <ul>
-            <li th:each="group : ${popularGroups}">
+            <li th:each="group : ${allGroups}">
                 <a th:href="@{/groups/{id}(id=${group.id})}">
                     <i class="fas fa-users"></i>
                     <span th:text="${group.name}"></span>
@@ -510,6 +635,8 @@
             </li>
         </ul>
     </aside>
+
+
 </div>
 
 <script>
@@ -533,291 +660,7 @@
         });
     });
 </script>
+
+
 </body>
 </html>
-
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--    <title>My Groups</title>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <style>-->
-<!--        body {-->
-<!--            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;-->
-<!--            margin: 0;-->
-<!--            padding: 0;-->
-<!--            background-color: #f0f2f5;-->
-<!--            color: #1c1e21;-->
-<!--        }-->
-
-<!--        .navbar {-->
-<!--            background-color: #ffffff;-->
-<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
-<!--            padding: 10px 0;-->
-<!--            position: sticky;-->
-<!--            top: 0;-->
-<!--            z-index: 1000;-->
-<!--        }-->
-
-<!--        .navbar-content {-->
-<!--            display: flex;-->
-<!--            justify-content: space-between;-->
-<!--            align-items: center;-->
-<!--            max-width: 1200px;-->
-<!--            margin: 0 auto;-->
-<!--            padding: 0 20px;-->
-<!--        }-->
-
-<!--        .logo {-->
-<!--            color: #1877f2;-->
-<!--            font-size: 24px;-->
-<!--            font-weight: bold;-->
-<!--            text-decoration: none;-->
-<!--        }-->
-
-<!--        .nav-links a {-->
-<!--            color: #65676b;-->
-<!--            text-decoration: none;-->
-<!--            margin-left: 20px;-->
-<!--            font-weight: 600;-->
-<!--        }-->
-
-<!--        .nav-links a:hover {-->
-<!--            color: #1877f2;-->
-<!--        }-->
-
-<!--        .container {-->
-<!--            display: flex;-->
-<!--            max-width: 1200px;-->
-<!--            margin: 20px auto;-->
-<!--            padding: 0 20px;-->
-<!--        }-->
-
-<!--        .main-content {-->
-<!--            flex: 1;-->
-<!--            margin-right: 20px;-->
-<!--        }-->
-
-<!--        .sidebar {-->
-<!--            width: 300px;-->
-<!--            background-color: #ffffff;-->
-<!--            border-radius: 8px;-->
-<!--            padding: 20px;-->
-<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
-<!--        }-->
-
-<!--        h1, h2 {-->
-<!--            color: #1c1e21;-->
-<!--        }-->
-
-<!--        ul {-->
-<!--            list-style-type: none;-->
-<!--            padding: 0;-->
-<!--        }-->
-
-<!--        li {-->
-<!--            margin-bottom: 10px;-->
-<!--        }-->
-
-<!--        a {-->
-<!--            color: #1877f2;-->
-<!--            text-decoration: none;-->
-<!--        }-->
-
-<!--        a:hover {-->
-<!--            text-decoration: underline;-->
-<!--        }-->
-
-<!--        .button {-->
-<!--            background-color: #1877f2;-->
-<!--            color: #ffffff;-->
-<!--            border: none;-->
-<!--            padding: 10px 15px;-->
-<!--            border-radius: 6px;-->
-<!--            font-weight: 600;-->
-<!--            cursor: pointer;-->
-<!--            transition: background-color 0.3s;-->
-<!--        }-->
-
-<!--        .button:hover {-->
-<!--            background-color: #166fe5;-->
-<!--        }-->
-
-<!--        .pagination {-->
-<!--            display: flex;-->
-<!--            justify-content: center;-->
-<!--            margin-top: 20px;-->
-<!--        }-->
-
-<!--        .pagination a {-->
-<!--            margin: 0 5px;-->
-<!--            padding: 5px 10px;-->
-<!--            border: 1px solid #dddfe2;-->
-<!--            border-radius: 4px;-->
-<!--        }-->
-
-<!--        .pagination a:hover {-->
-<!--            background-color: #f0f2f5;-->
-<!--        }-->
-
-<!--        .sort-options {-->
-<!--            margin-top: 20px;-->
-<!--            color: #65676b;-->
-<!--        }-->
-
-<!--        .group-list {-->
-<!--            background-color: #ffffff;-->
-<!--            border-radius: 8px;-->
-<!--            padding: 20px;-->
-<!--            margin-bottom: 20px;-->
-<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
-<!--        }-->
-
-<!--        .search-form {-->
-<!--            margin-bottom: 20px;-->
-<!--        }-->
-
-<!--        .search-form input {-->
-<!--            width: 100%;-->
-<!--            padding: 10px;-->
-<!--            border: 1px solid #dddfe2;-->
-<!--            border-radius: 6px;-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--<nav class="navbar">-->
-<!--    <div class="navbar-content">-->
-<!--        <a href="#" class="logo">MySocialNetwork</a>-->
-<!--        <div class="nav-links">-->
-<!--            <a href="#">Home</a>-->
-<!--            <a href="#">Profile</a>-->
-<!--            <a href="#">Messages</a>-->
-<!--            <a href="#">Notifications</a>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</nav>-->
-
-<!--<div class="container">-->
-<!--    <main class="main-content">-->
-<!--        <h1>My Groups</h1>-->
-
-<!--        <div class="group-list">-->
-<!--            <h2>Subscription Groups</h2>-->
-<!--            <ul>-->
-<!--                <li th:each="group : ${groups}"-->
-<!--                    th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">-->
-<!--                    <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>-->
-<!--                </li>-->
-<!--            </ul>-->
-<!--        </div>-->
-
-<!--        <div class="group-list">-->
-<!--            <h2>Interactive Groups</h2>-->
-<!--            <ul>-->
-<!--                <li th:each="group : ${groups}"-->
-<!--                    th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).INTERACTIVE}">-->
-<!--                    <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>-->
-<!--                </li>-->
-<!--            </ul>-->
-<!--        </div>-->
-
-<!--        <div class="pagination">-->
-<!--                <span th:if="${currentPage > 0}">-->
-<!--                    <a th:href="@{/groups/my(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Previous</a>-->
-<!--                </span>-->
-<!--            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">-->
-<!--                    <a th:href="@{/groups/my(page=${i}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"-->
-<!--                       th:text="${i + 1}"></a>-->
-<!--                </span>-->
-<!--            <span th:if="${currentPage < totalPages - 1}">-->
-<!--                    <a th:href="@{/groups/my(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Next</a>-->
-<!--                </span>-->
-<!--        </div>-->
-
-<!--        <div class="sort-options">-->
-<!--            <p>Sort by:-->
-<!--                <a th:href="@{/groups/my(sortBy='name', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Name</a>-->
-<!--                |-->
-<!--                <a th:href="@{/groups/my(sortBy='createdAt', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Creation-->
-<!--                    Date</a>-->
-<!--            </p>-->
-<!--        </div>-->
-
-<!--        <p>Total Items: <span th:text="${totalItems}"></span></p>-->
-<!--    </main>-->
-
-<!--    <aside class="sidebar">-->
-<!--        <h2>Group Actions</h2>-->
-<!--        <a href="/groups/create" class="button">Create New Group</a>-->
-<!--        <a href="/groups" class="button">Все группы</a>-->
-
-<!--        <h3>Find Groups</h3>-->
-<!--        <form class="search-form" action="/groups/search" method="get">-->
-<!--            <input type="text" name="query" placeholder="Search for groups...">-->
-<!--            <button type="submit" class="button">Search</button>-->
-<!--        </form>-->
-
-<!--        <h3>Предлагаемые группы</h3>-->
-<!--        <ul>-->
-<!--            <li><a href="#">Suggested Group 1</a></li>-->
-<!--            <li><a href="#">Suggested Group 2</a></li>-->
-<!--            <li><a href="#">Suggested Group 3</a></li>-->
-<!--        </ul>-->
-<!--    </aside>-->
-<!--</div>-->
-<!--</body>-->
-<!--</html>-->
-
-
-<!--&lt;!&ndash;<!DOCTYPE html>&ndash;&gt;-->
-<!--&lt;!&ndash;<html xmlns:th="http://www.thymeleaf.org">&ndash;&gt;-->
-<!--&lt;!&ndash;<head>&ndash;&gt;-->
-<!--&lt;!&ndash;    <title>My Groups</title>&ndash;&gt;-->
-<!--&lt;!&ndash;    <meta charset="UTF-8">&ndash;&gt;-->
-<!--&lt;!&ndash;    <meta name="viewport" content="width=device-width, initial-scale=1.0">&ndash;&gt;-->
-<!--&lt;!&ndash;</head>&ndash;&gt;-->
-<!--&lt;!&ndash;<body>&ndash;&gt;-->
-<!--&lt;!&ndash;<h1>My Groups</h1>&ndash;&gt;-->
-
-<!--&lt;!&ndash;<h2>Subscription Groups</h2>&ndash;&gt;-->
-<!--&lt;!&ndash;<ul>&ndash;&gt;-->
-<!--&lt;!&ndash;    <li th:each="group : ${groups}"&ndash;&gt;-->
-<!--&lt;!&ndash;        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).SUBSCRIPTION}">&ndash;&gt;-->
-<!--&lt;!&ndash;        <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>&ndash;&gt;-->
-<!--&lt;!&ndash;    </li>&ndash;&gt;-->
-<!--&lt;!&ndash;</ul>&ndash;&gt;-->
-
-<!--&lt;!&ndash;<h2>Interactive Groups</h2>&ndash;&gt;-->
-<!--&lt;!&ndash;<ul>&ndash;&gt;-->
-<!--&lt;!&ndash;    <li th:each="group : ${groups}"&ndash;&gt;-->
-<!--&lt;!&ndash;        th:if="${group.type == T(com.example.lucky_social_network.model.Group.GroupType).INTERACTIVE}">&ndash;&gt;-->
-<!--&lt;!&ndash;        <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}"></a>&ndash;&gt;-->
-<!--&lt;!&ndash;    </li>&ndash;&gt;-->
-<!--&lt;!&ndash;</ul>&ndash;&gt;-->
-
-<!--&lt;!&ndash;<div>&ndash;&gt;-->
-<!--&lt;!&ndash;        <span th:if="${currentPage > 0}">&ndash;&gt;-->
-<!--&lt;!&ndash;            <a th:href="@{/groups/my(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Previous</a>&ndash;&gt;-->
-<!--&lt;!&ndash;        </span>&ndash;&gt;-->
-<!--&lt;!&ndash;    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">&ndash;&gt;-->
-<!--&lt;!&ndash;            <a th:href="@{/groups/my(page=${i}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}"&ndash;&gt;-->
-<!--&lt;!&ndash;               th:text="${i + 1}"></a>&ndash;&gt;-->
-<!--&lt;!&ndash;        </span>&ndash;&gt;-->
-<!--&lt;!&ndash;    <span th:if="${currentPage < totalPages - 1}">&ndash;&gt;-->
-<!--&lt;!&ndash;            <a th:href="@{/groups/my(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDirection=${sortDirection})}">Next</a>&ndash;&gt;-->
-<!--&lt;!&ndash;        </span>&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-
-<!--&lt;!&ndash;<div>&ndash;&gt;-->
-<!--&lt;!&ndash;    <p>Sort by:&ndash;&gt;-->
-<!--&lt;!&ndash;        <a th:href="@{/groups/my(sortBy='name', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Name</a> |&ndash;&gt;-->
-<!--&lt;!&ndash;        <a th:href="@{/groups/my(sortBy='createdAt', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">Creation&ndash;&gt;-->
-<!--&lt;!&ndash;            Date</a>&ndash;&gt;-->
-<!--&lt;!&ndash;    </p>&ndash;&gt;-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
-
-<!--&lt;!&ndash;<p>Total Items: <span th:text="${totalItems}"></span></p>&ndash;&gt;-->
-<!--&lt;!&ndash;</body>&ndash;&gt;-->
-<!--&lt;!&ndash;</html>&ndash;&gt;-->

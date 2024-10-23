@@ -7,19 +7,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #f0f2f5;
-      margin: 0;
-      padding: 0;
-    }
-
     .container {
       max-width: 1200px;
-      margin: 0 auto;
+      margin: 60px auto 0; /* отступ сверху для хедера */
       padding: 20px;
       display: flex;
       gap: 20px;
+      position: relative;
+    }
+
+    main {
+      flex: 1;
+      min-width: 0; /* Важно для корректного расположения flex элементов */
+      margin-left: 170px; /* Ширина сайдбара + отступ */
     }
 
     header {
@@ -30,89 +30,7 @@
       left: 0;
       right: 0;
       z-index: 100;
-      color: white;
-    }
-
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-    }
-
-    .logo {
-      color: #ffffff;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .nav-links {
-      list-style-type: none;
-      display: flex;
-      margin: 0;
-      padding: 0;
-    }
-
-    .nav-links li {
-      margin-left: 20px;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: #ffffff;
-    }
-
-    main {
-      margin-top: 70px;
-      flex-grow: 1;
-    }
-
-    aside {
-      margin-top: 70px;
-      width: 250px;
-      flex-shrink: 0;
-    }
-
-    .sidebar-nav {
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      padding: 10px;
-    }
-
-    .sidebar-nav a {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      text-decoration: none;
-      color: #2a5885;
-      transition: background-color 0.2s;
-    }
-
-    .sidebar-nav a:hover {
-      background-color: #f5f6f8;
-      border-radius: 4px;
-    }
-
-    .sidebar-nav i {
-      margin-right: 10px;
-      width: 20px;
-      text-align: center;
-    }
-
-    .sidebar-nav .counter {
-      margin-left: auto;
-      background: #5181b8;
-      color: white;
-      border-radius: 12px;
-      padding: 2px 6px;
-      font-size: 12px;
-    }
-
-    h1 {
-      color: #1c1e21;
-      font-size: 24px;
-      margin-bottom: 20px;
+      height: 60px; /* Фиксированная высота */
     }
 
     .post {
@@ -120,31 +38,36 @@
       border-radius: 8px;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       margin-bottom: 20px;
-      padding: 12px;
+      padding: 16px;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .post:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .post h2 {
-      margin: 0 0 10px 0;
+      margin: 0 0 12px 0;
       font-size: 18px;
+      line-height: 1.4;
     }
 
     .post h2 a {
       color: #1c1e21;
       text-decoration: none;
+      transition: color 0.2s ease;
     }
 
-    .post-meta {
-      color: #65676b;
-      font-size: 13px;
-      margin: 5px 0;
+    .post h2 a:hover {
+      color: #1877f2;
     }
 
     .post-actions {
       display: flex;
       justify-content: space-between;
       border-top: 1px solid #dadde1;
-      margin-top: 10px;
-      padding-top: 10px;
+      margin-top: 12px;
+      padding-top: 12px;
     }
 
     .action-button {
@@ -153,21 +76,347 @@
       color: #65676b;
       cursor: pointer;
       font-size: 14px;
-      padding: 5px 10px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
     }
 
     .action-button:hover {
       background-color: #f2f2f2;
+      color: #1877f2;
+    }
+
+    .action-button i {
+      font-size: 16px;
+    }
+
+    @media (max-width: 1200px) {
+      .container {
+        max-width: 100%;
+        padding: 16px;
+      }
+
+      .left-sidebar {
+        width: 70px;
+      }
+
+      .side-nav-link span {
+        display: none;
+      }
+
+      .side-nav-link i {
+        margin-right: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .left-sidebar {
+        display: none;
+      }
+
+      .container {
+        padding: 12px;
+      }
+
+      .post {
+        padding: 12px;
+      }
+
+      .post-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .action-button {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+
+    .nav-links {
+      list-style-type: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+      gap: 16px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #ffffff;
+      padding: 8px 12px;
       border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .nav-links a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Плавное появление постов */
+    .post {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Эффект при нажатии на кнопки */
+    .action-button:active {
+      transform: scale(0.98);
     }
 
     .comment-form {
-      margin-top: 10px;
+      margin-top: 12px;
+      padding: 12px;
+      background: #f7f8fa;
+      border-radius: 4px;
+      font-size: 14px;
     }
 
     .comment-form a {
       color: #1877f2;
       text-decoration: none;
+      font-weight: 500;
+    }
+
+    .comment-form a:hover {
+      text-decoration: underline;
+    }
+
+    /* Основной контейнер боковой панели */
+    aside.left-sidebar {
+      width: 250px;
+      position: sticky;
+      top: 70px; /* Соответствует высоте header */
+      height: calc(100vh - 70px);
+      padding: 16px;
+      background: transparent;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+    }
+
+    /* Стилизация скроллбара */
+    .left-sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .left-sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .left-sidebar::-webkit-scrollbar-thumb {
+      background: #dadde1;
+      border-radius: 3px;
+    }
+
+    /* Навигация внутри боковой панели */
+    .side-nav {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 8px;
+    }
+
+    /* Ссылки в боковой панели */
+    .side-nav-link {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      color: #1c1e21;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .side-nav-link:hover {
+      background-color: #f2f3f5;
+      transform: translateX(4px);
+    }
+
+    .side-nav-link.active {
+      background-color: #e7f3ff;
+      color: #1877f2;
+    }
+
+    .side-nav-link i {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-right: 12px;
+      font-size: 20px;
+      color: #1877f2;
+      transition: transform 0.2s ease;
+    }
+
+    .side-nav-link:hover i {
+      transform: scale(1.1);
+    }
+
+    .side-nav-link span {
+      flex: 1;
+      font-size: 15px;
+    }
+
+    /* Стили для секции уведомлений */
+    .notifications {
+      position: relative;
+    }
+
+    .notification-link {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .notification-badge {
+      background: #e41e3f;
+      color: white;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 0 6px;
+      margin-left: auto;
+      transition: transform 0.2s ease;
+    }
+
+    .side-nav-link:hover .notification-badge {
+      transform: scale(1.1);
+    }
+
+    /* Выпадающий список уведомлений */
+    .notification-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-top: 4px;
+      padding: 8px 0;
+      display: none;
+      z-index: 1000;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .notifications:hover .notification-list {
+      display: block;
+      animation: slideDown 0.2s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .notification-item {
+      padding: 8px 16px;
+      transition: background-color 0.2s ease;
+    }
+
+    .notification-item a {
+      color: #1c1e21;
+      text-decoration: none;
+      font-size: 14px;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .notification-item:hover {
+      background-color: #f0f2f5;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 1200px) {
+      .left-sidebar {
+        width: 70px;
+        padding: 12px 8px;
+      }
+
+      .side-nav-link {
+        padding: 12px 8px;
+        justify-content: center;
+      }
+
+      .side-nav-link span {
+        display: none;
+      }
+
+      .side-nav-link i {
+        margin-right: 0;
+        font-size: 22px;
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        min-width: 16px;
+        height: 16px;
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .left-sidebar {
+        display: none;
+      }
+    }
+
+    /* Анимация при наведении */
+    .side-nav-link {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .side-nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #1877f2;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .side-nav-link:hover::after {
+      transform: scaleX(1);
     }
   </style>
 </head>
@@ -187,46 +436,60 @@
 </header>
 
 <div class="container">
-  <aside>
-    <div class="sidebar-nav">
-      <a href="/profile">
+  <aside class="left-sidebar">
+    <nav class="side-nav">
+      <a href="/home" class="side-nav-link">
         <i class="fas fa-user"></i>
-        Моя страница
+        <span>Моя Страница</span>
       </a>
-      <a href="/posts">
-        <i class="fas fa-newspaper"></i>
-        Новости
-        <span class="counter">12</span>
-      </a>
-      <a href="/messages">
-        <i class="fas fa-envelope"></i>
-        Сообщения
-        <span class="counter">3</span>
-      </a>
-      <a href="/users/friends">
+
+      <a href="/users/friends" class="side-nav-link">
         <i class="fas fa-users"></i>
-        Друзья
-        <span class="counter">2</span>
+        <span>Друзья</span>
       </a>
-      <a href="/groups/my">
-        <i class="fas fa-users-rectangle"></i>
-        Группы
-      </a>
-      <a href="/photos">
+
+      <a href="/albums" class="side-nav-link">
         <i class="fas fa-images"></i>
-        Фотографии
+        <span>Мои Фото</span>
       </a>
-      <a href="/music">
-        <i class="fas fa-music"></i>
-        Музыка
+
+      <a href="/chat/list" class="side-nav-link">
+        <i class="fas fa-envelope"></i>
+        <span>Сообщения</span>
       </a>
-      <a href="/notifications">
-        <i class="fas fa-bell"></i>
-        Уведомления
-        <span class="counter">5</span>
+
+      <a href="/posts" class="side-nav-link">
+        <i class="fas fa-newspaper"></i>
+        <span>Новости</span>
       </a>
-    </div>
+
+      <a href="/groups/my" class="side-nav-link">
+        <i class="fas fa-users-rectangle"></i>
+        <span>Группы</span>
+      </a>
+
+      <div class="side-nav-link notifications">
+        <a href="/notifications" class="notification-link">
+          <i class="fas fa-bell"></i>
+          <span>Уведомления</span>
+          <span th:if="${notificationCount > 0}"
+                class="notification-badge"
+                th:text="${notificationCount}">
+                </span>
+        </a>
+
+        <ul class="notification-list"
+            th:if="${recentNotifications != null and !recentNotifications.empty}">
+          <li th:each="notification : ${recentNotifications}" class="notification-item">
+            <a th:href="@{/notifications/{id}(id=${notification.id})}"
+               th:text="${notification.message}">
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
   </aside>
+
 
   <main>
     <h1>Все посты</h1>

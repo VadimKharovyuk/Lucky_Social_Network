@@ -259,7 +259,7 @@ public class GroupService {
     }
 
 
-    public Page<Group> getCurrentUserGroups(int page, int size, String sortBy, String sortDirection) {
+    public Page<Group> getCurrentUserGroups(int page, int size, String sortBy, String sortDirection, String type) {
         Long currentUserId = userService.getCurrentUserId();
         Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
