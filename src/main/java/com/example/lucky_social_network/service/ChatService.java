@@ -5,6 +5,8 @@ import com.example.lucky_social_network.model.Message;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.MessageRepository;
 import com.example.lucky_social_network.repository.UserRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,49 +26,50 @@ public class ChatService {
     private final UserService userService;
 
     private final RabbitMQService rabbitMQService;
+    private final MeterRegistry meterRegistry;
+    private final Timer messageSendTimer;
 
     public Message sendMessage(Long senderId, Long recipientId, String content) {
-        // Проверяем существование пользователей
-        User sender = userService.getUserById(senderId);
-        User recipient = userService.getUserById(recipientId);
+        return messageSendTimer.record(() -> {
+            try {
+                User sender = userService.getUserById(senderId);
+                User recipient = userService.getUserById(recipientId);
 
-        if (sender == null || recipient == null) {
-            throw new RuntimeException("Sender or recipient not found");
-        }
+                if (sender == null || recipient == null) {
+                    meterRegistry.counter("chat.messages.error", "type", "user_not_found").increment();
+                    throw new RuntimeException("Sender or recipient not found");
+                }
 
-        Message message = new Message();
-        message.setSender(sender);
-        message.setRecipient(recipient);
-        message.setContent(content);
-        message.setTimestamp(LocalDateTime.now());
+                Message message = new Message();
+                message.setSender(sender);
+                message.setRecipient(recipient);
+                message.setContent(content);
+                message.setTimestamp(LocalDateTime.now());
 
-        // Логируем сообщение перед сохранением
-        log.info("Saving message: from {} to {}: {}", senderId, recipientId, content);
+                log.info("Saving message: from {} to {}: {}", senderId, recipientId, content);
 
-        Message savedMessage = messageRepository.save(message);
+                Message savedMessage = messageRepository.save(message);
 
-        // Проверяем сохранение
-        log.info("Message saved with id: {}", savedMessage.getId());
+                // Отправка в RabbitMQ
+                MessageDTO messageDTO = new MessageDTO(
+                        "CHAT",
+                        savedMessage.getSender().getId(),
+                        savedMessage.getContent(),
+                        savedMessage.getTimestamp().toString()
+                );
+                rabbitMQService.sendChatMessage(messageDTO);
 
-        // Создаем DTO и отправляем в RabbitMQ
-        try {
-            MessageDTO messageDTO = new MessageDTO(
-                    "CHAT",
-                    savedMessage.getSender().getId(),
-                    savedMessage.getContent(),
-                    savedMessage.getTimestamp().toString()
-            );
-            rabbitMQService.sendChatMessage(messageDTO);
-            log.info("Message DTO successfully sent to RabbitMQ queue");
-        } catch (Exception e) {
-            log.error("Failed to send message to RabbitMQ queue: {}", e.getMessage());
-        }
+                // Увеличиваем счетчик успешных сообщений
+                meterRegistry.counter("chat.messages.sent").increment();
 
-        return savedMessage;
+                return savedMessage;
+            } catch (Exception e) {
+                // Увеличиваем счетчик ошибок
+                meterRegistry.counter("chat.messages.error", "type", e.getClass().getSimpleName()).increment();
+                throw e;
+            }
+        });
     }
-    
-
-////    private final RabbitMQService rabbitMQService;
 //
 //    public Message sendMessage(Long senderId, Long recipientId, String content) {
 //        // Проверяем существование пользователей
@@ -91,30 +94,28 @@ public class ChatService {
 //        // Проверяем сохранение
 //        log.info("Message saved with id: {}", savedMessage.getId());
 //
+//        // Создаем DTO и отправляем в RabbitMQ
+//        try {
+//            MessageDTO messageDTO = new MessageDTO(
+//                    "CHAT",
+//                    savedMessage.getSender().getId(),
+//                    savedMessage.getContent(),
+//                    savedMessage.getTimestamp().toString()
+//            );
+//            rabbitMQService.sendChatMessage(messageDTO);
+//            log.info("Message DTO successfully sent to RabbitMQ queue");
+//        } catch (Exception e) {
+//            log.error("Failed to send message to RabbitMQ queue: {}", e.getMessage());
+//        }
+//
 //        return savedMessage;
 //    }
+
 
     public List<Message> getChatHistory(Long senderId, Long recipientId) {
         List<Message> messages = messageRepository.findChatHistory(senderId, recipientId);
         return messages;
     }
-//    @Transactional
-//    public Message sendMessage(Long senderId, Long recipientId, String content) {
-//        User sender = getUserById(senderId);
-//        User recipient = getUserById(recipientId);
-//
-//        Message message = new Message();
-//        message.setSender(sender);
-//        message.setRecipient(recipient);
-//        message.setContent(content);
-//        message.setTimestamp(LocalDateTime.now());
-//
-//        return messageRepository.save(message);
-//    }
-//
-//    public List<Message> getChatHistory(Long senderId, Long recipientId) {
-//        return messageRepository.findChatHistory(senderId, recipientId);
-//    }
 
     public List<User> getUserChats(Long userId) {
         User currentUser = getUserById(userId);

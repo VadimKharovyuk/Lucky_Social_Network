@@ -23,38 +23,79 @@ public class RabbitMQService {
 
     public void sendChatMessage(MessageDTO messageDTO) {
         try {
-            log.info("Attempting to send message to RabbitMQ. Exchange: {}, RoutingKey: {}",
-                    messagesExchange, chatRoutingKey);
+            long startTime = System.currentTimeMillis();
 
             rabbitTemplate.convertAndSend(messagesExchange, chatRoutingKey, messageDTO);
 
-            log.info("Successfully sent message to RabbitMQ: sender={}, content={}",
+            long processTime = System.currentTimeMillis() - startTime;
+            log.info("Message sent [time={}ms]: sender={}, recipientId={}, messageId={}",
+                    processTime,
                     messageDTO.getSenderId(),
-                    messageDTO.getContent());
+                    messageDTO.getContent(),
+                    messageDTO.getTimestamp());
+
         } catch (Exception e) {
-            log.error("Error sending message to RabbitMQ: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to send message to RabbitMQ", e);
+            log.error("Send failed: sender={}, error={}",
+                    messageDTO.getSenderId(),
+                    e.getMessage(), e);
+            throw new RuntimeException("Failed to send message", e);
         }
     }
 
-    @RabbitListener(queues = "${rabbitmq.queue.chat}")
-    public void receiveChatMessage(MessageDTO messageDTO) {
-        log.info("Received message from RabbitMQ queue. Message: {}", messageDTO);
+    @RabbitListener(queues = "${rabbitmq.queue.chat}", id = "listener1")
+    public void receiveChatMessage1(MessageDTO messageDTO) {
+        processMessageWithListener(messageDTO, "Listener-1");
+    }
+
+    @RabbitListener(queues = "${rabbitmq.queue.chat}", id = "listener2")
+    public void receiveChatMessage2(MessageDTO messageDTO) {
+        processMessageWithListener(messageDTO, "Listener-2");
+    }
+
+    private void processMessageWithListener(MessageDTO messageDTO, String listenerId) {
+        long startTime = System.currentTimeMillis();
+        String threadName = Thread.currentThread().getName()
+                .replace("org.springframework.amqp.rabbit.RabbitListenerEndpointContainer", "RabbitListener");
+
         try {
+            log.debug("{} - Processing started [thread={}]: sender={}",
+                    listenerId,
+                    threadName,
+                    messageDTO.getSenderId());
+
             processMessage(messageDTO);
+
+            long processTime = System.currentTimeMillis() - startTime;
+            log.info("{} - Message processed [thread={}, time={}ms]: sender={}, content={}, length={}",
+                    listenerId,
+                    threadName,
+                    processTime,
+                    messageDTO.getSenderId(),
+                    messageDTO.getContent(),
+                    messageDTO.getContent().length());
+
         } catch (Exception e) {
-            log.error("Error processing RabbitMQ message: {}", e.getMessage(), e);
+            log.error("{} - Processing failed [thread={}]: sender={}, error={}",
+                    listenerId,
+                    threadName,
+                    messageDTO.getSenderId(),
+                    e.getMessage(), e);
             throw e;
         }
     }
 
     private void processMessage(MessageDTO messageDTO) {
-        log.info("Processing message: sender={}, content={}, timestamp={}",
-                messageDTO.getSenderId(),
-                messageDTO.getContent(),
-                messageDTO.getTimestamp());
+        String threadName = Thread.currentThread().getName()
+                .replace("org.springframework.amqp.rabbit.RabbitListenerEndpointContainer", "RabbitListener");
 
-        // Здесь можно добавить дополнительную логику обработки сообщения
-        // Например, отправку уведомлений, сохранение в базу данных и т.д.
+        log.debug("Processing started [thread={}]: sender={}",
+                threadName,
+                messageDTO.getSenderId());
+
+        // Ваша логика обработки
+
+        log.debug("Processing completed [thread={}]: sender={}",
+                threadName,
+                messageDTO.getSenderId());
     }
 }
