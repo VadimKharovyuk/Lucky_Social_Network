@@ -6,6 +6,7 @@ import com.example.lucky_social_network.service.ChatService;
 import com.example.lucky_social_network.service.CustomUserDetails;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -15,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-
+@Slf4j
 @Controller
 @RequestMapping("/chat")
 @RequiredArgsConstructor
@@ -52,7 +53,6 @@ public class ChatController {
 
         return "chat";
     }
-
     @PostMapping("/send")
     public String sendMessage(@RequestParam("content") String content,
                               @RequestParam("senderId") Long senderId,
@@ -61,11 +61,27 @@ public class ChatController {
         try {
             chatService.sendMessage(senderId, recipientId, content);
             return "redirect:/chat/" + senderId + "/" + recipientId + "#bottom";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Не удалось отправить сообщение");
+        } catch (RuntimeException e) {
+            log.error("Error sending message: {}", e.getMessage());
+            String errorMessage = "Не удалось отправить сообщение: " +
+                    (e.getMessage() != null ? e.getMessage() : "неизвестная ошибка");
+            redirectAttributes.addFlashAttribute("error", errorMessage);
             return "redirect:/chat/" + senderId + "/" + recipientId;
         }
     }
+//    @PostMapping("/send")
+//    public String sendMessage(@RequestParam("content") String content,
+//                              @RequestParam("senderId") Long senderId,
+//                              @RequestParam("recipientId") Long recipientId,
+//                              RedirectAttributes redirectAttributes) {
+//        try {
+//            chatService.sendMessage(senderId, recipientId, content);
+//            return "redirect:/chat/" + senderId + "/" + recipientId + "#bottom";
+//        } catch (Exception e) {
+//            redirectAttributes.addFlashAttribute("error", "Не удалось отправить сообщение");
+//            return "redirect:/chat/" + senderId + "/" + recipientId;
+//        }
+//    }
 
 
     @GetMapping("/list")

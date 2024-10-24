@@ -1,5 +1,6 @@
 package com.example.lucky_social_network.service;
 
+import com.example.lucky_social_network.dto.MessageDTO;
 import com.example.lucky_social_network.model.Message;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.MessageRepository;
@@ -21,7 +22,8 @@ public class ChatService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-//    private final RabbitMQService rabbitMQService;
+
+    private final RabbitMQService rabbitMQService;
 
     public Message sendMessage(Long senderId, Long recipientId, String content) {
         // Проверяем существование пользователей
@@ -46,8 +48,51 @@ public class ChatService {
         // Проверяем сохранение
         log.info("Message saved with id: {}", savedMessage.getId());
 
+        // Создаем DTO и отправляем в RabbitMQ
+        try {
+            MessageDTO messageDTO = new MessageDTO(
+                    "CHAT",
+                    savedMessage.getSender().getId(),
+                    savedMessage.getContent(),
+                    savedMessage.getTimestamp().toString()
+            );
+            rabbitMQService.sendChatMessage(messageDTO);
+            log.info("Message DTO successfully sent to RabbitMQ queue");
+        } catch (Exception e) {
+            log.error("Failed to send message to RabbitMQ queue: {}", e.getMessage());
+        }
+
         return savedMessage;
     }
+    
+
+////    private final RabbitMQService rabbitMQService;
+//
+//    public Message sendMessage(Long senderId, Long recipientId, String content) {
+//        // Проверяем существование пользователей
+//        User sender = userService.getUserById(senderId);
+//        User recipient = userService.getUserById(recipientId);
+//
+//        if (sender == null || recipient == null) {
+//            throw new RuntimeException("Sender or recipient not found");
+//        }
+//
+//        Message message = new Message();
+//        message.setSender(sender);
+//        message.setRecipient(recipient);
+//        message.setContent(content);
+//        message.setTimestamp(LocalDateTime.now());
+//
+//        // Логируем сообщение перед сохранением
+//        log.info("Saving message: from {} to {}: {}", senderId, recipientId, content);
+//
+//        Message savedMessage = messageRepository.save(message);
+//
+//        // Проверяем сохранение
+//        log.info("Message saved with id: {}", savedMessage.getId());
+//
+//        return savedMessage;
+//    }
 
     public List<Message> getChatHistory(Long senderId, Long recipientId) {
         List<Message> messages = messageRepository.findChatHistory(senderId, recipientId);

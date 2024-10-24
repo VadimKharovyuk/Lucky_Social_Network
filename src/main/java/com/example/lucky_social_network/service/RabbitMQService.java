@@ -1,6 +1,6 @@
 package com.example.lucky_social_network.service;
 
-import com.example.lucky_social_network.model.Message;
+import com.example.lucky_social_network.dto.MessageDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -21,17 +21,16 @@ public class RabbitMQService {
     @Value("${rabbitmq.routing.key.chat}")
     private String chatRoutingKey;
 
-    public void sendChatMessage(Message message) {
+    public void sendChatMessage(MessageDTO messageDTO) {
         try {
             log.info("Attempting to send message to RabbitMQ. Exchange: {}, RoutingKey: {}",
                     messagesExchange, chatRoutingKey);
 
-            rabbitTemplate.convertAndSend(messagesExchange, chatRoutingKey, message);
+            rabbitTemplate.convertAndSend(messagesExchange, chatRoutingKey, messageDTO);
 
-            log.info("Successfully sent message to RabbitMQ: sender={}, recipient={}, content={}",
-                    message.getSender().getId(),
-                    message.getRecipient().getId(),
-                    message.getContent());
+            log.info("Successfully sent message to RabbitMQ: sender={}, content={}",
+                    messageDTO.getSenderId(),
+                    messageDTO.getContent());
         } catch (Exception e) {
             log.error("Error sending message to RabbitMQ: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to send message to RabbitMQ", e);
@@ -39,20 +38,23 @@ public class RabbitMQService {
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.chat}")
-    public void receiveChatMessage(Message message) {
-        log.info("Received message from RabbitMQ queue. Message: {}", message);
+    public void receiveChatMessage(MessageDTO messageDTO) {
+        log.info("Received message from RabbitMQ queue. Message: {}", messageDTO);
         try {
-            processMessage(message);
+            processMessage(messageDTO);
         } catch (Exception e) {
             log.error("Error processing RabbitMQ message: {}", e.getMessage(), e);
-            throw e; // Повторное выбрасывание исключения для обработки повторных попыток
+            throw e;
         }
     }
 
-    private void processMessage(Message message) {
-        log.info("Processing message: sender={}, recipient={}, content={}",
-                message.getSender().getId(),
-                message.getRecipient().getId(),
-                message.getContent());
+    private void processMessage(MessageDTO messageDTO) {
+        log.info("Processing message: sender={}, content={}, timestamp={}",
+                messageDTO.getSenderId(),
+                messageDTO.getContent(),
+                messageDTO.getTimestamp());
+
+        // Здесь можно добавить дополнительную логику обработки сообщения
+        // Например, отправку уведомлений, сохранение в базу данных и т.д.
     }
 }
