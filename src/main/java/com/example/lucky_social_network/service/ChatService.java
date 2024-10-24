@@ -20,11 +20,17 @@ public class ChatService {
 
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
+//    private final RabbitMQService rabbitMQService;
 
-    @Transactional
     public Message sendMessage(Long senderId, Long recipientId, String content) {
-        User sender = getUserById(senderId);
-        User recipient = getUserById(recipientId);
+        // Проверяем существование пользователей
+        User sender = userService.getUserById(senderId);
+        User recipient = userService.getUserById(recipientId);
+
+        if (sender == null || recipient == null) {
+            throw new RuntimeException("Sender or recipient not found");
+        }
 
         Message message = new Message();
         message.setSender(sender);
@@ -32,12 +38,38 @@ public class ChatService {
         message.setContent(content);
         message.setTimestamp(LocalDateTime.now());
 
-        return messageRepository.save(message);
+        // Логируем сообщение перед сохранением
+        log.info("Saving message: from {} to {}: {}", senderId, recipientId, content);
+
+        Message savedMessage = messageRepository.save(message);
+
+        // Проверяем сохранение
+        log.info("Message saved with id: {}", savedMessage.getId());
+
+        return savedMessage;
     }
 
     public List<Message> getChatHistory(Long senderId, Long recipientId) {
-        return messageRepository.findChatHistory(senderId, recipientId);
+        List<Message> messages = messageRepository.findChatHistory(senderId, recipientId);
+        return messages;
     }
+//    @Transactional
+//    public Message sendMessage(Long senderId, Long recipientId, String content) {
+//        User sender = getUserById(senderId);
+//        User recipient = getUserById(recipientId);
+//
+//        Message message = new Message();
+//        message.setSender(sender);
+//        message.setRecipient(recipient);
+//        message.setContent(content);
+//        message.setTimestamp(LocalDateTime.now());
+//
+//        return messageRepository.save(message);
+//    }
+//
+//    public List<Message> getChatHistory(Long senderId, Long recipientId) {
+//        return messageRepository.findChatHistory(senderId, recipientId);
+//    }
 
     public List<User> getUserChats(Long userId) {
         User currentUser = getUserById(userId);

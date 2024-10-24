@@ -1,14 +1,13 @@
 package com.example.lucky_social_network.model;
 
-import com.example.lucky_social_network.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 @Getter
 @Setter
@@ -16,7 +15,8 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @Entity
 @Table(name = "messages")
-public class Message {
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

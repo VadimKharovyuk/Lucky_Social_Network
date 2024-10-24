@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="30">
     <title>Чат - Lucky Social Network</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -147,7 +148,7 @@
             flex-direction: column;
             height: calc(600px - 130px); /* Высота чата минус высота header и form */
         }
-        
+
 
         .chat-header h1 {
             font-size: 18px;
@@ -183,15 +184,6 @@
             }
         }
 
-        .message.sender {
-            float: right;
-            margin-left: auto;
-        }
-
-        .message.recipient {
-            float: left;
-            margin-right: auto;
-        }
 
         .message-content {
             padding: 12px 16px;
@@ -290,6 +282,32 @@
                 display: none;
             }
         }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth; /* Добавляем плавную прокрутку */
+        }
+
+        .message {
+            max-width: 70%;
+            margin-bottom: 12px;
+            clear: both;
+        }
+
+        .message.sender {
+            float: right;
+            margin-left: auto;
+        }
+
+        .message.recipient {
+            float: left;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
@@ -348,26 +366,32 @@
     <main class="main-content">
         <div class="chat-container">
             <div class="chat-header">
+                <div th:if="${error}" class="alert alert-danger" role="alert"
+                     style="margin: 10px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px;">
+                    <span th:text="${error}"></span>
+                </div>
                 <i class="fas fa-user-circle fa-2x"></i>
                 <h1>Чат с <span th:text="${recipient.username}"></span></h1>
             </div>
 
-            <div class="chat-history" id="chatHistory">
+            <div class="chat-history" id="chatHistory" th:data-sender-id="${currentUser.id}"
+                 th:data-recipient-id="${recipient.id}">
                 <div th:each="message : ${chatHistory}"
-                     th:class="${message.sender.id == currentUser.id ? 'message sender' : 'message recipient'}">
+                     th:class="${message.sender.id == currentUser.id ? 'message sender' : 'message recipient'}"
+                     th:data-message-id="${message.id}">
                     <div class="message-content" th:text="${message.content}"></div>
                     <div class="timestamp" th:text="${#temporals.format(message.timestamp, 'dd-MM-yyyy HH:mm')}"></div>
                 </div>
+                <div id="bottom"></div>
             </div>
-
-            <form class="message-form" id="messageForm">
+            <form th:action="@{/chat/send}" method="post" class="message-form" id="messageForm">
                 <input type="hidden" name="senderId" th:value="${currentUser.id}">
                 <input type="hidden" name="recipientId" th:value="${recipient.id}">
                 <div class="message-input-container">
-                        <textarea name="content"
-                                  required
-                                  placeholder="Введите сообщение..."
-                                  rows="1"></textarea>
+        <textarea name="content"
+                  required
+                  placeholder="Введите сообщение..."
+                  rows="1"></textarea>
                 </div>
                 <button type="submit" class="send-button">
                     <i class="fas fa-paper-plane"></i>
@@ -375,282 +399,216 @@
                 </button>
             </form>
         </div>
+
+        <!-- Debug info -->
+        <div style="display: none;">
+            <p>CurrentUser ID: <span th:text="${currentUser.id}"></span></p>
+            <p>CurrentUser Name: <span th:text="${currentUser.username}"></span></p>
+            <p>Recipient ID: <span th:text="${recipient.id}"></span></p>
+            <p>Recipient Name: <span th:text="${recipient.username}"></span></p>
+        </div>
     </main>
+
 </div>
 </body>
-
-<!-- Обновленный JavaScript -->
-<script th:inline="javascript">
+<script>
     document.addEventListener('DOMContentLoaded', function () {
         const chatHistory = document.getElementById('chatHistory');
-        const form = document.getElementById('messageForm');
-        const textarea = form.querySelector('textarea');
-        const senderId = document.querySelector('input[name="senderId"]').value;
-        const recipientId = document.querySelector('input[name="recipientId"]').value;
+        const senderId = chatHistory.dataset.senderId;
+        const recipientId = chatHistory.dataset.recipientId;
+        let lastMessageId = getLastMessageId();
 
-        let socket = null;
+        // Первоначальная прокрутка
+        scrollToBottom();
+
+        // Функция получения ID последнего сообщения
+        function getLastMessageId() {
+            const messages = chatHistory.querySelectorAll('[data-message-id]');
+            return messages.length > 0
+                ? messages[messages.length - 1].dataset.messageId
+                : '0';
+        }
+
+        // Функция прокрутки
+        function scrollToBottom() {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // Обработка формы
+        const messageForm = document.getElementById('messageForm');
+        messageForm.addEventListener('submit', function (e) {
+            const textarea = this.querySelector('textarea');
+            const content = textarea.value.trim();
+
+            if (!content) {
+                e.preventDefault();
+                return;
+            }
+
+            // Сохраняем форму
+            const form = this;
+
+            // Отправляем форму программно
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            }).then(() => {
+                // Очищаем textarea
+                textarea.value = '';
+                textarea.style.height = 'auto';
+
+                // Обновляем чат и прокручиваем вниз
+                fetch(`/chat/${senderId}/${recipientId}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newChatHistory = doc.getElementById('chatHistory');
+
+                        if (newChatHistory) {
+                            chatHistory.innerHTML = newChatHistory.innerHTML;
+                            lastMessageId = getLastMessageId();
+                            scrollToBottom();
+                        }
+                    });
+            }).catch(error => {
+                console.error('Error sending message:', error);
+            });
+
+            // Предотвращаем стандартную отправку формы
+            e.preventDefault();
+        });
+
+        // Обработка Enter для отправки
+        const textarea = messageForm.querySelector('textarea');
+        textarea.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (this.value.trim()) {
+                    messageForm.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
 
         // Автоматическая регулировка высоты textarea
         textarea.addEventListener('input', function () {
             this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
-            this.rows = this.value.split('\n').length;
-        });
-
-        function connectWebSocket() {
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            socket = new WebSocket(`${protocol}//${window.location.host}/chat?userId=${senderId}`);
-
-            socket.onopen = () => {
-                console.log('WebSocket connected');
-            };
-
-            socket.onmessage = (event) => {
-                const message = event.data;
-                console.log('Received message:', message);
-
-                if (message.startsWith('Error:')) {
-                    console.error(message);
-                    return;
-                }
-
-                if (message.startsWith('Message from user')) {
-                    const [_, userId, content] = message.match(/Message from user (\d+): (.+)/);
-                    // Проверяем, что это сообщение от собеседника
-                    if (userId === recipientId) {
-                        addMessageToChat(content, 'recipient');
-                    }
-                }
-            };
-
-            socket.onclose = () => {
-                console.log('WebSocket disconnected');
-                setTimeout(connectWebSocket, 5000);
-            };
-        }
-
-        function addMessageToChat(content, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.textContent = content;
-            messageDiv.appendChild(contentDiv);
-
-            const timestampDiv = document.createElement('div');
-            timestampDiv.className = 'timestamp';
-            timestampDiv.textContent = new Date().toLocaleString('ru-RU', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            messageDiv.appendChild(timestampDiv);
-
-            chatHistory.appendChild(messageDiv);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-
-        // Инициализация
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-        connectWebSocket();
-
-        // Обработка отправки сообщения
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const content = textarea.value.trim();
-            if (!content || !socket || socket.readyState !== WebSocket.OPEN) {
-                return;
-            }
-
-            // Отправка сообщения через WebSocket
-            socket.send(`${recipientId}:${content}`);
-
-            // Добавление сообщения в чат
-            addMessageToChat(content, 'sender');
-
-            // Очистка поля ввода
-            textarea.value = '';
-            textarea.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
         });
     });
 </script>
+
 </html>
-
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
-<!--<head>-->
-<!--    <title>Чат - Lucky Social Network</title>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
-<!--    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">-->
-<!--    <style>-->
-<!--        body {-->
-<!--            font-family: 'Poppins', sans-serif;-->
-<!--            background: #f0f2f5;-->
-<!--            color: #1c1e21;-->
-<!--            min-height: 100vh;-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--        }-->
-<!--        .main-container {-->
-<!--            flex: 1;-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--            justify-content: center;-->
-<!--            padding: 2rem 0;-->
-<!--        }-->
-<!--        .chat-container {-->
-<!--            background: #fff;-->
-<!--            border-radius: 8px;-->
-<!--            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);-->
-<!--            padding: 1.5rem;-->
-<!--            width: 100%;-->
-<!--            max-width: 800px;-->
-<!--        }-->
-<!--        header {-->
-<!--            background-color: #4267B2;-->
-<!--            position: fixed;-->
-<!--            width: 100%;-->
-<!--            top: 0;-->
-<!--            z-index: 1000;-->
-<!--            padding: 0.75rem 0;-->
-<!--        }-->
-<!--        header .container {-->
-<!--            display: flex;-->
-<!--            justify-content: space-between;-->
-<!--            align-items: center;-->
-<!--            color: #fff;-->
-<!--        }-->
-<!--        .logo {-->
-<!--            font-size: 1.5rem;-->
-<!--            font-weight: 600;-->
-<!--        }-->
-<!--        nav ul {-->
-<!--            display: flex;-->
-<!--            list-style: none;-->
-<!--            margin: 0;-->
-<!--            padding: 0;-->
-<!--        }-->
-<!--        nav ul li {-->
-<!--            margin-left: 1.5rem;-->
-<!--        }-->
-<!--        nav ul li a {-->
-<!--            text-decoration: none;-->
-<!--            color: #fff;-->
-<!--            font-weight: 400;-->
-<!--            transition: all 0.3s ease;-->
-<!--        }-->
-<!--        nav ul li a:hover {-->
-<!--            color: #dfe3ee;-->
-<!--        }-->
-<!--        h1 {-->
-<!--            color: #4267B2;-->
-<!--            font-weight: 600;-->
-<!--            margin-bottom: 1rem;-->
-<!--        }-->
-<!--        .chat-history {-->
-<!--            height: 400px;-->
-<!--            overflow-y: auto;-->
-<!--            border: 1px solid #ddd;-->
-<!--            padding: 10px;-->
-<!--            margin-bottom: 20px;-->
-<!--            border-radius: 4px;-->
-<!--        }-->
-<!--        .message {-->
-<!--            margin-bottom: 10px;-->
-<!--            padding: 10px;-->
-<!--            border-radius: 18px;-->
-<!--            max-width: 70%;-->
-<!--        }-->
-<!--        .sender {-->
-<!--            background-color: #e7f3ff;-->
-<!--            text-align: right;-->
-<!--            margin-left: auto;-->
-<!--            color: #333;-->
-<!--        }-->
-<!--        .recipient {-->
-<!--            background-color: #f0f2f5;-->
-<!--            color: #333;-->
-<!--        }-->
-<!--        .timestamp {-->
-<!--            font-size: 0.8em;-->
-<!--            color: #777;-->
-<!--            margin-top: 5px;-->
-<!--        }-->
-<!--        .message-form textarea {-->
-<!--            width: 100%;-->
-<!--            padding: 10px;-->
-<!--            border: 1px solid #ddd;-->
-<!--            border-radius: 18px;-->
-<!--            resize: vertical;-->
-<!--            min-height: 60px;-->
-<!--            background-color: #fff;-->
-<!--            color: #333;-->
-<!--        }-->
-<!--        .message-form button {-->
-<!--            margin-top: 10px;-->
-<!--            padding: 10px 20px;-->
-<!--            background-color: #4267B2;-->
-<!--            color: #fff;-->
-<!--            border: none;-->
-<!--            border-radius: 18px;-->
-<!--            cursor: pointer;-->
-<!--            transition: all 0.3s ease;-->
-<!--            font-weight: 600;-->
-<!--        }-->
-<!--        .message-form button:hover {-->
-<!--            background-color: #365899;-->
-<!--            transform: translateY(-2px);-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--<header>-->
-<!--    <div class="container">-->
-<!--        <div class="logo">Lucky Social Network</div>-->
-<!--        <nav>-->
-<!--            <ul>-->
-<!--                <li><a href="/home">Моя страница</a></li>-->
-<!--                <li><a href="/users/friends">Друзья</a></li>-->
-<!--                <li><a href="/chat/list">Мои Сообщения</a></li>-->
-<!--                <li><a href="/settings">Настройки</a></li>-->
-<!--            </ul>-->
-<!--        </nav>-->
-<!--    </div>-->
-<!--</header>-->
-
-<!--<div class="main-container">-->
-<!--    <div class="chat-container">-->
-<!--        <h1>Чат с <span th:text="${recipient.username}"></span></h1>-->
-
-<!--        <div class="chat-history" id="chatHistory">-->
-<!--            <div th:each="message : ${chatHistory}"-->
-<!--                 th:class="${message.sender.id == sender.id ? 'message sender' : 'message recipient'}">-->
-<!--                <div th:text="${message.content}"></div>-->
-<!--                <div class="timestamp" th:text="${#temporals.format(message.timestamp, 'dd-MM-yyyy HH:mm')}"></div>-->
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        <form class="message-form" th:action="@{/chat/send}" method="post">-->
-<!--            <input type="hidden" name="senderId" th:value="${sender.id}">-->
-<!--            <input type="hidden" name="recipientId" th:value="${recipient.id}">-->
-<!--            <textarea name="content" rows="3" required placeholder="Введите ваше сообщение здесь..."></textarea>-->
-<!--            <button type="submit">Отправить</button>-->
-<!--        </form>-->
-<!--    </div>-->
-<!--</div>-->
-
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!-- Обновленный JavaScript -->
 <!--<script>-->
-<!--    document.addEventListener('DOMContentLoaded', function() {-->
-<!--        var chatHistory = document.getElementById('chatHistory');-->
+<!--    document.addEventListener('DOMContentLoaded', function () {-->
+<!--        const chatHistory = document.getElementById('chatHistory');-->
+<!--        const form = document.getElementById('messageForm');-->
+<!--        const textarea = form.querySelector('textarea');-->
+<!--        const senderId = document.querySelector('input[name="senderId"]').value;-->
+<!--        const recipientId = document.querySelector('input[name="recipientId"]').value;-->
+
+<!--        let socket = null;-->
+<!--        let reconnectAttempts = 0;-->
+<!--        const MAX_RECONNECT_ATTEMPTS = 5;-->
+
+<!--        function connectWebSocket() {-->
+<!--            if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {-->
+<!--                console.error('Max reconnection attempts reached');-->
+<!--                return;-->
+<!--            }-->
+
+<!--            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';-->
+<!--            socket = new WebSocket(`${protocol}//${window.location.host}/chat?userId=${senderId}`);-->
+
+<!--            socket.onopen = () => {-->
+<!--                console.log('WebSocket connected');-->
+<!--                reconnectAttempts = 0;-->
+<!--            };-->
+
+<!--            socket.onmessage = (event) => {-->
+<!--                try {-->
+<!--                    const data = JSON.parse(event.data);-->
+
+<!--                    if (data.type === 'error') {-->
+<!--                        console.error('Server error:', data.message);-->
+<!--                        return;-->
+<!--                    }-->
+
+<!--                    if (data.type === 'message') {-->
+<!--                        // Проверяем, что сообщение от нужного собеседника-->
+<!--                        if (data.senderId.toString() === recipientId) {-->
+<!--                            addMessageToChat(data.content, 'recipient', data.timestamp);-->
+<!--                        }-->
+<!--                    }-->
+<!--                } catch (e) {-->
+<!--                    console.error('Error processing message:', e);-->
+<!--                }-->
+<!--            };-->
+
+<!--            socket.onclose = () => {-->
+<!--                console.log('WebSocket disconnected');-->
+<!--                reconnectAttempts++;-->
+<!--                setTimeout(connectWebSocket, 5000);-->
+<!--            };-->
+
+<!--            socket.onerror = (error) => {-->
+<!--                console.error('WebSocket error:', error);-->
+<!--            };-->
+<!--        }-->
+
+<!--        function addMessageToChat(content, type, timestamp) {-->
+<!--            const messageDiv = document.createElement('div');-->
+<!--            messageDiv.className = `message ${type}`;-->
+
+<!--            const contentDiv = document.createElement('div');-->
+<!--            contentDiv.className = 'message-content';-->
+<!--            contentDiv.textContent = content;-->
+<!--            messageDiv.appendChild(contentDiv);-->
+
+<!--            const timestampDiv = document.createElement('div');-->
+<!--            timestampDiv.className = 'timestamp';-->
+<!--            timestampDiv.textContent = timestamp || new Date().toLocaleString('ru-RU', {-->
+<!--                day: '2-digit',-->
+<!--                month: '2-digit',-->
+<!--                year: 'numeric',-->
+<!--                hour: '2-digit',-->
+<!--                minute: '2-digit'-->
+<!--            });-->
+<!--            messageDiv.appendChild(timestampDiv);-->
+
+<!--            chatHistory.appendChild(messageDiv);-->
+<!--            chatHistory.scrollTop = chatHistory.scrollHeight;-->
+<!--        }-->
+
+<!--        // Инициализация-->
 <!--        chatHistory.scrollTop = chatHistory.scrollHeight;-->
+<!--        connectWebSocket();-->
+
+<!--        // Обработка отправки сообщения-->
+<!--        form.addEventListener('submit', function (e) {-->
+<!--            e.preventDefault();-->
+
+<!--            const content = textarea.value.trim();-->
+<!--            if (!content || !socket || socket.readyState !== WebSocket.OPEN) {-->
+<!--                return;-->
+<!--            }-->
+
+<!--            // Отправка сообщения через WebSocket-->
+<!--            socket.send(`${recipientId}:${content}`);-->
+
+<!--            // Добавление сообщения в чат на стороне отправителя-->
+<!--            addMessageToChat(content, 'sender');-->
+
+<!--            // Очистка поля ввода-->
+<!--            textarea.value = '';-->
+<!--            textarea.style.height = 'auto';-->
+<!--        });-->
 <!--    });-->
 <!--</script>-->
-<!--</body>-->
 <!--</html>-->

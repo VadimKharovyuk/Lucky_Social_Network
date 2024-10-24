@@ -59,4 +59,6 @@ public class RedisConfig {
                 .cacheDefaults(cacheConfiguration)
                 .build();
     }
+
+
 }

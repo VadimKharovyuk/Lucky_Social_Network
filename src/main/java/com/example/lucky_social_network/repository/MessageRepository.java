@@ -16,10 +16,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE " +
             "(m.sender.id = :senderId AND m.recipient.id = :recipientId) OR " +
             "(m.sender.id = :recipientId AND m.recipient.id = :senderId) " +
-            "ORDER BY m.timestamp")
+            "ORDER BY m.timestamp ASC")
     List<Message> findChatHistory(@Param("senderId") Long senderId,
                                   @Param("recipientId") Long recipientId);
-
 
     @Modifying
     @Query("DELETE FROM Message m WHERE m.sender = :user OR m.recipient = :user")

@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -23,54 +24,47 @@ public class ChatController {
     private final ChatService chatService;
     private final UserService userService;
 
+
     @GetMapping("/{senderId}/{recipientId}")
     public String getChatPage(@PathVariable Long senderId,
                               @PathVariable Long recipientId,
                               Model model) {
-        User currentUser = userService.getCurrentUser(); // текущий пользователь
+        User currentUser = userService.getUserById(senderId);
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
         User recipient = userService.getUserById(recipientId);
+        if (recipient == null) {
+            return "redirect:/messages";
+        }
+
+        // Проверяем, что пользователь не пытается отправить сообщение самому себе
+        if (currentUser.getId().equals(recipientId)) {
+            return "redirect:/messages";
+        }
+
         List<Message> chatHistory = chatService.getChatHistory(senderId, recipientId);
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("recipient", recipient);
         model.addAttribute("chatHistory", chatHistory);
-        model.addAttribute("newMessage", new Message());
 
         return "chat";
     }
 
-
-//    @GetMapping("/{senderId}/{recipientId}")
-//    public String getChatPage(@PathVariable Long senderId,
-//                              @PathVariable Long recipientId,
-//                              Model model) {
-//        User sender = userService.getUserById(senderId);
-//        User recipient = userService.getUserById(recipientId);
-//        List<Message> chatHistory = chatService.getChatHistory(senderId, recipientId);
-//        User currentUser = userService.getCurrentUser();
-//
-//        model.addAttribute("sender", sender);
-//        model.addAttribute("recipient", recipient);
-//        model.addAttribute("chatHistory", chatHistory);
-//        model.addAttribute("newMessage", new Message());
-//        model.addAttribute("currentUser", currentUser);
-//
-//        return "chat";
-//    }
-
     @PostMapping("/send")
-    public String sendMessage(@ModelAttribute("newMessage") Message newMessage,
-                              @RequestParam Long senderId,
-                              @RequestParam Long recipientId) {
-        chatService.sendMessage(senderId, recipientId, newMessage.getContent());
-        return "redirect:/chat/" + senderId + "/" + recipientId;
-    }
-
-
-    @GetMapping("/start/{recipientId}")
-    public String startNewChat(@PathVariable Long recipientId) {
-        Long currentUserId = getCurrentUserId();
-        return "redirect:/chat/" + currentUserId + "/" + recipientId;
+    public String sendMessage(@RequestParam("content") String content,
+                              @RequestParam("senderId") Long senderId,
+                              @RequestParam("recipientId") Long recipientId,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            chatService.sendMessage(senderId, recipientId, content);
+            return "redirect:/chat/" + senderId + "/" + recipientId + "#bottom";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Не удалось отправить сообщение");
+            return "redirect:/chat/" + senderId + "/" + recipientId;
+        }
     }
 
 
@@ -83,6 +77,12 @@ public class ChatController {
         model.addAttribute("chatUsers", chatUsers);
         model.addAttribute("currentUser", currentUser);
         return "chatList";  // Возвращаем имя шаблона
+    }
+
+    @GetMapping("/start/{recipientId}")
+    public String startNewChat(@PathVariable Long recipientId) {
+        Long currentUserId = getCurrentUserId();
+        return "redirect:/chat/" + currentUserId + "/" + recipientId;
     }
 
 
