@@ -36,4 +36,12 @@ public class Message implements Serializable {
     private LocalDateTime timestamp;
 
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean deletedForSender = false;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean deletedForRecipient = false;
+    private LocalDateTime deletedAt;
+
+
 }

@@ -60,13 +60,6 @@ public class ModeratorController {
     }
 
 
-    @PostMapping("/message/{messageId}/delete")
-    public String deleteMessage(@PathVariable Long messageId, @RequestParam Long user1Id, @RequestParam Long user2Id) {
-        chatService.deleteMessage(messageId);
-        log.info("Message {} deleted by moderator", messageId);
-        return "redirect:/moderator/chat-history?user1Id=" + user1Id + "&user2Id=" + user2Id;
-    }
-
     @PostMapping("/user/{userId}/warn")
     public String warnUser(@PathVariable Long userId, @RequestParam Long otherUserId) {
         chatService.warnUser(userId);

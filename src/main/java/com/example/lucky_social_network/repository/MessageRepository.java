@@ -12,13 +12,14 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
+    @Query("SELECT m FROM Message m " +
+            "WHERE ((m.sender.id = :userId AND m.deletedForSender = false) OR " +
+            "(m.recipient.id = :userId AND m.deletedForRecipient = false)) AND " +
+            "((m.sender.id = :partnerId) OR (m.recipient.id = :partnerId)) " +
+            "ORDER BY m.timestamp")
+    List<Message> findAvailableChatHistory(@Param("userId") Long userId,
+                                           @Param("partnerId") Long partnerId);
 
-    @Query("SELECT m FROM Message m WHERE " +
-            "(m.sender.id = :senderId AND m.recipient.id = :recipientId) OR " +
-            "(m.sender.id = :recipientId AND m.recipient.id = :senderId) " +
-            "ORDER BY m.timestamp ASC")
-    List<Message> findChatHistory(@Param("senderId") Long senderId,
-                                  @Param("recipientId") Long recipientId);
 
     @Modifying
     @Query("DELETE FROM Message m WHERE m.sender = :user OR m.recipient = :user")

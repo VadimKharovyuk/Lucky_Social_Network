@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="30">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>Чат - Lucky Social Network</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -308,6 +309,70 @@
             float: left;
             margin-right: auto;
         }
+
+        .message-actions {
+            transition: opacity 0.2s ease-in-out;
+            opacity: 0;
+        }
+
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+
+        .btn-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .message.deleted {
+            animation: fadeOut 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                height: 0;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        message-actions {
+            display: none;
+            position: absolute;
+            right: 5px;
+            top: 5px;
+        }
+
+        .message:hover .message-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .message {
+            position: relative;
+        }
+
+        .btn-link {
+            padding: 0;
+            margin: 0;
+            color: #dc3545;
+        }
+
+        .btn-link:hover {
+            color: #c82333;
+        }
+
+        .delete-history-form {
+            margin-left: auto;
+            margin-right: 10px;
+        }
+
+        .alert {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -370,8 +435,22 @@
                      style="margin: 10px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px;">
                     <span th:text="${error}"></span>
                 </div>
+                <div th:if="${success}" class="alert alert-success" role="alert"
+                     style="margin: 10px; padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">
+                    <span th:text="${success}"></span>
+                </div>
                 <i class="fas fa-user-circle fa-2x"></i>
                 <h1>Чат с <span th:text="${recipient.username}"></span></h1>
+                <!-- Добавляем кнопку удаления истории -->
+                <form th:action="@{/chat/delete-history}" method="post" class="delete-history-form"
+                      style="float: right;">
+                    <input type="hidden" name="userId" th:value="${currentUser.id}">
+                    <input type="hidden" name="partnerId" th:value="${recipient.id}">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Вы уверены, что хотите удалить историю чата?')">
+                        <i class="fas fa-trash"></i> Удалить историю
+                    </button>
+                </form>
             </div>
 
             <div class="chat-history" id="chatHistory" th:data-sender-id="${currentUser.id}"
@@ -379,33 +458,56 @@
                 <div th:each="message : ${chatHistory}"
                      th:class="${message.sender.id == currentUser.id ? 'message sender' : 'message recipient'}"
                      th:data-message-id="${message.id}">
-                    <div class="message-content" th:text="${message.content}"></div>
+                    <div class="message-content">
+                        <div th:text="${message.content}"></div>
+                        <div class="message-actions">
+                            <!-- Кнопки удаления для отдельных сообщений -->
+                            <form th:action="@{/chat/message/{messageId}/delete(messageId=${message.id})}"
+                                  method="post" style="display: inline;">
+                                <input type="hidden" name="userId" th:value="${currentUser.id}"/>
+                                <input type="hidden" name="recipientId" th:value="${recipient.id}"/>
+                                <!-- Добавляем recipientId -->
+                                <input type="hidden" name="forEveryone" value="false"/>
+                                <button type="submit" class="btn btn-link btn-sm text-danger"
+                                        onclick="return confirm('Удалить сообщение для себя?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+
+                            <!-- Кнопка "Удалить для всех" -->
+                            <form th:if="${message.sender.id == currentUser.id}"
+                                  th:action="@{/chat/message/{messageId}/delete(messageId=${message.id})}"
+                                  method="post" style="display: inline;">
+                                <input type="hidden" name="userId" th:value="${currentUser.id}"/>
+                                <input type="hidden" name="recipientId" th:value="${recipient.id}"/>
+                                <!-- Добавляем recipientId -->
+                                <input type="hidden" name="forEveryone" value="true"/>
+                                <button type="submit" class="btn btn-link btn-sm text-danger"
+                                        onclick="return confirm('Удалить сообщение для всех?')">
+                                    <i class="fas fa-trash"></i> Для всех
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                     <div class="timestamp" th:text="${#temporals.format(message.timestamp, 'dd-MM-yyyy HH:mm')}"></div>
                 </div>
                 <div id="bottom"></div>
             </div>
+
             <form th:action="@{/chat/send}" method="post" class="message-form" id="messageForm">
                 <input type="hidden" name="senderId" th:value="${currentUser.id}">
                 <input type="hidden" name="recipientId" th:value="${recipient.id}">
                 <div class="message-input-container">
-        <textarea name="content"
-                  required
-                  placeholder="Введите сообщение..."
-                  rows="1"></textarea>
+            <textarea name="content"
+                      required
+                      placeholder="Введите сообщение..."
+                      rows="1"></textarea>
                 </div>
                 <button type="submit" class="send-button">
                     <i class="fas fa-paper-plane"></i>
                     Отправить
                 </button>
             </form>
-        </div>
-
-        <!-- Debug info -->
-        <div style="display: none;">
-            <p>CurrentUser ID: <span th:text="${currentUser.id}"></span></p>
-            <p>CurrentUser Name: <span th:text="${currentUser.username}"></span></p>
-            <p>Recipient ID: <span th:text="${recipient.id}"></span></p>
-            <p>Recipient Name: <span th:text="${recipient.username}"></span></p>
         </div>
     </main>
 
