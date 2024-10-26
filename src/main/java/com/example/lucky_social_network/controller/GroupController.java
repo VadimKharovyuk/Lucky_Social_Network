@@ -114,29 +114,6 @@ public class GroupController {
         return "groups/view";
     }
 
-//    @GetMapping("/{groupId}")
-//    public String showGroup(@PathVariable Long groupId, Model model) {
-//        Group group = groupService.getGroupById(groupId);
-//        User currentUser = userService.getCurrentUser();
-//
-//        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
-//        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
-//        boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
-//
-//        // Получаем посты группы, отсортированные по дате (самые новые первые)
-//        List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
-//
-//        model.addAttribute("group", group);
-//        model.addAttribute("posts", posts);  // Добавляем посты в модель
-//        model.addAttribute("currentUser", currentUser);
-//        model.addAttribute("isMember", isMember);
-//        model.addAttribute("canPost", canPost);
-//        model.addAttribute("isOwner", isOwner);
-//
-//        return "groups/view";
-//    }
-
-
     // Метод для отображения фото группы
     @GetMapping("/{groupId}/photo")
     @ResponseBody
@@ -174,17 +151,6 @@ public class GroupController {
         }
     }
 
-//    @GetMapping("/{groupId}/photo")
-//    public ResponseEntity<byte[]> getGroupPhoto(@PathVariable Long groupId) {
-//        byte[] photoBytes = groupService.getGroupPhoto(groupId);
-//        if (photoBytes != null) {
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.IMAGE_JPEG); // или другой подходящий тип
-//            return new ResponseEntity<>(photoBytes, headers, HttpStatus.OK);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
 
     @PostMapping("/update/{groupId}")
     public String updateGroup(
@@ -266,7 +232,7 @@ public class GroupController {
         User currentUser;
         currentUser = userService.getCurrentUser();
         groupService.createGroup(group, currentUser);
-        return "redirect:/groups";
+        return "redirect:/groups/my";
     }
 
 
@@ -311,15 +277,18 @@ public class GroupController {
 
         return "redirect:/groups/" + groupId;
     }
-//    @PostMapping("/{groupId}/post")
-//    public String createPost(@PathVariable Long groupId, @RequestParam String content) {
-//        Group group = groupService.getGroupById(groupId);
-//        User currentUser = userService.getCurrentUser();
-//
-//        groupService.createPost(group, currentUser, content);
-//
-//        return "redirect:/groups/" + groupId;
-//    }
+
+    @PostMapping("/delete/{groupId}")
+    public String deleteGroup(@PathVariable Long groupId) {
+        Group group = groupService.getGroupById(groupId);
+        User currentUser = userService.getCurrentUser();
+        // Проверяем, является ли текущий пользователь владельцем группы
+        if (!group.getOwner().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Only group owner can delete the group");
+        }
+        groupService.deleteGroupById(groupId);
+        return "redirect:/groups/all";
+    }
 
 
 }

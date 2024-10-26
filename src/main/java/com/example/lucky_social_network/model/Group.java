@@ -24,8 +24,7 @@ public class Group {
     @Column(nullable = false)
     private String name;
 
-    //    @Lob
-//    @Column(columnDefinition = "TEXT")
+  
     @Column(length = 2500)
     private String description;
 

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <title>Профиль пользователя - Lucky Social Network</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles */
+        :root {
+            --primary-color: #1877f2;
+            --secondary-color: #42b72a;
+            --text-primary: #1c1e21;
+            --text-secondary: #65676b;
+            --background-main: #f0f2f5;
+            --background-card: #ffffff;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-main);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Keeping original navbar styles */
+        .navbar {
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        /* Main container layout */
+        .main-container {
+            margin-top: 70px;
+            padding: var(--spacing-md);
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--spacing-lg);
+            max-width: 1440px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Profile card section */
+        .profile-card {
+            background: var(--background-card);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            position: relative;
+            padding-top: 200px;
+        }
+
+        .profile-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to right, #1cb5e0, #000046);
+        }
+
+        .profile-avatar-wrapper {
+            position: absolute;
+            bottom: -60px;
+            left: var(--spacing-lg);
+            padding: var(--spacing-xs);
+            background: var(--background-card);
+            border-radius: 50%;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            padding: calc(60px + var(--spacing-lg)) var(--spacing-lg) var(--spacing-lg);
+        }
+
+        .profile-main-info {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .profile-name-wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .verified-badge {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+
+        .profile-status {
+            display: flex;
+            align-items: center
+        }
+
+        .profile-status {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+        }
+
+        .status-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Profile details */
+        .profile-details {
+            padding: var(--spacing-md) 0;
+            border-top: 1px solid var(--background-main);
+            border-bottom: 1px solid var(--background-main);
+            margin: var(--spacing-md) 0;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-secondary);
+        }
+
+        .detail-item i {
+            width: 20px;
+            color: var(--primary-color);
+        }
+
+        .detail-item.bio {
+            margin-top: var(--spacing-md);
+        }
+
+        /* Profile stats */
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: var(--spacing-md) 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Profile actions */
+        .profile-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-sm);
+            border: none;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-action.primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-action.primary:hover {
+            background-color: #166fe5;
+        }
+
+        .btn-action.secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-action.secondary:hover {
+            background-color: #36a420;
+        }
+
+        /* Photos section */
+        .photos-section {
+            background: var(--background-card);
+            border-radius: var(--radius-md);
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .section-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .albums-count {
+            color: var(--text-secondary);
+        }
+
+        .btn-create {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .btn-create:hover {
+            background-color: #166fe5;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        /* Posts section */
+        .posts-section {
+            margin-top: var(--spacing-lg);
+        }
+
+        .create-post {
+            background: var(--background-card);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .post-input-wrapper {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .post-input {
+            width: 100%;
+            min-height: 100px;
+            padding: var(--spacing-md);
+            border: 1px solid var(--background-main);
+            border-radius: var(--radius-sm);
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .post-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .btn-attachment,
+        .btn-location {
+            background: none;
+            border: none;
+            padding: var(--spacing-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: background-color 0.2s;
+        }
+
+        .btn-attachment:hover,
+        .btn-location:hover {
+            background-color: var(--background-main);
+            color: var(--primary-color);
+        }
+
+        .btn-submit {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #166fe5;
+        }
+
+        .location-fields {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-sm);
+            background-color: var(--background-main);
+            border-radius: var(--radius-sm);
+        }
+
+        .location-fields input[type="text"] {
+            width: 100%;
+            padding: var(--spacing-sm);
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        #locationStatus {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 240px 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .left-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-actions {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .photos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 576px) {
+            .profile-stats {
+                flex-wrap: wrap;
+                gap: var(--spacing-md);
+            }
+
+            .stat-item {
+                width: calc(50% - var(--spacing-md));
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Сохраняем оригинальный header -->
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Lucky Social Network</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">На главную</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users/friends">Друзья</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat/list">Сообщения</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/settings">Настройки</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Выйти</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="main-container">
+    <!-- Сохраняем оригинальный aside -->
+    <aside class="left-sidebar">
+        <nav class="side-nav">
+            <a th:href="@{/profile/{id}(id=${currentUser.id})}" class="side-nav-link">
+                <i class="fas fa-user"></i>
+                <span>Моя Страница</span>
+            </a>
+            <a href="/users/friends" class="side-nav-link">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+            </a>
+            <a href="/albums" class="side-nav-link">
+                <i class="fas fa-images"></i>
+                <span>Мои Фото</span>
+            </a>
+            <a href="/chat/list" class="side-nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Сообщения</span>
+            </a>
+            <a href="/posts" class="side-nav-link">
+                <i class="fas fa-newspaper"></i>
+                <span>Новости</span>
+            </a>
+            <a href="/groups/my" class="side-nav-link">
+                <i class="fas fa-users-rectangle"></i>
+                <span>Группы</span>
+            </a>
+            <div class="side-nav-link notifications">
+                <a href="/notifications" class="notification-link">
+                    <i class="fas fa-bell"></i>
+                    <span>Уведомления</span>
+                    <span th:if="${notificationCount > 0}" class="notification-badge"
+                          th:text="${notificationCount}"></span>
+                </a>
+                <ul class="notification-list" th:if="${recentNotifications != null and !recentNotifications.empty}">
+                    <li th:each="notification : ${recentNotifications}" class="notification-item">
+                        <a th:href="@{/notifications/{id}(id=${notification.id})}"
+                           th:text="${notification.message}"></a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Обновленный контент профиля -->
+    <main class="profile-content">
+        <section class="profile-card">
+            <div class="profile-header">
+                <div class="profile-cover"></div>
+                <div class="profile-avatar-wrapper">
+                    <img th:if="${avatarUrl != null}" th:src="${avatarUrl}" alt="User Avatar" class="profile-avatar">
+                    <img th:unless="${avatarUrl != null}" src="/path/to/default/avatar.png" alt="Default Avatar"
+                         class="profile-avatar">
+                </div>
+            </div>
+
+            <div class="profile-info">
+                <div class="profile-main-info">
+                    <div class="profile-name-wrapper">
+                        <h1 class="profile-name">
+                                <span th:if="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}">
+                                    <span th:text="${user.firstName}"></span>
+                                    <span th:text="${user.lastName}"></span>
+                                </span>
+                            <span th:unless="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"
+                                  th:text="${'@' + user.username}"></span>
+                        </h1>
+                        <span th:if="${isEmailVerified}" class="verified-badge" title="Email подтвержден">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                    </div>
+                    <div class="profile-status">
+                        <span class="status-indicator"></span>
+                        <span class="status-text">Online</span>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}"></span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span th:text="${user.location}"></span>
+                    </div>
+                    <div class="detail-item bio">
+                        <i class="fas fa-info-circle"></i>
+                        <span th:text="${user.getBio()}"></span>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" th:text="${user.friendsCount}">0</span>
+                        <span class="stat-label">Друзья</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" th:text="${user.followersCount}">0</span>
+                        <span class="stat-label">Подписчики</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" th:text="${user.friendsCount + user.followersCount}">0</span>
+                        <span class="stat-label">Контакты</span>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <form th:if="${currentUser != null && user != null && currentUser.id != user.id && !isFriend}"
+                          th:action="@{/users/addFriend}" method="post" class="action-form">
+                        <input type="hidden" name="userId" th:value="${currentUser.id}">
+                        <input type="hidden" name="friendId" th:value="${user.id}">
+                        <button type="submit" class="btn-action primary">
+                            <i class="fas fa-user-plus"></i>
+                            Добавить в друзья
+                        </button>
+                    </form>
+                    <a th:if="${currentUser != null && user != null && currentUser.id != user.id}"
+                       th:href="@{/chat/start/{userId}(userId=${user.id})}"
+                       class="btn-action secondary">
+                        <i class="fas fa-envelope"></i>
+                        Отправить сообщение
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="photos-section">
+            <div class="section-header">
+                <h2>Альбомы</h2>
+                <div class="section-actions">
+                    <span th:if="${totalAlbums > 0}" class="albums-count" th:text="${totalAlbums + ' альбомов'}"></span>
+                    <a th:if="${user.id == currentUser.id}" href="/albums/create" class="btn-create">
+                        <i class="fas fa-plus"></i>
+                        Создать альбом
+                    </a>
+                </div>
+            </div>
+            <div class="photos-grid">
+                <!-- Album items -->
+            </div>
+        </section>
+
+        <section class="posts-section" th:if="${currentUser != null && currentUser.id == user.id}">
+            <div class="create-post">
+                <form th:action="@{/posts/create}" method="post" th:object="${postCreationDto}"
+                      enctype="multipart/form-data" class="post-form">
+                    <input type="hidden" name="userId" th:value="${user.id}"/>
+                    <div class="post-input-wrapper">
+                            <textarea th:field="*{content}" class="post-input"
+                                      placeholder="Что у вас нового?" maxlength="600"></textarea>
+                    </div>
+                    <div class="post-actions">
+                        <div class="action-buttons">
+                            <button type="button" class="btn-attachment"
+                                    onclick="document.getElementById('image').click()">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            <button type="button" class="btn-location" onclick="getLocation()">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </button>
+                            <input type="file" id="image" name="image" accept="image/*" hidden>
+                        </div>
+                        <button type="submit" class="btn-submit">Опубликовать</button>
+                    </div>
+                    <div class="location-fields" hidden>
+                        <input type="hidden" th:field="*{latitude}" id="latitude"/>
+                        <input type="hidden" th:field="*{longitude}" id="longitude"/>
+                        <input type="text" th:field="*{locationName}" id="locationName"
+                               placeholder="Название местоположения"/>
+                        <span id="locationStatus"></span>
+                    </div>
+                </form>
+            </div>
+
+            <div class="posts-list">
+                <!-- Existing posts loop -->
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="location.js"></script>
+</body>
+</html>

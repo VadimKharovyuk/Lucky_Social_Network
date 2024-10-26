@@ -1032,15 +1032,13 @@
                         </svg>
 
                         <span th:if="${post.originalGroupPost}">
+
     Reposted from group:
     <a th:if="${post.originalGroupPost.group}"
        th:href="@{/groups/{groupId}(groupId=${post.originalGroupPost.group.id})}"
        th:text="${post.originalGroupPost.group.name}"></a>
 </span>
-                        <!--                        <span>Reposted from group:-->
-                        <!--        <a th:href="@{/groups/{groupId}(groupId=${post.originalGroupPost.group.id})}"-->
-                        <!--           th:text="${post.originalGroupPost.group.name}"></a>-->
-                        <!--    </span>-->
+
                     </div>
                     <div class="post-image" th:if="${post.imageUrl != null}">
                         <img th:src="${post.imageUrl}" alt="Post image">

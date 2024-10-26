@@ -307,4 +307,24 @@ public class GroupService {
 
         return false;
     }
+
+    @Transactional
+    public Group deleteGroupById(Long groupId) {
+        Optional<Group> groupOptional = groupRepository.findById(groupId);
+
+        if (groupOptional.isPresent()) {
+            Group group = groupOptional.get();
+
+            // Очищаем связи
+            group.getMembers().clear();
+            group.getPosts().clear();
+
+            // Удаляем группу
+            groupRepository.delete(group);
+
+            return group;
+        } else {
+            throw new RuntimeException("Group not found with id: " + groupId);
+        }
+    }
 }

@@ -308,6 +308,16 @@
         <p>Тип: <span th:text="${group.type}"></span></p>
         <p>Участники: <span th:text="${group.membersCount}"></span></p>
         <a th:if="${isOwner}" th:href="@{/groups/update/{id}(id=${group.id})}" class="update-button">Обновить группу</a>
+        <form th:if="${isOwner}"
+              th:action="@{/groups/delete/{id}(id=${group.id})}"
+              method="post"
+              style="display: inline;">
+            <button type="submit"
+                    class="delete-button"
+                    onclick="return confirm('Вы уверены, что хотите удалить группу?')">
+                Удалить группу
+            </button>
+        </form>
     </div>
 
     <form th:if="${!isMember}" th:action="@{/groups/{id}/join(id=${group.id})}" method="post">
