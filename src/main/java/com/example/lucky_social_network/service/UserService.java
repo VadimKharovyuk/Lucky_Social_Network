@@ -45,8 +45,6 @@ public class UserService {
 
         UserCacheDTO dto = UserCacheDTO.fromUser(user);
 
-        // Проверяем роли после конвертации
-        log.info("User {} roles after conversion: {}", userId, dto.getRoles());
 
         return dto;
     }

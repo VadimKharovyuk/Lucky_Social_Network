@@ -14,7 +14,7 @@ public class LuckySocialNetworkApplication {
         SpringApplication.run(LuckySocialNetworkApplication.class, args);
     }
 
-    //убрать роль из кеша
+
     //настройки добавить навигацию
     //профиль добавить <adide>
 

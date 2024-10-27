@@ -4,7 +4,6 @@ import com.example.lucky_social_network.model.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
 
 @Slf4j
 @Data
@@ -44,11 +42,6 @@ public class UserCacheDTO implements Serializable {
     private Integer friendsCount;
     private Integer followersCount;
 
-    // Роли пользователя
-    @JsonProperty("roles")
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
-    @JsonSerialize(contentAs = String.class)
-    private List<String> roles;
 
     public static UserCacheDTO fromUser(User user) {
         UserCacheDTO dto = new UserCacheDTO();
@@ -77,16 +70,6 @@ public class UserCacheDTO implements Serializable {
         dto.setFriendsCount(user.getFriendsCount());
         dto.setFollowersCount(user.getFollowersCount());
 
-        // Роли
-        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-            List<String> roleNames = user.getRoles().stream()
-                    .map(Enum::name)
-                    .toList();
-            dto.setRoles(roleNames);
-            log.debug("Setting roles for user {}: {}", user.getId(), roleNames);
-        } else {
-            log.debug("No roles found for user {}", user.getId());
-        }
 
         return dto;
     }
