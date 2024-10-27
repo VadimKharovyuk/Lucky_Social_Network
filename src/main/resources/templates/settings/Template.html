@@ -199,9 +199,9 @@
                     
                 </div>
                 <div class="nav flex-column nav-pills" role="tablist">
-                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#profile">
-                        <i class="bi bi-person-fill me-2"></i>Профиль
-                    </button>
+
+                    <a th:href="@{/profile/{id}(id=${user.id})}" class="btn btn-primary">Профиль</a>
+
                     <button class="nav-link" data-bs-toggle="pill" data-bs-target="#security">
                         <i class="bi bi-shield-lock-fill me-2"></i>Безопасность
                     </button>
@@ -230,10 +230,6 @@
                             <h3 class="settings-title">Настройки профиля</h3>
                         </div>
                         <form>
-                            <div class="mb-3">
-                                <label class="form-label">Фото профиля</label>
-                                <input type="file" class="form-control" accept="image/*">
-                            </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Имя</label>
@@ -243,13 +239,38 @@
                                     <label class="form-label">Фамилия</label>
                                     <input type="text" class="form-control" th:value="${user.lastName}">
                                 </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">День Рождения</label>
+                                    <input type="text" class="form-control" th:value="${user.getDateOfBirth()}">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Почта</label>
+                                    <input type="text" class="form-control" th:value="${user.getEmail()}">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Место проживание</label>
+                                    <input type="text" class="form-control" th:value="${user.getLocation()}">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Номер мобильного</label>
+                                    <input type="text" class="form-control" th:value="${user.getPhone()}">
+                                </div>
+
+
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">О себе</label>
                                 <textarea class="form-control" rows="3" th:text="${user.bio}"></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+
+                            <a href="/profile" class="btn btn-primary">Изменить профиль</a>
+
                         </form>
+
                     </div>
                 </div>
 
@@ -502,46 +523,7 @@
     </div>
 </div>
 
-<!--&lt;!&ndash; Модальное окно для подтверждения изменений &ndash;&gt;-->
-<!--<div class="modal fade" id="confirmChanges" tabindex="-1">-->
-<!--    <div class="modal-dialog">-->
-<!--        <div class="modal-content bg-dark text-white">-->
-<!--            <div class="modal-header border-0">-->
-<!--                <h5 class="modal-title">Подтверждение изменений</h5>-->
-<!--                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>-->
-<!--            </div>-->
-<!--            <div class="modal-body">-->
-<!--                Вы уверены, что хотите сохранить изменения?-->
-<!--            </div>-->
-<!--            <div class="modal-footer border-0">-->
-<!--                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>-->
-<!--                <button type="button" class="btn btn-primary">Подтвердить</button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Обработка изменения аватара
-    document.querySelector('input[type="file"]').addEventListener('change', function (e) {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                document.querySelector('.avatar-preview img').src = event.target.result;
-            }
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    });
-
-    // // Подтверждение изменений
-    // document.querySelectorAll('form').forEach(form => {
-    //     form.addEventListener('submit', function (e) {
-    //         e.preventDefault();
-    //         const modal = new bootstrap.Modal(document.getElementById('confirmChanges'));
-    //         modal.show();
-    //     });
-    // });
-</script>
 </body>
 </html>

@@ -31,6 +31,7 @@ public class SettingsController {
         User user = userService.getCurrentUser();
         String avatarUrl = userService.getUserAvatarUrl(user);
 
+
         // Добавляем URL аватара в модель
         model.addAttribute("avatarUrl", avatarUrl);
         model.addAttribute("ticket", new SupportTicket());

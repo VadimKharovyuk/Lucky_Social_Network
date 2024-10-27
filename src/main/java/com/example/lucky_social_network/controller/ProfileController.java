@@ -37,10 +37,28 @@ public class ProfileController {
     private final AlbumService albumService;
 
 
+    //профиль пользователя
+    @GetMapping
+    public String getProfile(Authentication authentication, Model model) {
+        User user = userService.findByUsername(authentication.getName());
+
+        String avatarUrl = userService.getUserAvatarUrl(user);
+
+        // Добавляем URL аватара в модель, если он существует
+        if (avatarUrl != null) {
+            model.addAttribute("avatarUrl", avatarUrl);
+        }
+        model.addAttribute("avatarUrl", avatarUrl);
+        model.addAttribute("user", user);
+        return "profile";
+    }
+
+
     @PostMapping("/update")
     public String updateProfile(@ModelAttribute User updatedUser,
                                 @RequestParam("avatarFile") MultipartFile avatarFile,
                                 RedirectAttributes redirectAttributes) {
+        User user = userService.getCurrentUser();
         try {
             // Обновляем основную информацию пользователя
             userService.updateUser(updatedUser);
@@ -57,7 +75,7 @@ public class ProfileController {
             }
 
             redirectAttributes.addFlashAttribute("successMessage", "Профиль успешно обновлен.");
-            return "redirect:/profile";
+            return "redirect:/settings";
         } catch (IOException e) {
             log.error("Ошибка при чтении файла аватара: ", e);
             redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при загрузке аватара.");
@@ -125,21 +143,6 @@ public class ProfileController {
     }
 
 
-    //профиль пользователя
-    @GetMapping
-    public String getProfile(Authentication authentication, Model model) {
-        User user = userService.findByUsername(authentication.getName());
-
-        String avatarUrl = userService.getUserAvatarUrl(user);
-
-        // Добавляем URL аватара в модель, если он существует
-        if (avatarUrl != null) {
-            model.addAttribute("avatarUrl", avatarUrl);
-        }
-        model.addAttribute("avatarUrl", avatarUrl);
-        model.addAttribute("user", user);
-        return "profile";
-    }
 
 
 
