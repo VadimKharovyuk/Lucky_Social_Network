@@ -40,6 +40,7 @@ public class PostController {
     public String getAllPosts(Model model) {
         List<Post> posts = postService.getAllPostsSortedByDateDesc();
         model.addAttribute("posts", posts);
+        User currentUser = userService.getCurrentUser();
 
 
         Long currentUserId = null;
@@ -48,7 +49,7 @@ public class PostController {
         } catch (IllegalStateException e) {
             // Пользователь не аутентифицирован, оставляем currentUserId как null
         }
-        model.addAttribute("currentUserId", currentUserId);
+        model.addAttribute("currentUser", currentUser);
 
         return "posts/list";
     }

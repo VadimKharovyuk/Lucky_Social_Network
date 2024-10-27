@@ -155,69 +155,266 @@
       font-size: 12px;
       color: #65676b;
     }
+
+    .content-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      margin: 20px auto;
+      max-width: 680px;
+      padding: 20px;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .post-author-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .post-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .author-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .post-author a {
+      color: #050505;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .author-posts-link {
+      color: #65676b;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .post-timestamp {
+      color: #65676b;
+      font-size: 13px;
+    }
+
+    .post-content {
+      font-size: 15px;
+      line-height: 1.5;
+      margin: 16px 0;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 8px;
+      padding: 8px 0;
+      border-top: 1px solid #dadde1;
+      border-bottom: 1px solid #dadde1;
+      margin: 12px 0;
+    }
+
+    .action-button {
+      background: none;
+      border: none;
+      color: #65676b;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .action-button:hover {
+      background-color: #f2f3f5;
+    }
+
+    .action-button.liked {
+      color: #1877f2;
+    }
+
+    .comments-section {
+      margin-top: 16px;
+    }
+
+    .comment {
+      padding: 8px 0;
+    }
+
+    .comment-header {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .comment-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .comment-meta {
+      background-color: #f0f2f5;
+      border-radius: 18px;
+      padding: 8px 12px;
+      flex: 1;
+    }
+
+    .comment-author {
+      font-weight: 500;
+      margin-right: 8px;
+    }
+
+    .comment-content {
+      font-size: 14px;
+    }
+
+    .comment-form {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .comment-form textarea {
+      flex: 1;
+      border: none;
+      background-color: #f0f2f5;
+      border-radius: 20px;
+      padding: 8px 12px;
+      resize: none;
+      min-height: 36px;
+    }
+
+    .comment-form button {
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0 16px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .comment-form button:hover {
+      background-color: #166fe5;
+    }
+
+    .comment-form {
+      transition: all 0.3s ease;
+    }
+
+
   </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light">
   <div class="container">
     <a class="navbar-brand" href="/">Lucky Social Network</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <!--    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">-->
+    <!--      <span class="navbar-toggler-icon"></span>-->
+    <!--    </button>-->
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" href="/home"><i class="fas fa-home"></i> Главная</a>
+          <a class="nav-link" href="/"><i class="fas fa-home"></i> Главная</a>
         </li>
+        <a class="nav-link" th:href="@{/profile/{id}(id=${currentUserId})}">
+          <i class="fas fa-user"></i> Профиль
+        </a>
         <li class="nav-item">
-          <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Профиль</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/messages"><i class="fas fa-envelope"></i> Сообщения</a>
+          <a class="nav-link" href="/chat/list"><i class="fas fa-envelope"></i> Сообщения</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
 
+
 <div class="container">
   <div class="content-container">
     <div class="post-header">
       <div class="post-author-info">
-        <span class="post-author">
-            <a th:href="@{/profile/{userId}(userId=${post.author.id})}" th:text="${post.author.username}">Имя автора</a><br>
-        </span>
-        <a th:href="@{/posts/user/{userId}(userId=${post.author.id})}" class="author-posts-link">Все посты автора</a>
+        <!-- Аватар -->
+        <img th:src="${post.author.avatarUrl}"
+             class="post-avatar"
+             alt="Avatar">
+
+        <div class="author-details">
+          <!-- Имя с проверкой -->
+          <span class="post-author">
+                        <a th:href="@{/profile/{userId}(userId=${post.author.id})}"
+                           th:with="fullName=${(post.author.firstName != null and !post.author.firstName.isEmpty() and
+                                              post.author.lastName != null and !post.author.lastName.isEmpty()) ?
+                                              post.author.firstName + ' ' + post.author.lastName : null}"
+                           th:text="${fullName != null ? fullName : post.author.username}">
+                        </a>
+                    </span>
+          <a th:href="@{/posts/user/{userId}(userId=${post.author.id})}"
+             class="author-posts-link">Все посты автора</a>
+        </div>
       </div>
-      <span class="post-timestamp" th:text="${#temporals.format(post.timestamp, 'dd MMMM в HH:mm')}">Дата поста</span>
+      <span class="post-timestamp"
+            th:text="${#temporals.format(post.timestamp, 'dd MMMM в HH:mm')}">
+                Дата поста
+            </span>
     </div>
+
     <div class="post-content" th:text="${post.content}">
       Содержание поста
     </div>
+
     <div class="post-actions">
       <form th:action="@{/posts/{id}/like(id=${post.id})}" method="post" class="like-form">
         <button type="submit" class="action-button" th:classappend="${userLiked} ? 'liked' : ''">
           <i class="far fa-thumbs-up"></i> Нравится <span th:text="${likeCount}">0</span>
         </button>
       </form>
-      <button class="action-button">
+      <!-- Кнопка с привязанным id формы -->
+      <button class="action-button" onclick="scrollToComments()">
         <i class="far fa-comment"></i> Комментировать
       </button>
-      <button class="action-button">
-        <i class="fas fa-share"></i> Поделиться
-      </button>
+      <!--      <button class="action-button">-->
+      <!--        <i class="fas fa-share"></i> Поделиться-->
+      <!--      </button>-->
     </div>
+
     <div class="comments-section">
       <div th:each="comment : ${comments}" class="comment">
-        <span class="comment-author" th:text="${comment.author.username}">Автор комментария</span>
-        <div class="comment-content" th:text="${comment.content}">
-          Текст комментария
+        <div class="comment-header">
+          <img th:src="${comment.author.avatarUrl}"
+               class="comment-avatar"
+               alt="Comment Avatar">
+          <div class="comment-meta">
+                        <span class="comment-author"
+                              th:with="commentFullName=${(comment.author.firstName != null and !comment.author.firstName.isEmpty() and
+                                                        comment.author.lastName != null and !comment.author.lastName.isEmpty()) ?
+                                                        comment.author.firstName + ' ' + comment.author.lastName : null}"
+                              th:text="${commentFullName != null ? commentFullName : comment.author.username}">
+                        </span>
+            <div class="comment-content" th:text="${comment.content}">
+              Текст комментария
+            </div>
+          </div>
         </div>
       </div>
-      <form th:action="@{/comments/add}" method="post" class="comment-form" th:object="${newComment}">
+
+      <form th:action="@{/comments/add}" method="post" class="comment-form" th:object="${newComment}" id="comment-form">
         <input type="hidden" name="postId" th:value="${post.id}"/>
         <input type="hidden" name="userId" th:value="${currentUserId}"/>
-        <textarea th:field="*{content}" rows="1" placeholder="Написать комментарий..."></textarea>
+        <textarea th:field="*{content}" rows="1" placeholder="Написать комментарий..." id="comment-textarea"></textarea>
         <button type="submit">Отправить</button>
       </form>
     </div>
@@ -225,6 +422,28 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function scrollToComments() {
+    const form = document.getElementById('comment-form');
+    const textarea = document.getElementById('comment-textarea');
+
+    // Плавный скролл
+    form.scrollIntoView({behavior: 'smooth', block: 'center'});
+
+    // Добавляем подсветку
+    form.classList.add('highlight');
+
+    // Убираем подсветку через 2 секунды
+    setTimeout(() => {
+      form.classList.remove('highlight');
+    }, 2000);
+
+    // Фокус на поле ввода
+    setTimeout(() => {
+      textarea.focus();
+    }, 500);
+  }
+</script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const likeForm = document.querySelector('.like-form');
@@ -248,153 +467,4 @@
 </script>
 </body>
 </html>
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
-<!--<head>-->
-<!--  <meta charset="UTF-8">-->
-<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--  <title>View Post</title>-->
-<!--  <style>-->
-<!--    body {-->
-<!--      font-family: Arial, sans-serif;-->
-<!--      line-height: 1.6;-->
-<!--      color: #333;-->
-<!--      margin: 0;-->
-<!--      padding: 0;-->
-<!--      background-color: #f4f4f4;-->
-<!--    }-->
-<!--    .container {-->
-<!--      max-width: 800px;-->
-<!--      margin: 0 auto;-->
-<!--      padding: 20px;-->
-<!--    }-->
-<!--    header {-->
-<!--      background-color: #2c3e50;-->
-<!--      color: #fff;-->
-<!--      padding: 1rem 0;-->
-<!--    }-->
-<!--    nav {-->
-<!--      display: flex;-->
-<!--      justify-content: space-between;-->
-<!--      align-items: center;-->
-<!--      max-width: 1200px;-->
-<!--      margin: 0 auto;-->
-<!--      padding: 0 20px;-->
-<!--    }-->
-<!--    .logo {-->
-<!--      font-size: 1.5rem;-->
-<!--      font-weight: bold;-->
-<!--    }-->
-<!--    .nav-links {-->
-<!--      list-style: none;-->
-<!--      display: flex;-->
-<!--      margin: 0;-->
-<!--      padding: 0;-->
-<!--    }-->
-<!--    .nav-links li {-->
-<!--      margin-left: 20px;-->
-<!--    }-->
-<!--    .nav-links a {-->
-<!--      color: #fff;-->
-<!--      text-decoration: none;-->
-<!--      transition: color 0.3s;-->
-<!--    }-->
-<!--    .nav-links a:hover {-->
-<!--      color: #3498db;-->
-<!--    }-->
-<!--    h1 {-->
-<!--      color: #2c3e50;-->
-<!--      border-bottom: 2px solid #3498db;-->
-<!--      padding-bottom: 10px;-->
-<!--    }-->
-<!--    .post {-->
-<!--      background-color: #fff;-->
-<!--      border-radius: 5px;-->
-<!--      padding: 20px;-->
-<!--      box-shadow: 0 2px 5px rgba(0,0,0,0.1);-->
-<!--    }-->
-<!--    .post h2 {-->
-<!--      color: #2c3e50;-->
-<!--      margin-top: 0;-->
-<!--    }-->
-<!--    .post p {-->
-<!--      margin: 10px 0;-->
-<!--    }-->
-<!--    .post-meta {-->
-<!--      font-size: 0.9em;-->
-<!--      color: #7f8c8d;-->
-<!--    }-->
-<!--    .button {-->
-<!--      display: inline-block;-->
-<!--      padding: 10px 15px;-->
-<!--      background-color: #3498db;-->
-<!--      color: #fff;-->
-<!--      text-decoration: none;-->
-<!--      border-radius: 3px;-->
-<!--      border: none;-->
-<!--      cursor: pointer;-->
-<!--      transition: background-color 0.3s;-->
-<!--    }-->
-<!--    .button:hover {-->
-<!--      background-color: #2980b9;-->
-<!--    }-->
-<!--    .delete-button {-->
-<!--      background-color: #e74c3c;-->
-<!--    }-->
-<!--    .delete-button:hover {-->
-<!--      background-color: #c0392b;-->
-<!--    }-->
-<!--    .back-link {-->
-<!--      display: inline-block;-->
-<!--      margin-top: 20px;-->
-<!--      color: #3498db;-->
-<!--      text-decoration: none;-->
-<!--    }-->
-<!--    .back-link:hover {-->
-<!--      text-decoration: underline;-->
-<!--    }-->
-<!--  </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--<header>-->
-<!--  <nav>-->
-<!--    <div class="logo">Lucky Social Network</div>-->
-<!--    <ul class="nav-links">-->
-<!--      <li><a href="/home">Главная</a></li>-->
-<!--      <li><a href="/profile">Профиль</a></li>-->
-<!--      <li><a href="/">Сообщения</a></li>-->
-<!--      <li><a href="#settings">Настройки</a></li>-->
-<!--    </ul>-->
-<!--  </nav>-->
-<!--</header>-->
-<!--<div class="post-container">-->
-<!--  &lt;!&ndash; Отображение поста &ndash;&gt;-->
-<!--  <div class="post">-->
-<!--    <p th:text="${post.content}">Содержание поста</p>-->
-<!--    <p>Автор: <span th:text="${post.author.username}">Имя автора</span></p>-->
-<!--    <p>Дата: <span th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}">Дата поста</span></p>-->
-<!--  </div>-->
 
-<!--  &lt;!&ndash; Отображение существующих комментариев &ndash;&gt;-->
-<!--  <div class="comments-container">-->
-<!--    <h3>Комментарии:</h3>-->
-<!--    <div th:each="comment : ${comments}" class="comment">-->
-<!--      <p th:text="${comment.content}">Текст комментария</p>-->
-<!--      <p>Автор: <span th:text="${comment.author.username}">Имя автора комментария</span></p>-->
-<!--      <p>Дата: <span th:text="${#temporals.format(comment.timestamp, 'dd-MM-yyyy HH:mm')}">Дата комментария</span></p>-->
-<!--    </div>-->
-<!--  </div>-->
-
-<!--  &lt;!&ndash; Форма для добавления нового комментария &ndash;&gt;-->
-<!--  <div class="comment-form">-->
-<!--    <h3>Добавить комментарий</h3>-->
-<!--    <form th:action="@{/comments/add}" method="post" th:object="${newComment}">-->
-<!--      <input type="hidden" name="postId" th:value="${post.id}"/>-->
-<!--      <input type="hidden" name="userId" th:value="${currentUserId}"/>-->
-<!--      <textarea th:field="*{content}" rows="4" cols="50" placeholder="Введите ваш комментарий"></textarea>-->
-<!--      <button type="submit">Отправить комментарий</button>-->
-<!--    </form>-->
-<!--  </div>-->
-<!--</div>-->
-<!--</body>-->
-<!--</html>-->

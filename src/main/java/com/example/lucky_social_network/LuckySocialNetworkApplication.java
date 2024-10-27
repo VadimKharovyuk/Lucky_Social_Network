@@ -15,8 +15,6 @@ public class LuckySocialNetworkApplication {
     }
 
 
-    //настройки добавить навигацию
-    //профиль добавить <adide>
 
     //docker buildx build --platform linux/amd64 -t lucky1911/lucky_social_network:latest . --push
     //push Docker Hub

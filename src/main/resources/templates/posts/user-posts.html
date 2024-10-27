@@ -5,16 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Посты пользователя</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f0f2f5;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding-top: 56px;
         }
 
+        /* Header styles */
         .navbar {
             background-color: #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
         .navbar-brand {
@@ -23,71 +30,379 @@
             font-size: 24px;
         }
 
-        .content-container {
-            max-width: 680px;
+        /* Main container */
+        .main-container {
+            display: flex;
+            max-width: 1200px;
             margin: 20px auto;
+            padding: 0 16px;
+            gap: 20px;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 360px;
+            position: sticky;
+            top: 76px;
+            height: calc(100vh - 76px);
+            padding: 20px 8px;
+            overflow-y: auto;
+        }
+
+        .side-nav {
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            text-decoration: none;
+            color: #1c1e21;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .side-nav-link:hover {
+            background-color: #f2f3f5;
+        }
+
+        .side-nav-link.active {
+            background-color: #e7f3ff;
+            color: #1877f2;
+        }
+
+        .side-nav-link i {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        /* Content styles */
+        .content-container {
+            flex: 1;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .user-profile-header {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-avatar {
+            width: 168px;
+            height: 168px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
         }
 
         .user-info {
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
-            padding: 20px;
-            margin-bottom: 20px;
+            flex: 1;
         }
 
         .user-name {
             font-size: 24px;
             font-weight: bold;
             color: #1c1e21;
+            margin-bottom: 8px;
         }
 
         .post {
             background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
         }
 
         .post-header {
             padding: 12px 16px;
-            border-bottom: 1px solid #dddfe2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .post-timestamp {
             color: #65676b;
-            font-size: 12px;
+            font-size: 13px;
         }
 
         .post-content {
             padding: 16px;
             font-size: 15px;
-            line-height: 1.3333;
+            line-height: 1.5;
         }
 
         .post-actions {
             display: flex;
-            justify-content: space-around;
-            padding: 4px 16px;
+            padding: 8px;
             border-top: 1px solid #dddfe2;
+            gap: 8px;
         }
 
         .action-button {
+            flex: 1;
             background: none;
             border: none;
             color: #65676b;
+            font-size: 14px;
             font-weight: 600;
             padding: 8px;
             cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
         }
 
         .action-button:hover {
-            background-color: #f2f2f2;
-            border-radius: 4px;
+            background-color: #f2f3f5;
         }
 
         .action-button.liked {
             color: #1877f2;
+        }
+
+        .empty-posts {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: #65676b;
+        }
+
+        /* Media Queries */
+        @media (max-width: 1200px) {
+            .main-container {
+                padding: 0 12px;
+            }
+
+            .sidebar {
+                width: 280px;
+            }
+
+            .content-container {
+                max-width: 580px;
+            }
+
+            .user-avatar {
+                width: 140px;
+                height: 140px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .side-nav-link span {
+                display: none;
+            }
+
+            .side-nav-link i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+
+            .content-container {
+                max-width: calc(100% - 80px);
+            }
+
+            .user-profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-avatar {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 0 8px;
+            }
+
+            .sidebar {
+                display: none; /* Скрываем сайдбар на мобильных */
+            }
+
+            .content-container {
+                max-width: 100%;
+                margin: 0;
+            }
+
+            .user-profile-header {
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+
+            .user-avatar {
+                width: 100px;
+                height: 100px;
+            }
+
+            .user-name {
+                font-size: 20px;
+            }
+
+            .post {
+                margin-bottom: 12px;
+            }
+
+            .post-header {
+                padding: 8px 12px;
+            }
+
+            .post-content {
+                padding: 12px;
+            }
+
+            .post-actions {
+                padding: 4px;
+                gap: 4px;
+            }
+
+            .action-button {
+                padding: 6px;
+                font-size: 12px;
+            }
+
+            .action-button i {
+                font-size: 16px;
+            }
+
+            /* Настройка навбара для мобильных */
+            .navbar {
+                padding: 8px 0;
+            }
+
+            .navbar-brand {
+                font-size: 20px;
+            }
+
+            .nav-link {
+                padding: 8px !important;
+                font-size: 14px;
+            }
+        }
+
+        /* Для очень маленьких экранов */
+        @media (max-width: 480px) {
+            .user-profile-header {
+                padding: 12px;
+            }
+
+            .user-avatar {
+                width: 80px;
+                height: 80px;
+            }
+
+            .user-name {
+                font-size: 18px;
+            }
+
+            .post-actions {
+                flex-wrap: wrap;
+            }
+
+            .action-button {
+                flex: 0 0 100%;
+                margin-bottom: 4px;
+            }
+
+            /* Упрощаем навигацию */
+            .nav-link span {
+                display: none;
+            }
+
+            .nav-link i {
+                font-size: 18px;
+            }
+
+            /* Настройка формы комментариев для мобильных */
+            .comment-form {
+                flex-direction: column;
+            }
+
+            .comment-form textarea {
+                margin-bottom: 8px;
+            }
+
+            .comment-form button {
+                width: 100%;
+            }
+        }
+
+        /* Анимации для улучшения UX */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Улучшенная доступность */
+        @media (prefers-reduced-motion: reduce) {
+            .post {
+                animation: none;
+            }
+        }
+
+        /* Улучшения для больших экранов */
+        @media (min-width: 1400px) {
+            .main-container {
+                max-width: 1320px;
+            }
+
+            .content-container {
+                max-width: 800px;
+            }
+
+            .sidebar {
+                width: 380px;
+            }
+        }
+
+        /* Фиксы для устройств с нотчем */
+        @supports (padding: max(0px)) {
+            .navbar {
+                padding-left: max(16px, env(safe-area-inset-left));
+                padding-right: max(16px, env(safe-area-inset-right));
+            }
+
+            body {
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
         }
     </style>
 </head>
@@ -104,40 +419,113 @@
                     <a class="nav-link" href="/home"><i class="fas fa-home"></i> Главная</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Профиль</a>
+                    <a class="nav-link" th:href="@{/profile/{id}(id=${currentUser.id})}">
+                        <i class="fas fa-user"></i> Профиль
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/messages"><i class="fas fa-envelope"></i> Сообщения</a>
+                    <a class="nav-link" href="/chat/list"><i class="fas fa-envelope"></i> Сообщения</a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container">
+<div class="main-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <nav class="side-nav">
+            <a th:href="@{/profile/{id}(id=${currentUser.id})}" class="side-nav-link">
+                <i class="fas fa-user"></i>
+                <span>Моя страница</span>
+            </a>
+            <a href="/posts" class="side-nav-link">
+                <i class="fas fa-newspaper"></i>
+                <span>Новости</span>
+            </a>
+            <a href="/chat/list" class="side-nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Сообщения</span>
+            </a>
+            <a href="/users/friends" class="side-nav-link">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+            </a>
+            <a href="/groups/my" class="side-nav-link">
+                <i class="fas fa-users-rectangle"></i>
+                <span>Группы</span>
+            </a>
+            <a href="/albums" class="side-nav-link">
+                <i class="fas fa-images"></i>
+                <span>Фотографии</span>
+            </a>
+            <a href="/notifications" class="side-nav-link">
+                <i class="fas fa-bell"></i>
+                <span>Уведомления</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main content -->
     <div class="content-container">
+        <!-- User Profile Header -->
+        <div class="user-profile-header">
+            <img th:if="${user.avatarUrl != null}"
+                 th:src="${user.avatarUrl}"
+                 class="user-avatar"
+                 alt="User avatar">
+            <img th:unless="${user.avatarUrl != null}"
+                 src="/default-avatar.jpg"
+                 class="user-avatar"
+                 alt="Default avatar">
 
+            <div class="user-info">
+                <h1 class="user-name"
+                    th:with="fullName=${(user.firstName != null and !user.firstName.isEmpty() and
+                                          user.lastName != null and !user.lastName.isEmpty()) ?
+                                          user.firstName + ' ' + user.lastName : null}"
+                    th:text="${fullName != null ? fullName : user.username}">
+                </h1>
+                <p class="text-muted">Публикации пользователя</p>
+            </div>
+        </div>
 
-        <div th:if="${userPosts.empty}">
+        <!-- Posts -->
+        <div th:if="${userPosts.empty}" class="empty-posts">
             <p>У пользователя пока нет постов.</p>
         </div>
 
         <div th:each="post : ${userPosts}" class="post">
             <div class="post-header">
-                <span class="post-timestamp" th:text="${#temporals.format(post.timestamp, 'dd MMMM в HH:mm')}">Дата поста</span>
+                <div class="post-timestamp"
+                     th:text="${#temporals.format(post.timestamp, 'dd MMMM в HH:mm')}">
+                </div>
             </div>
-            <div class="post-content" th:text="${post.content}">
-                Содержание поста
+            <div class="post-content" th:text="${post.content}"></div>
+            <div class="post-actions">
+                <form th:action="@{/posts/{id}/like(id=${post.id})}"
+                      method="post"
+                      class="like-form"
+                      style="flex: 1;">
+                    <button type="submit"
+                            class="action-button"
+                            th:classappend="${likedPostIds.contains(post.id)} ? 'liked'">
+                        <i class="far fa-thumbs-up"></i>
+                        <span th:text="${post.likeCount}">0</span>
+                    </button>
+                </form>
+                <a th:href="@{/posts/{id}(id=${post.id})}"
+                   class="action-button">
+                    <i class="far fa-comment"></i>
+                    Комментировать
+                </a>
+                <!--                <button class="action-button">-->
+                <!--                    <i class="fas fa-share"></i>-->
+                <!--                    Поделиться-->
+                <!--                </button>-->
             </div>
-            <a th:href="@{/posts/{id}(id=${post.id})}" class="action-button">
-                <i class="far fa-comment"></i> Комментировать
-            </a>
-            <button class="action-button">
-                <i class="fas fa-share"></i> Поделиться
-            </button>
         </div>
     </div>
-</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -169,3 +557,176 @@
 </script>
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Посты пользователя</title>-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">-->
+<!--    <style>-->
+<!--        body {-->
+<!--            background-color: #f0f2f5;-->
+<!--            font-family: Arial, sans-serif;-->
+<!--        }-->
+
+<!--        .navbar {-->
+<!--            background-color: #ffffff;-->
+<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);-->
+<!--        }-->
+
+<!--        .navbar-brand {-->
+<!--            color: #1877f2;-->
+<!--            font-weight: bold;-->
+<!--            font-size: 24px;-->
+<!--        }-->
+
+<!--        .content-container {-->
+<!--            max-width: 680px;-->
+<!--            margin: 20px auto;-->
+<!--        }-->
+
+<!--        .user-info {-->
+<!--            background-color: #ffffff;-->
+<!--            border-radius: 8px;-->
+<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);-->
+<!--            padding: 20px;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        .user-name {-->
+<!--            font-size: 24px;-->
+<!--            font-weight: bold;-->
+<!--            color: #1c1e21;-->
+<!--        }-->
+
+<!--        .post {-->
+<!--            background-color: #ffffff;-->
+<!--            border-radius: 8px;-->
+<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        .post-header {-->
+<!--            padding: 12px 16px;-->
+<!--            border-bottom: 1px solid #dddfe2;-->
+<!--        }-->
+
+<!--        .post-timestamp {-->
+<!--            color: #65676b;-->
+<!--            font-size: 12px;-->
+<!--        }-->
+
+<!--        .post-content {-->
+<!--            padding: 16px;-->
+<!--            font-size: 15px;-->
+<!--            line-height: 1.3333;-->
+<!--        }-->
+
+<!--        .post-actions {-->
+<!--            display: flex;-->
+<!--            justify-content: space-around;-->
+<!--            padding: 4px 16px;-->
+<!--            border-top: 1px solid #dddfe2;-->
+<!--        }-->
+
+<!--        .action-button {-->
+<!--            background: none;-->
+<!--            border: none;-->
+<!--            color: #65676b;-->
+<!--            font-weight: 600;-->
+<!--            padding: 8px;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+
+<!--        .action-button:hover {-->
+<!--            background-color: #f2f2f2;-->
+<!--            border-radius: 4px;-->
+<!--        }-->
+
+<!--        .action-button.liked {-->
+<!--            color: #1877f2;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<nav class="navbar navbar-expand-lg navbar-light">-->
+<!--    <div class="container">-->
+<!--        <a class="navbar-brand" href="/">Lucky Social Network</a>-->
+<!--        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">-->
+<!--            <span class="navbar-toggler-icon"></span>-->
+<!--        </button>-->
+<!--        <div class="collapse navbar-collapse" id="navbarNav">-->
+<!--            <ul class="navbar-nav ms-auto">-->
+<!--                <li class="nav-item">-->
+<!--                    <a class="nav-link" href="/home"><i class="fas fa-home"></i> Главная</a>-->
+<!--                </li>-->
+<!--                <li class="nav-item">-->
+<!--                    <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Профиль</a>-->
+<!--                </li>-->
+<!--                <li class="nav-item">-->
+<!--                    <a class="nav-link" href="/messages"><i class="fas fa-envelope"></i> Сообщения</a>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</nav>-->
+
+<!--<div class="container">-->
+<!--    <div class="content-container">-->
+
+
+<!--        <div th:if="${userPosts.empty}">-->
+<!--            <p>У пользователя пока нет постов.</p>-->
+<!--        </div>-->
+
+<!--        <div th:each="post : ${userPosts}" class="post">-->
+<!--            <div class="post-header">-->
+<!--                <span class="post-timestamp" th:text="${#temporals.format(post.timestamp, 'dd MMMM в HH:mm')}">Дата поста</span>-->
+<!--            </div>-->
+<!--            <div class="post-content" th:text="${post.content}">-->
+<!--                Содержание поста-->
+<!--            </div>-->
+<!--            <a th:href="@{/posts/{id}(id=${post.id})}" class="action-button">-->
+<!--                <i class="far fa-comment"></i> Комментировать-->
+<!--            </a>-->
+<!--            <button class="action-button">-->
+<!--                <i class="fas fa-share"></i> Поделиться-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--</div>-->
+
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<script>-->
+<!--    document.addEventListener('DOMContentLoaded', function () {-->
+<!--        const likeForms = document.querySelectorAll('.like-form');-->
+
+<!--        likeForms.forEach(form => {-->
+<!--            form.addEventListener('submit', function (e) {-->
+<!--                e.preventDefault();-->
+
+<!--                fetch(this.action, {-->
+<!--                    method: 'POST',-->
+<!--                    headers: {-->
+<!--                        'X-Requested-With': 'XMLHttpRequest'-->
+<!--                    }-->
+<!--                })-->
+<!--                    .then(response => response.json())-->
+<!--                    .then(data => {-->
+<!--                        const button = this.querySelector('button');-->
+<!--                        const likeCount = button.querySelector('span');-->
+<!--                        button.classList.toggle('liked', data.liked);-->
+<!--                        likeCount.textContent = data.likeCount;-->
+<!--                    })-->
+<!--                    .catch(error => console.error('Error:', error));-->
+<!--            });-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
