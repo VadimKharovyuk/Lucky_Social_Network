@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -14,14 +16,18 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      margin: 0;
     }
+
     .main-container {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2rem 0;
+      margin-top: 60px;
     }
+
     .form-container {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
@@ -29,7 +35,9 @@
       padding: 2rem;
       width: 100%;
       max-width: 500px;
+      margin: 0 15px;
     }
+
     header {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
@@ -39,59 +47,80 @@
       z-index: 1000;
       padding: 1rem 0;
     }
+
     header .container {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .logo {
       font-size: 1.5rem;
       font-weight: 600;
       color: #ffd700;
+      text-decoration: none;
     }
-    nav ul {
+
+    .logo:hover {
+      color: #ffd700;
+    }
+
+    .desktop-nav ul {
       display: flex;
       list-style: none;
       margin: 0;
       padding: 0;
     }
-    nav ul li {
+
+    .desktop-nav ul li {
       margin-left: 2rem;
     }
-    nav ul li a {
+
+    .desktop-nav ul li a {
       text-decoration: none;
       color: #fff;
       font-weight: 300;
       transition: all 0.3s ease;
     }
-    nav ul li a:hover {
+
+    .desktop-nav ul li a:hover {
       color: #ffd700;
       text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
     }
+
     h2 {
       color: #ffd700;
       font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
     }
+
     .form-label {
       color: #fff;
     }
+
     .form-control, .form-select {
       background: rgba(255, 255, 255, 0.2);
       border: none;
       color: #fff;
+      padding: 0.8rem;
     }
+
     .form-control:focus, .form-select:focus {
       background: rgba(255, 255, 255, 0.3);
       box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
       color: #fff;
     }
+
     .btn-primary {
       background-color: #ffd700;
       border-color: #ffd700;
       color: #764ba2;
       font-weight: 600;
       transition: all 0.3s ease;
+      padding: 0.8rem;
     }
+
     .btn-primary:hover {
       background-color: #fff;
       border-color: #fff;
@@ -131,6 +160,94 @@
       margin-top: 0.25rem;
     }
 
+    .mobile-menu-btn {
+      display: none;
+      color: #fff;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 1rem;
+      z-index: 999;
+    }
+
+    .mobile-menu.active {
+      display: block;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .mobile-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .mobile-menu li {
+      margin: 0.5rem 0;
+    }
+
+    .mobile-menu a {
+      display: block;
+      padding: 0.8rem;
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .mobile-menu a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .logo {
+        font-size: 1.2rem;
+      }
+
+      .form-container {
+        padding: 1.5rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-container {
+        padding: 1rem;
+        margin: 0 10px;
+      }
+
+      .main-container {
+        padding: 1rem 0;
+      }
+
+      header {
+        padding: 0.5rem 0;
+      }
+    }
+
     @keyframes slideIn {
       from {
         transform: translateY(-10px);
@@ -142,7 +259,17 @@
       }
     }
 
-    /* Анимация встряхивания для формы при ошибке */
+    @keyframes slideDown {
+      from {
+        transform: translateY(-10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
     .shake {
       animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
     }
@@ -162,12 +289,14 @@
       }
     }
   </style>
-</head>
 <body>
 <header>
   <div class="container">
-    <div class="logo">Lucky Social Network</div>
-    <nav>
+    <a href="/" class="logo">Lucky Social Network</a>
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <nav class="desktop-nav">
       <ul>
         <li><a href="/">На главную</a></li>
         <li><a href="#features">Возможности</a></li>
@@ -178,9 +307,18 @@
   </div>
 </header>
 
+<div class="mobile-menu">
+  <ul>
+    <li><a href="/">На главную</a></li>
+    <li><a href="#features">Возможности</a></li>
+    <li><a href="#about">О нас</a></li>
+    <li><a href="#contact">Контакты</a></li>
+  </ul>
+</div>
+
 <div class="main-container">
   <div class="form-container">
-    <h2 class="mb-4">Регистрация</h2>
+    <h2>Регистрация</h2>
 
     <!-- Сообщения об ошибках -->
     <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
@@ -200,22 +338,29 @@
                minlength="3"
                maxlength="20"
                pattern="^[a-zA-Z0-9_]+$"
-               title="Используйте только буквы, цифры и знак подчеркивания">
+               title="Используйте только буквы, цифры и знак подчеркивания"
+               placeholder="Введите имя пользователя">
         <div class="invalid-feedback">
-          Это имя пользователя уже занято. Пожалуйста, выберите другое.
+          Это имя пользователя уже занято или содержит недопустимые символы
         </div>
       </div>
 
       <div class="mb-3">
         <label for="password" class="form-label">Пароль:</label>
-        <input type="password"
-               class="form-control"
-               id="password"
-               th:field="*{password}"
-               required
-               minlength="6"
-               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"
-               title="Пароль должен содержать минимум 6 символов, включая буквы и цифры">
+        <div class="password-container position-relative">
+          <input type="password"
+                 class="form-control"
+                 id="password"
+                 th:field="*{password}"
+                 required
+                 minlength="6"
+                 pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"
+                 title="Пароль должен содержать минимум 6 символов, включая буквы и цифры"
+                 placeholder="Введите пароль">
+          <i class="fas fa-eye toggle-password position-absolute end-0 top-50 translate-middle-y me-2"
+             style="cursor: pointer;"
+             onclick="togglePasswordVisibility()"></i>
+        </div>
         <div class="invalid-feedback">
           Пароль должен содержать минимум 6 символов, включая буквы и цифры
         </div>
@@ -229,7 +374,9 @@
         </select>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
+      <button type="submit" class="btn btn-primary w-100">
+        <i class="fas fa-user-plus me-2"></i>Зарегистрироваться
+      </button>
     </form>
 
     <div class="mt-3 text-center">
@@ -240,20 +387,54 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // Добавляем анимацию встряхивания при ошибке
-  document.addEventListener('DOMContentLoaded', function () {
-    const errorAlert = document.querySelector('.alert-danger');
-    const form = document.querySelector('#registrationForm');
+  function toggleMobileMenu() {
+    const mobileMenu = document.querySelector('.mobile-menu');
+    mobileMenu.classList.toggle('active');
+  }
 
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.querySelector('.toggle-password');
+
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleIcon.classList.remove('fa-eye');
+      toggleIcon.classList.add('fa-eye-slash');
+    } else {
+      passwordInput.type = 'password';
+      toggleIcon.classList.remove('fa-eye-slash');
+      toggleIcon.classList.add('fa-eye');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('#registrationForm');
+    const usernameInput = document.querySelector('#username');
+    const passwordInput = document.querySelector('#password');
+    const errorAlert = document.querySelector('.alert-danger');
+
+    // Конвертация в нижний регистр при вводе
+    usernameInput.addEventListener('input', function (e) {
+      let cursorPosition = e.target.selectionStart;
+      let newValue = e.target.value.toLowerCase();
+      e.target.value = newValue;
+      e.target.setSelectionRange(cursorPosition, cursorPosition);
+    });
+
+    // Конвертация пароля в нижний регистр перед отправкой
+    form.addEventListener('submit', function (e) {
+      passwordInput.value = passwordInput.value.toLowerCase();
+    });
+
+    // Анимация встряхивания при ошибке
     if (errorAlert) {
       form.classList.add('shake');
-      // Удаляем класс после окончания анимации
       form.addEventListener('animationend', function () {
         form.classList.remove('shake');
       });
     }
 
-    // Автоматически скрываем сообщения через 5 секунд
+    // Автоматически скрываем сообщения
     setTimeout(function () {
       const alerts = document.querySelectorAll('.alert');
       alerts.forEach(function (alert) {
@@ -264,7 +445,295 @@
         }, 500);
       });
     }, 5000);
+
+    // Закрытие мобильного меню при клике вне его
+    document.addEventListener('click', function (e) {
+      const mobileMenu = document.querySelector('.mobile-menu');
+      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+      if (mobileMenu.classList.contains('active') &&
+              !mobileMenu.contains(e.target) &&
+              !mobileMenuBtn.contains(e.target)) {
+        mobileMenu.classList.remove('active');
+      }
+    });
+  });
+
+  // Предотвращение зума на iOS
+  document.addEventListener('gesturestart', function (e) {
+    e.preventDefault();
   });
 </script>
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--  <title>Регистрация - Lucky Social Network</title>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">-->
+<!--  <style>-->
+<!--    body {-->
+<!--      font-family: 'Poppins', sans-serif;-->
+<!--      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);-->
+<!--      color: #fff;-->
+<!--      min-height: 100vh;-->
+<!--      display: flex;-->
+<!--      flex-direction: column;-->
+<!--    }-->
+<!--    .main-container {-->
+<!--      flex: 1;-->
+<!--      display: flex;-->
+<!--      align-items: center;-->
+<!--      justify-content: center;-->
+<!--      padding: 2rem 0;-->
+<!--    }-->
+<!--    .form-container {-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      backdrop-filter: blur(10px);-->
+<!--      border-radius: 10px;-->
+<!--      padding: 2rem;-->
+<!--      width: 100%;-->
+<!--      max-width: 500px;-->
+<!--    }-->
+<!--    header {-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      backdrop-filter: blur(10px);-->
+<!--      position: fixed;-->
+<!--      width: 100%;-->
+<!--      top: 0;-->
+<!--      z-index: 1000;-->
+<!--      padding: 1rem 0;-->
+<!--    }-->
+<!--    header .container {-->
+<!--      display: flex;-->
+<!--      justify-content: space-between;-->
+<!--      align-items: center;-->
+<!--    }-->
+<!--    .logo {-->
+<!--      font-size: 1.5rem;-->
+<!--      font-weight: 600;-->
+<!--      color: #ffd700;-->
+<!--    }-->
+<!--    nav ul {-->
+<!--      display: flex;-->
+<!--      list-style: none;-->
+<!--      margin: 0;-->
+<!--      padding: 0;-->
+<!--    }-->
+<!--    nav ul li {-->
+<!--      margin-left: 2rem;-->
+<!--    }-->
+<!--    nav ul li a {-->
+<!--      text-decoration: none;-->
+<!--      color: #fff;-->
+<!--      font-weight: 300;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    nav ul li a:hover {-->
+<!--      color: #ffd700;-->
+<!--      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);-->
+<!--    }-->
+<!--    h2 {-->
+<!--      color: #ffd700;-->
+<!--      font-weight: 600;-->
+<!--    }-->
+<!--    .form-label {-->
+<!--      color: #fff;-->
+<!--    }-->
+<!--    .form-control, .form-select {-->
+<!--      background: rgba(255, 255, 255, 0.2);-->
+<!--      border: none;-->
+<!--      color: #fff;-->
+<!--    }-->
+<!--    .form-control:focus, .form-select:focus {-->
+<!--      background: rgba(255, 255, 255, 0.3);-->
+<!--      box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);-->
+<!--      color: #fff;-->
+<!--    }-->
+<!--    .btn-primary {-->
+<!--      background-color: #ffd700;-->
+<!--      border-color: #ffd700;-->
+<!--      color: #764ba2;-->
+<!--      font-weight: 600;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .btn-primary:hover {-->
+<!--      background-color: #fff;-->
+<!--      border-color: #fff;-->
+<!--      color: #764ba2;-->
+<!--      transform: translateY(-3px);-->
+<!--      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);-->
+<!--    }-->
+
+<!--    .alert {-->
+<!--      padding: 1rem;-->
+<!--      margin-bottom: 1rem;-->
+<!--      border: none;-->
+<!--      border-radius: 8px;-->
+<!--      animation: slideIn 0.3s ease-out;-->
+<!--    }-->
+
+<!--    .alert-danger {-->
+<!--      background: rgba(220, 53, 69, 0.2);-->
+<!--      color: #fff;-->
+<!--      border-left: 4px solid #dc3545;-->
+<!--    }-->
+
+<!--    .alert-success {-->
+<!--      background: rgba(40, 167, 69, 0.2);-->
+<!--      color: #fff;-->
+<!--      border-left: 4px solid #28a745;-->
+<!--    }-->
+
+<!--    .form-control.is-invalid {-->
+<!--      border: 2px solid rgba(220, 53, 69, 0.5);-->
+<!--      background-image: none;-->
+<!--    }-->
+
+<!--    .invalid-feedback {-->
+<!--      color: #ffd700;-->
+<!--      font-size: 0.875rem;-->
+<!--      margin-top: 0.25rem;-->
+<!--    }-->
+
+<!--    @keyframes slideIn {-->
+<!--      from {-->
+<!--        transform: translateY(-10px);-->
+<!--        opacity: 0;-->
+<!--      }-->
+<!--      to {-->
+<!--        transform: translateY(0);-->
+<!--        opacity: 1;-->
+<!--      }-->
+<!--    }-->
+
+<!--    /* Анимация встряхивания для формы при ошибке */-->
+<!--    .shake {-->
+<!--      animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;-->
+<!--    }-->
+
+<!--    @keyframes shake {-->
+<!--      10%, 90% {-->
+<!--        transform: translate3d(-1px, 0, 0);-->
+<!--      }-->
+<!--      20%, 80% {-->
+<!--        transform: translate3d(2px, 0, 0);-->
+<!--      }-->
+<!--      30%, 50%, 70% {-->
+<!--        transform: translate3d(-4px, 0, 0);-->
+<!--      }-->
+<!--      40%, 60% {-->
+<!--        transform: translate3d(4px, 0, 0);-->
+<!--      }-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--  <div class="container">-->
+<!--    <div class="logo">Lucky Social Network</div>-->
+<!--    <nav>-->
+<!--      <ul>-->
+<!--        <li><a href="/">На главную</a></li>-->
+<!--        <li><a href="#features">Возможности</a></li>-->
+<!--        <li><a href="#about">О нас</a></li>-->
+<!--        <li><a href="#contact">Контакты</a></li>-->
+<!--      </ul>-->
+<!--    </nav>-->
+<!--  </div>-->
+<!--</header>-->
+
+<!--<div class="main-container">-->
+<!--  <div class="form-container">-->
+<!--    <h2 class="mb-4">Регистрация</h2>-->
+
+<!--    &lt;!&ndash; Сообщения об ошибках &ndash;&gt;-->
+<!--    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>-->
+
+<!--    &lt;!&ndash; Сообщение об успехе &ndash;&gt;-->
+<!--    <div th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></div>-->
+
+<!--    <form th:action="@{/register}" th:object="${user}" method="post" id="registrationForm">-->
+<!--      <div class="mb-3">-->
+<!--        <label for="username" class="form-label">Имя пользователя:</label>-->
+<!--        <input type="text"-->
+<!--               class="form-control"-->
+<!--               th:classappend="${error != null} ? 'is-invalid'"-->
+<!--               id="username"-->
+<!--               th:field="*{username}"-->
+<!--               required-->
+<!--               minlength="3"-->
+<!--               maxlength="20"-->
+<!--               pattern="^[a-zA-Z0-9_]+$"-->
+<!--               title="Используйте только буквы, цифры и знак подчеркивания">-->
+<!--        <div class="invalid-feedback">-->
+<!--          Это имя пользователя уже занято. Пожалуйста, выберите другое.-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div class="mb-3">-->
+<!--        <label for="password" class="form-label">Пароль:</label>-->
+<!--        <input type="password"-->
+<!--               class="form-control"-->
+<!--               id="password"-->
+<!--               th:field="*{password}"-->
+<!--               required-->
+<!--               minlength="6"-->
+<!--               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"-->
+<!--               title="Пароль должен содержать минимум 6 символов, включая буквы и цифры">-->
+<!--        <div class="invalid-feedback">-->
+<!--          Пароль должен содержать минимум 6 символов, включая буквы и цифры-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div class="mb-3">-->
+<!--        <label for="gender" class="form-label">Пол:</label>-->
+<!--        <select class="form-select" id="gender" th:field="*{gender}">-->
+<!--          <option value="MALE">Мужской</option>-->
+<!--          <option value="FEMALE">Женский</option>-->
+<!--        </select>-->
+<!--      </div>-->
+
+<!--      <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>-->
+<!--    </form>-->
+
+<!--    <div class="mt-3 text-center">-->
+<!--      <p>Уже есть аккаунт? <a th:href="@{/login}" class="text-warning">Войдите</a></p>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<script>-->
+<!--  // Добавляем анимацию встряхивания при ошибке-->
+<!--  document.addEventListener('DOMContentLoaded', function () {-->
+<!--    const errorAlert = document.querySelector('.alert-danger');-->
+<!--    const form = document.querySelector('#registrationForm');-->
+
+<!--    if (errorAlert) {-->
+<!--      form.classList.add('shake');-->
+<!--      // Удаляем класс после окончания анимации-->
+<!--      form.addEventListener('animationend', function () {-->
+<!--        form.classList.remove('shake');-->
+<!--      });-->
+<!--    }-->
+
+<!--    // Автоматически скрываем сообщения через 5 секунд-->
+<!--    setTimeout(function () {-->
+<!--      const alerts = document.querySelectorAll('.alert');-->
+<!--      alerts.forEach(function (alert) {-->
+<!--        alert.style.opacity = '0';-->
+<!--        alert.style.transition = 'opacity 0.5s ease-out';-->
+<!--        setTimeout(function () {-->
+<!--          alert.style.display = 'none';-->
+<!--        }, 500);-->
+<!--      });-->
+<!--    }, 5000);-->
+<!--  });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

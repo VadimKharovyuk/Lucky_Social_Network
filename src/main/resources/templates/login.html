@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Ваши существующие стили */
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -14,204 +16,252 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-
+            padding: 20px 0;
         }
-
 
         .container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 10px;
             padding: 2rem;
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
         }
 
-        h2 {
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo i {
+            font-size: 3rem;
             color: #ffd700;
-            font-weight: 600;
-
+            margin-bottom: 1rem;
         }
 
+        .password-container {
+            position: relative;
+        }
 
-        .form-label {
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password:hover {
             color: #fff;
         }
 
-        .form-control {
+        .social-login {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .social-login-title {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .social-login-title::before,
+        .social-login-title::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
             background: rgba(255, 255, 255, 0.2);
-            border: none;
+        }
+
+        .social-login-title::before {
+            left: 0;
+        }
+
+        .social-login-title::after {
+            right: 0;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
-
-        }
-
-
-        .form-control:focus {
-            background: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
-            color: #fff;
-
-        }
-
-
-        /*.btn-primary {*/
-        /*    background-color: #ffd700;*/
-        /*    border-color: #ffd700;*/
-        /*    color: #764ba2;*/
-        /*    font-weight: 600;*/
-        /*    transition: all 0.3s ease;*/
-        /*}*/
-
-
-        .btn-primary:hover {
-            background-color: #fff;
-            border-color: #fff;
-            color: #764ba2;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-
-        }
-
-      
-        .form-check-input:checked {
-            background-color: #ffd700;
-            border-color: #ffd700
-        }
-
-        a {
-            color: #ffd700;
-            text-decoration: none;
             transition: all 0.3s ease;
         }
 
-        a:hover {
-            color: #fff;
-        --> text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        -->
+        .social-button:hover {
+            background: #fff;
+            color: #764ba2;
+            transform: translateY(-3px);
         }
 
-        .alert {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: none;
-            color: #fff;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .alert-danger {
-            background: rgba(220, 53, 69, 0.2);
-            border-left: 4px solid #dc3545;
-        }
-
-        .alert-success {
-            background: rgba(40, 167, 69, 0.2);
-            border-left: 4px solid #28a745;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
+        /* Адаптивные стили */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
             }
-            to {
-                transform: translateY(0);
-                opacity: 1;
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+
+            .form-control {
+                font-size: 16px; /* Предотвращает масштабирование на iOS */
+                padding: 0.8rem;
+            }
+
+            .btn-primary {
+                padding: 0.8rem;
+            }
+
+            .social-buttons {
+                flex-wrap: wrap;
             }
         }
 
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .login-logo i {
+                font-size: 2.5rem;
+            }
+
+            .social-button {
+                width: 35px;
+                height: 35px;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+            }
+
+            .alert {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
         }
 
-        .shake {
-            animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
-            transform: translate3d(0, 0, 0);
+        /* Поддержка темной темы устройства */
+        @media (prefers-color-scheme: dark) {
+            .form-control::placeholder {
+                color: rgba(255, 255, 255, 0.3);
+            }
         }
 
-        @keyframes shake {
-            10%, 90% {
-                transform: translate3d(-1px, 0, 0);
-            }
-            20%, 80% {
-                transform: translate3d(2px, 0, 0);
-            }
-            30%, 50%, 70% {
-                transform: translate3d(-4px, 0, 0);
-            }
-            40%, 60% {
-                transform: translate3d(4px, 0, 0);
+        /* Улучшения для устройств с notch */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
             }
         }
+
     </style>
 </head>
 <body>
-<div class="container mt-5">
+<div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <h2 class="mb-4">Вход в Lucky Social Network</h2>
+            <div class="login-logo">
+                <i class="fas fa-user-circle"></i>
+            </div>
 
-            <!-- Сообщения об ошибках -->
+            <h2 class="mb-4 text-center">Вход в Lucky Social Network</h2>
+
             <div th:if="${error}" class="alert alert-danger" role="alert">
                 <div th:text="${error}"></div>
             </div>
 
-            <!-- Сообщение об успешном выходе -->
             <div th:if="${message}" class="alert alert-success" role="alert">
                 <div th:text="${message}"></div>
             </div>
 
             <form th:action="@{/login}" method="post" id="loginForm">
                 <div class="mb-3">
-                    <label for="username" class="form-label">Имя пользователя:</label>
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user"></i> Имя пользователя:
+                    </label>
                     <input type="text" class="form-control" id="username" name="username"
                            required autofocus placeholder="Введите имя пользователя">
                 </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Пароль:</label>
+                <div class="mb-3 password-container">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Пароль:
+                    </label>
                     <input type="password" class="form-control" id="password" name="password"
                            required placeholder="Введите пароль">
+                    <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>
                 </div>
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
-                    <label class="form-check-label" for="remember-me">Запомнить меня</label>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Войти</button>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
             </form>
 
             <div class="mt-3 text-center">
                 <p>Еще нет аккаунта? <a th:href="@{/register}">Зарегистрируйтесь</a></p>
             </div>
+
+            <!--            <div class="social-login">-->
+            <!--                <div class="social-login-title">или войдите через</div>-->
+            <!--                <div class="social-buttons">-->
+            <!--                    <a href="#" class="social-button"><i class="fab fa-google"></i></a>-->
+            <!--                    <a href="#" class="social-button"><i class="fab fa-facebook-f"></i></a>-->
+            <!--                    <a href="#" class="social-button"><i class="fab fa-twitter"></i></a>-->
+            <!--                </div>-->
+            <!--            </div>-->
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Добавляем анимацию тряски при ошибке
-    document.addEventListener('DOMContentLoaded', function () {
-        const errorAlert = document.querySelector('.alert-danger');
-        const form = document.querySelector('#loginForm');
+    // Ваши существующие скрипты
 
-        if (errorAlert) {
-            form.classList.add('shake');
-            // Удаляем класс после окончания анимации
-            form.addEventListener('animationend', function () {
-                form.classList.remove('shake');
-            });
+    // Добавляем функцию переключения видимости пароля
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.querySelector('.toggle-password');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+
+    // Предотвращаем отправку формы при нажатии Enter на поле пароля
+    document.getElementById('password').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.querySelector('button[type="submit"]').click();
         }
     });
-
-    // Автоматически скрываем сообщения через 5 секунд
-    setTimeout(function () {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function (alert) {
-            alert.style.opacity = '0';
-            alert.style.transition = 'opacity 0.5s ease-out';
-            setTimeout(function () {
-                alert.style.display = 'none';
-            }, 500);
-        });
-    }, 5000);
 </script>
 </body>
 </html>
@@ -232,56 +282,124 @@
 <!--            min-height: 100vh;-->
 <!--            display: flex;-->
 <!--            align-items: center;-->
+
 <!--        }-->
+
+
 <!--        .container {-->
 <!--            background: rgba(255, 255, 255, 0.1);-->
 <!--            backdrop-filter: blur(10px);-->
 <!--            border-radius: 10px;-->
 <!--            padding: 2rem;-->
 <!--        }-->
+
 <!--        h2 {-->
 <!--            color: #ffd700;-->
 <!--            font-weight: 600;-->
+
 <!--        }-->
+
+
 <!--        .form-label {-->
 <!--            color: #fff;-->
 <!--        }-->
+
 <!--        .form-control {-->
 <!--            background: rgba(255, 255, 255, 0.2);-->
 <!--            border: none;-->
 <!--            color: #fff;-->
+
 <!--        }-->
+
+
 <!--        .form-control:focus {-->
 <!--            background: rgba(255, 255, 255, 0.3);-->
 <!--            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);-->
 <!--            color: #fff;-->
+
 <!--        }-->
-<!--        .btn-primary {-->
-<!--            background-color: #ffd700;-->
-<!--            border-color: #ffd700;-->
-<!--            color: #764ba2;-->
-<!--            font-weight: 600;-->
-<!--            transition: all 0.3s ease;-->
-<!--        }-->
+
+
 <!--        .btn-primary:hover {-->
 <!--            background-color: #fff;-->
 <!--            border-color: #fff;-->
 <!--            color: #764ba2;-->
 <!--            transform: translateY(-3px);-->
 <!--            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);-->
+
 <!--        }-->
+
+<!--      -->
 <!--        .form-check-input:checked {-->
 <!--            background-color: #ffd700;-->
-<!--            border-color: #ffd700;-->
+<!--            border-color: #ffd700-->
 <!--        }-->
+
 <!--        a {-->
 <!--            color: #ffd700;-->
 <!--            text-decoration: none;-->
 <!--            transition: all 0.3s ease;-->
 <!--        }-->
+
 <!--        a:hover {-->
 <!--            color: #fff;-->
-<!--            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);-->
+<!--        &ndash;&gt; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);-->
+<!--        &ndash;&gt;-->
+<!--        }-->
+
+<!--        .alert {-->
+<!--            background: rgba(255, 255, 255, 0.1);-->
+<!--            backdrop-filter: blur(10px);-->
+<!--            border: none;-->
+<!--            color: #fff;-->
+<!--            padding: 1rem;-->
+<!--            margin-bottom: 1.5rem;-->
+<!--            animation: slideDown 0.3s ease-out;-->
+<!--        }-->
+
+<!--        .alert-danger {-->
+<!--            background: rgba(220, 53, 69, 0.2);-->
+<!--            border-left: 4px solid #dc3545;-->
+<!--        }-->
+
+<!--        .alert-success {-->
+<!--            background: rgba(40, 167, 69, 0.2);-->
+<!--            border-left: 4px solid #28a745;-->
+<!--        }-->
+
+<!--        @keyframes slideDown {-->
+<!--            from {-->
+<!--                transform: translateY(-20px);-->
+<!--                opacity: 0;-->
+<!--            }-->
+<!--            to {-->
+<!--                transform: translateY(0);-->
+<!--                opacity: 1;-->
+<!--            }-->
+<!--        }-->
+
+<!--        .form-control::placeholder {-->
+<!--            color: rgba(255, 255, 255, 0.5);-->
+<!--        }-->
+
+<!--        .shake {-->
+<!--            animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;-->
+<!--            transform: translate3d(0, 0, 0);-->
+<!--        }-->
+
+<!--        @keyframes shake {-->
+<!--            10%, 90% {-->
+<!--                transform: translate3d(-1px, 0, 0);-->
+<!--            }-->
+<!--            20%, 80% {-->
+<!--                transform: translate3d(2px, 0, 0);-->
+<!--            }-->
+<!--            30%, 50%, 70% {-->
+<!--                transform: translate3d(-4px, 0, 0);-->
+<!--            }-->
+<!--            40%, 60% {-->
+<!--                transform: translate3d(4px, 0, 0);-->
+<!--            }-->
 <!--        }-->
 <!--    </style>-->
 <!--</head>-->
@@ -290,24 +408,35 @@
 <!--    <div class="row justify-content-center">-->
 <!--        <div class="col-md-6">-->
 <!--            <h2 class="mb-4">Вход в Lucky Social Network</h2>-->
-<!--            <div th:if="${loginError}" class="alert alert-danger" role="alert">-->
-<!--                Неправильное имя пользователя или пароль. Пожалуйста, попробуйте снова.-->
+
+<!--            &lt;!&ndash; Сообщения об ошибках &ndash;&gt;-->
+<!--            <div th:if="${error}" class="alert alert-danger" role="alert">-->
+<!--                <div th:text="${error}"></div>-->
 <!--            </div>-->
-<!--            <form th:action="@{/login}" method="post">-->
+
+<!--            &lt;!&ndash; Сообщение об успешном выходе &ndash;&gt;-->
+<!--            <div th:if="${message}" class="alert alert-success" role="alert">-->
+<!--                <div th:text="${message}"></div>-->
+<!--            </div>-->
+
+<!--            <form th:action="@{/login}" method="post" id="loginForm">-->
 <!--                <div class="mb-3">-->
 <!--                    <label for="username" class="form-label">Имя пользователя:</label>-->
-<!--                    <input type="text" class="form-control" id="username" name="username" required autofocus>-->
+<!--                    <input type="text" class="form-control" id="username" name="username"-->
+<!--                           required autofocus placeholder="Введите имя пользователя">-->
 <!--                </div>-->
 <!--                <div class="mb-3">-->
 <!--                    <label for="password" class="form-label">Пароль:</label>-->
-<!--                    <input type="password" class="form-control" id="password" name="password" required>-->
+<!--                    <input type="password" class="form-control" id="password" name="password"-->
+<!--                           required placeholder="Введите пароль">-->
 <!--                </div>-->
-<!--                <div class="mb-3 form-check">-->
-<!--                    <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">-->
-<!--                    <label class="form-check-label" for="remember-me">Запомнить меня</label>-->
-<!--                </div>-->
+<!--                &lt;!&ndash;                <div class="mb-3 form-check">&ndash;&gt;-->
+<!--                &lt;!&ndash;                    <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">&ndash;&gt;-->
+<!--                &lt;!&ndash;                    <label class="form-check-label" for="remember-me">Запомнить меня</label>&ndash;&gt;-->
+<!--                &lt;!&ndash;                </div>&ndash;&gt;-->
 <!--                <button type="submit" class="btn btn-primary w-100">Войти</button>-->
 <!--            </form>-->
+
 <!--            <div class="mt-3 text-center">-->
 <!--                <p>Еще нет аккаунта? <a th:href="@{/register}">Зарегистрируйтесь</a></p>-->
 <!--            </div>-->
@@ -316,5 +445,32 @@
 <!--</div>-->
 
 <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<script>-->
+<!--    // Добавляем анимацию тряски при ошибке-->
+<!--    document.addEventListener('DOMContentLoaded', function () {-->
+<!--        const errorAlert = document.querySelector('.alert-danger');-->
+<!--        const form = document.querySelector('#loginForm');-->
+
+<!--        if (errorAlert) {-->
+<!--            form.classList.add('shake');-->
+<!--            // Удаляем класс после окончания анимации-->
+<!--            form.addEventListener('animationend', function () {-->
+<!--                form.classList.remove('shake');-->
+<!--            });-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Автоматически скрываем сообщения через 5 секунд-->
+<!--    setTimeout(function () {-->
+<!--        const alerts = document.querySelectorAll('.alert');-->
+<!--        alerts.forEach(function (alert) {-->
+<!--            alert.style.opacity = '0';-->
+<!--            alert.style.transition = 'opacity 0.5s ease-out';-->
+<!--            setTimeout(function () {-->
+<!--                alert.style.display = 'none';-->
+<!--            }, 500);-->
+<!--        });-->
+<!--    }, 5000);-->
+<!--</script>-->
 <!--</body>-->
 <!--</html>-->
