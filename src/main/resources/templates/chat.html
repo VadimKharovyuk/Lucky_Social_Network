@@ -373,6 +373,44 @@
         .alert {
             margin-bottom: 10px;
         }
+
+        .chat-header-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid #e4e6eb;
+        }
+
+        .user-avatar-container {
+            flex-shrink: 0;
+        }
+
+        .chat-user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .chat-header-container {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .chat-user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -401,23 +439,23 @@
                 <i class="fas fa-user"></i>
                 <span>Моя страница</span>
             </a>
-            <a href="/news" class="side-nav-link">
+            <a href="/posts" class="side-nav-link">
                 <i class="fas fa-newspaper"></i>
                 <span>Новости</span>
             </a>
-            <a href="/messages" class="side-nav-link active">
+            <a href="/chat/list" class="side-nav-link active">
                 <i class="fas fa-envelope"></i>
                 <span>Сообщения</span>
             </a>
-            <a href="/friends" class="side-nav-link">
+            <a href="/users/friends" class="side-nav-link">
                 <i class="fas fa-users"></i>
                 <span>Друзья</span>
             </a>
-            <a href="/groups" class="side-nav-link">
+            <a href="/groups/my" class="side-nav-link">
                 <i class="fas fa-users-rectangle"></i>
                 <span>Группы</span>
             </a>
-            <a href="/photos" class="side-nav-link">
+            <a href="/albums" class="side-nav-link">
                 <i class="fas fa-images"></i>
                 <span>Фотографии</span>
             </a>
@@ -440,7 +478,28 @@
                     <span th:text="${success}"></span>
                 </div>
                 <i class="fas fa-user-circle fa-2x"></i>
-                <h1>Чат с <span th:text="${recipient.username}"></span></h1>
+                <div class="chat-header-container">
+                    <div class="user-avatar-container">
+                        <!-- Проверка и отображение аватара -->
+                        <img th:if="${recipient.avatarUrl != null}"
+                             th:src="${recipient.avatarUrl}"
+                             alt="User avatar"
+                             class="chat-user-avatar">
+                        <img th:unless="${recipient.avatarUrl != null}"
+                             src="/default-avatar.jpg"
+                             alt="Default avatar"
+                             class="chat-user-avatar">
+                    </div>
+                    <h1>Чат с
+                        <span th:if="${not #strings.isEmpty(recipient.firstName) and not #strings.isEmpty(recipient.lastName)}"
+                              th:text="${recipient.firstName + ' ' + recipient.lastName}">
+        </span>
+                        <span th:unless="${not #strings.isEmpty(recipient.firstName) and not #strings.isEmpty(recipient.lastName)}"
+                              th:text="${recipient.username}">
+        </span>
+                    </h1>
+                </div>
+                <!--                <h1>Чат с <span th:text="${recipient.username}"></span></h1>-->
                 <!-- Добавляем кнопку удаления истории -->
                 <form th:action="@{/chat/delete-history}" method="post" class="delete-history-form"
                       style="float: right;">

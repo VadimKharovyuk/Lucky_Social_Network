@@ -316,6 +316,80 @@
       transition: all 0.3s ease;
     }
 
+    .post-content {
+      padding: 15px;
+    }
+
+    .post-image-container {
+      margin-bottom: 15px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .post-image {
+      width: 100%;
+      max-height: 500px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .post-image:hover {
+      transform: scale(1.01);
+    }
+
+    .post-text {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #1c1e21;
+    }
+
+    /* Стили для модального окна */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      padding: 20px;
+    }
+
+    .modal-content {
+      margin: auto;
+      display: block;
+      max-width: 90%;
+      max-height: 90vh;
+      object-fit: contain;
+    }
+
+    .close-modal {
+      position: absolute;
+      right: 25px;
+      top: 15px;
+      color: #f1f1f1;
+      font-size: 35px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Адаптивность для мобильных устройств */
+    @media (max-width: 768px) {
+      .post-image-container {
+        margin: -15px -15px 15px -15px;
+        border-radius: 0;
+      }
+
+      .post-image {
+        max-height: 300px;
+      }
+
+      .modal-content {
+        max-width: 100%;
+      }
+    }
 
   </style>
 </head>
@@ -372,8 +446,24 @@
             </span>
     </div>
 
-    <div class="post-content" th:text="${post.content}">
-      Содержание поста
+    <div class="post-content">
+      <!-- Проверяем наличие изображения -->
+      <div th:if="${post.imageUrl != null}" class="post-image-container">
+        <img th:src="${post.imageUrl}"
+             alt="Post image"
+             class="post-image"
+             onclick="openImageModal(this.src)">
+      </div>
+      <!-- Текст поста -->
+      <div class="post-text" th:text="${post.content}">
+        Содержание поста
+      </div>
+    </div>
+
+    <!-- Модальное окно для просмотра изображения -->
+    <div id="imageModal" class="modal">
+      <span class="close-modal">&times;</span>
+      <img id="modalImage" class="modal-content">
     </div>
 
     <div class="post-actions">
@@ -464,6 +554,9 @@
               .catch(error => console.error('Error:', error));
     });
   });
+</script>
+<script>
+  
 </script>
 </body>
 </html>

@@ -230,6 +230,76 @@
         border-radius: 0;
       }
     }
+
+    .chat-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f0f2f5;
+      margin-right: 15px;
+    }
+
+    .chat-avatar img.user-avatar {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .chat-avatar i {
+      font-size: 24px;
+      color: #65676b;
+    }
+
+    .chat-link {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      text-decoration: none;
+      color: inherit;
+      transition: background-color 0.2s;
+    }
+
+    .chat-link:hover {
+      background-color: #f0f2f5;
+    }
+
+    .chat-info {
+      flex: 1;
+    }
+
+    .chat-name {
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .chat-preview {
+      color: #65676b;
+      font-size: 0.9em;
+    }
+
+    /* Адаптивность для мобильных устройств */
+    @media (max-width: 768px) {
+      .chat-avatar {
+        width: 40px;
+        height: 40px;
+      }
+
+      .chat-name {
+        font-size: 14px;
+      }
+
+      .chat-preview {
+        font-size: 12px;
+      }
+
+      .chat-link {
+        padding: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -258,23 +328,23 @@
         <i class="fas fa-user"></i>
         <span>Моя страница</span>
       </a>
-      <a href="/news" class="side-nav-link">
+      <a href="/posts" class="side-nav-link">
         <i class="fas fa-newspaper"></i>
         <span>Новости</span>
       </a>
-      <a href="/messages" class="side-nav-link active">
+      <a href="/chat/list" class="side-nav-link active">
         <i class="fas fa-envelope"></i>
         <span>Сообщения</span>
       </a>
-      <a href="/friends" class="side-nav-link">
+      <a href="/users/friends" class="side-nav-link">
         <i class="fas fa-users"></i>
         <span>Друзья</span>
       </a>
-      <a href="/groups" class="side-nav-link">
+      <a href="/groups/my" class="side-nav-link">
         <i class="fas fa-users-rectangle"></i>
         <span>Группы</span>
       </a>
-      <a href="/photos" class="side-nav-link">
+      <a href="/albums" class="side-nav-link">
         <i class="fas fa-images"></i>
         <span>Фотографии</span>
       </a>
@@ -296,12 +366,20 @@
           <a th:href="@{/chat/{senderId}/{recipientId}(senderId=${#authentication.principal.id},recipientId=${user.id})}"
              class="chat-link">
             <div class="chat-avatar">
-              <i class="fas fa-user"></i>
+              <!-- Проверка и отображение аватара пользователя -->
+              <img th:if="${user.avatarUrl != null}"
+                   th:src="${user.avatarUrl}"
+                   alt="User avatar"
+                   class="user-avatar">
+              <img th:unless="${user.avatarUrl != null}"
+                   src="/default-avatar.jpg"
+                   alt="Default avatar"
+                   class="user-avatar">
             </div>
             <div class="chat-info">
               <div class="chat-name">
-                                    <span th:if="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"
-                                          th:text="${user.firstName + ' ' + user.lastName}">Имя Фамилия</span>
+              <span th:if="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"
+                    th:text="${user.firstName + ' ' + user.lastName}">Имя Фамилия</span>
                 <span th:unless="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"
                       th:text="${user.username}">Username</span>
               </div>
@@ -312,6 +390,34 @@
       </ul>
     </div>
   </main>
+
+  <!--  <main class="main-content">-->
+  <!--    <div class="chat-container">-->
+  <!--      <div class="chat-header">-->
+  <!--        <h1>Ваши чаты</h1>-->
+  <!--      </div>-->
+
+  <!--      <ul class="chat-list">-->
+  <!--        <li class="chat-item" th:each="user : ${chatUsers}">-->
+  <!--          <a th:href="@{/chat/{senderId}/{recipientId}(senderId=${#authentication.principal.id},recipientId=${user.id})}"-->
+  <!--             class="chat-link">-->
+  <!--            <div class="chat-avatar">-->
+  <!--              <i class="fas fa-user"></i>-->
+  <!--            </div>-->
+  <!--            <div class="chat-info">-->
+  <!--              <div class="chat-name">-->
+  <!--                                    <span th:if="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"-->
+  <!--                                          th:text="${user.firstName + ' ' + user.lastName}">Имя Фамилия</span>-->
+  <!--                <span th:unless="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"-->
+  <!--                      th:text="${user.username}">Username</span>-->
+  <!--              </div>-->
+  <!--              <div class="chat-preview">Нажмите, чтобы открыть чат</div>-->
+  <!--            </div>-->
+  <!--          </a>-->
+  <!--        </li>-->
+  <!--      </ul>-->
+  <!--    </div>-->
+  <!--  </main>-->
 </div>
 </body>
 </html>

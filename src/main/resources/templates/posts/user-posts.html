@@ -404,6 +404,83 @@
                 padding-right: env(safe-area-inset-right);
             }
         }
+
+        .post-content {
+            padding: 15px;
+        }
+
+        .post-image-container {
+            margin: -15px -15px 15px -15px;
+            position: relative;
+            overflow: hidden;
+            max-height: 400px;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .post-image:hover {
+            transform: scale(1.02);
+        }
+
+        .post-text {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #1c1e21;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 25px;
+            top: 15px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .post-image-container {
+                max-height: 300px;
+            }
+
+            .post-content {
+                padding: 12px;
+            }
+
+            .modal-content {
+                max-width: 100%;
+                margin: 0 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -490,7 +567,6 @@
             </div>
         </div>
 
-        <!-- Posts -->
         <div th:if="${userPosts.empty}" class="empty-posts">
             <p>У пользователя пока нет постов.</p>
         </div>
@@ -501,7 +577,19 @@
                      th:text="${#temporals.format(post.timestamp, 'dd MMMM в HH:mm')}">
                 </div>
             </div>
-            <div class="post-content" th:text="${post.content}"></div>
+
+            <div class="post-content">
+                <!-- Контейнер для изображения -->
+                <div th:if="${post.imageUrl != null}" class="post-image-container">
+                    <img th:src="${post.imageUrl}"
+                         alt="Post image"
+                         class="post-image"
+                         onclick="openImageModal(this.src)">
+                </div>
+                <!-- Текст поста -->
+                <div class="post-text" th:text="${post.content}"></div>
+            </div>
+
             <div class="post-actions">
                 <form th:action="@{/posts/{id}/like(id=${post.id})}"
                       method="post"
@@ -519,11 +607,13 @@
                     <i class="far fa-comment"></i>
                     Комментировать
                 </a>
-                <!--                <button class="action-button">-->
-                <!--                    <i class="fas fa-share"></i>-->
-                <!--                    Поделиться-->
-                <!--                </button>-->
             </div>
+        </div>
+
+        <!-- Модальное окно для просмотра изображения -->
+        <div id="imageModal" class="modal">
+            <span class="close-modal">&times;</span>
+            <img id="modalImage" class="modal-content">
         </div>
     </div>
 </div>
