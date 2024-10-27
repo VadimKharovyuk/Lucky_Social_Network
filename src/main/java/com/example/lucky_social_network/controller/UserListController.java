@@ -66,6 +66,7 @@ public class UserListController {
 public String getFriends(Model model) {
     Long currentUserId = getCurrentUserId();
     Set<User> friends = userService.getFriendsByUser(currentUserId);
+    User currentUserI = userService.getCurrentUser();
 
     // Получаем аватары для всех друзей
     Map<Long, String> friendAvatars = new HashMap<>();
@@ -75,6 +76,7 @@ public String getFriends(Model model) {
     }
 
     model.addAttribute("friends", friends);
+    model.addAttribute("currentUserI", currentUserI);
     model.addAttribute("friendAvatars", friendAvatars);
     model.addAttribute("currentUserId", currentUserId);
 

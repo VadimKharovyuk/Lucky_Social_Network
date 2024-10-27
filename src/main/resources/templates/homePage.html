@@ -4,202 +4,1062 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lucky Social Network - Объединяя мир</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --accent-color: #ffd700;
+    --text-color: #fff;
+    --transition: all 0.3s ease;
+    --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  html {
+    height: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--text-color);
+    line-height: 1.6;
+    position: relative;
+  }
+
+  .container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+
+  /* Header Styles */
+  header {
+    padding: 1rem 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+  }
+
+  header .logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-decoration: none;
+  }
+
+  header nav {
+    float: right;
+  }
+
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  header nav ul li a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 300;
+    transition: var(--transition);
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+  }
+
+  header nav ul li a:hover {
+    color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Main Content Styles */
+  .page-content {
+    flex: 1;
+    padding-top: 80px;
+    padding-bottom: 40px;
+  }
+
+  .main-content {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .info-blocks {
+    flex: 3;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .info-block {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .info-block:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow);
+    border-color: var(--accent-color);
+  }
+
+  .info-block h2 {
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+
+  /* Sidebar Styles */
+  aside {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .auth-links {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+  }
+
+  .auth-links a {
+    display: block;
+    text-align: center;
+    background: var(--accent-color);
+    color: #333;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+
+  .auth-links a:hover {
+    background: var(--text-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+  }
+
+  /* Footer Styles */
+  .footer {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4rem 0 2rem;
+    backdrop-filter: blur(10px);
+    width: 100%;
+    margin-top: auto;
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .footer-column h3 {
+    color: var(--accent-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+  }
+
+  .footer-column ul {
+    list-style: none;
+  }
+
+  .footer-column ul li {
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-column ul li a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: var(--transition);
+  }
+
+  .footer-column ul li a:hover {
+    color: var(--accent-color);
+  }
+
+  .footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
     }
-    html, body {
-      height: 100%;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
-    body {
-      display: flex;
-      flex-direction: column;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      line-height: 1.6;
-      margin: 0;
-    }
+  }
+
+  .info-block, .auth-links {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  /* Media Queries */
+  @media (max-width: 1024px) {
     .container {
-      width: 85%;
-      margin: auto;
-      overflow: hidden;
-      flex: 1;
+      width: 95%;
     }
-    header {
-      padding: 1rem 0;
-      position: fixed;
-      width: 100%;
-      top: 0;
-      z-index: 1000;
+  }
+
+  @media (max-width: 768px) {
+    .nav-toggle {
+      display: block;
+    }
+
+    header nav ul {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
+      flex-direction: column;
+      padding: 1rem;
     }
-    header .logo {
-      float: left;
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-    header nav {
-      float: right;
-    }
-    header nav ul {
-      list-style: none;
-    }
-    header nav ul li {
-      display: inline;
-      margin-left: 1.5rem;
-    }
-    header nav ul li a {
-      text-decoration: none;
-      color: #fff;
-      font-weight: 300;
-      transition: all 0.3s ease;
-    }
-    header nav ul li a:hover {
-      color: #ffd700;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-    }
-    .main-content {
+
+    header nav ul.active {
       display: flex;
-      margin-top: 6rem;
-      align-items: flex-start;
-      flex: 1;
     }
-    .info-blocks {
-      flex: 3;
+
+    .main-content {
+      flex-direction: column;
     }
-    .info-block {
-      background: rgba(255, 255, 255, 0.1);
-      margin-bottom: 1.5rem;
-      padding: 1.5rem;
-      border-radius: 10px;
-      backdrop-filter: blur(5px);
-      transition: all 0.3s ease;
-    }
-    .info-block:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-    .info-block h2 {
-      margin-bottom: 0.5rem;
-      color: #ffd700;
-    }
+
     aside {
-      flex: 1;
-      margin-left: 2rem;
+      width: 100%;
     }
-    .auth-links, .popular-users {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 1.5rem;
-      border-radius: 10px;
-      backdrop-filter: blur(5px);
-      margin-bottom: 1.5rem;
+
+    .footer-content {
+      grid-template-columns: repeat(2, 1fr);
     }
-    .auth-links a, .popular-users a {
-      display: block;
-      text-align: center;
-      background: #ffd700;
-      color: #333;
-      padding: 0.7rem;
-      margin-bottom: 1rem;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: 600;
-      transition: all 0.3s ease;
+  }
+
+  @media (max-width: 480px) {
+    header .logo {
+      font-size: 1.2rem;
     }
-    .auth-links a:hover, .popular-users a:hover {
-      background: #fff;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+
+    .info-block {
+      padding: 1rem;
     }
-    .popular-users h3 {
-      color: #ffd700;
-      margin-bottom: 1rem;
+
+    .info-block h2 {
+      font-size: 1.3rem;
     }
-    .popular-users ul {
-      list-style: none;
-      margin-bottom: 1rem;
+
+    .footer-content {
+      grid-template-columns: 1fr;
     }
-    .popular-users ul li {
-      margin-bottom: 0.5rem;
+
+    .auth-links a {
+      padding: 0.8rem;
+      font-size: 0.9rem;
     }
-    footer {
-      background: rgba(0, 0, 0, 0.5);
-      color: #fff;
-      text-align: center;
-      padding: 1rem 0;
-      margin-top: auto;
+  }
+
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .info-block, .auth-links, .popular-users {
-      animation: fadeIn 0.5s ease-out forwards;
-    }
-  </style>
-</head>
+  }
+</style>
 <body>
 <header>
   <div class="container">
-    <div class="logo">Lucky Social Network</div>
+    <a href="/" class="logo">Lucky Social Network</a>
+    <button class="nav-toggle" aria-label="Открыть меню">
+      <i class="fas fa-bars"></i>
+    </button>
     <nav>
       <ul>
-<!--        <li><a href="/home">Моя страница</a></li>-->
-        <li><a href="#features">Возможности</a></li>
-        <li><a href="#about">О нас</a></li>
-        <li><a href="#contact">Контакты</a></li>
+        <li><a href="#features"><i class="fas fa-star"></i> Возможности</a></li>
+        <li><a href="#about"><i class="fas fa-info-circle"></i> О нас</a></li>
+        <li><a href="#contact"><i class="fas fa-envelope"></i> Контакты</a></li>
       </ul>
     </nav>
   </div>
 </header>
 
-<div class="container main-content">
-  <div class="info-blocks">
-    <div class="info-block">
-      <h2>Объединяем мир</h2>
-      <p>Lucky Social Network - это место, где каждый может найти свое сообщество и поделиться своими идеями.</p>
+<main class="page-content">
+  <div class="container main-content">
+    <div class="info-blocks">
+      <div class="info-block">
+        <h2><i class="fas fa-globe"></i> Объединяем мир</h2>
+        <p>Lucky Social Network - это место, где каждый может найти свое сообщество и поделиться своими идеями.</p>
+      </div>
+      <div class="info-block">
+        <h2><i class="fas fa-comments"></i> Безграничное общение</h2>
+        <p>Общайтесь с людьми со всего мира, расширяйте свой кругозор и находите новых друзей.</p>
+      </div>
+      <div class="info-block">
+        <h2><i class="fas fa-paint-brush"></i> Творите и вдохновляйте</h2>
+        <p>Делитесь своим творчеством, вдохновляйте других и находите вдохновение для себя.</p>
+      </div>
     </div>
-    <div class="info-block">
-      <h2>Безграничное общение</h2>
-      <p>Общайтесь с людьми со всего мира, расширяйте свой кругозор и находите новых друзей.</p>
-    </div>
-    <div class="info-block">
-      <h2>Творите и вдохновляйте</h2>
-      <p>Делитесь своим творчеством, вдохновляйте других и находите вдохновение для себя.</p>
-    </div>
-    <div class="info-block">
-      <h2>Безопасность превыше всего</h2>
-      <p>Мы заботимся о вашей безопасности и конфиденциальности, предоставляя надежную платформу для общения.</p>
-    </div>
+
+    <aside>
+      <div class="auth-links">
+        <a href="/login"><i class="fas fa-sign-in-alt"></i> Войти</a>
+        <a href="/register"><i class="fas fa-user-plus"></i> Присоединиться</a>
+      </div>
+    </aside>
   </div>
-  <aside>
-    <div class="auth-links">
-      <a href="/login">Войти</a>
-      <a href="/register">Присоединиться</a>
-    </div>
-    <div class="popular-users">
-      <h3>Популярные пользователи</h3>
-      <ul>
-        <li th:each="user : ${userList}" th:if="${userStat.index < 3}">
-          <a th:href="@{/profile/{id}(id=${user.id})}" th:text="${user.username}"></a>
-        </li>
+</main>
 
-      </ul>
-      <a href="/profile-list">Посмотреть всех пользователей</a>
-    </div>
-  </aside>
-</div>
-
-<footer>
+<footer class="footer">
   <div class="container">
-    <p>&copy; 2024 Vadim Kharovyuk.<br>
-      Соединяя сердца и умы.</p>
+    <div class="footer-content">
+      <div class="footer-column">
+        <h3>О компании</h3>
+        <ul>
+          <li><a href="/about">О нас</a></li>
+          <li><a href="/careers">Карьера</a></li>
+          <li><a href="/news">Новости</a></li>
+          <li><a href="/privacy">Конфиденциальность</a></li>
+          <li><a href="/terms">Условия использования</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h3>Поддержка</h3>
+        <ul>
+          <li><a href="/help">Центр помощи</a></li>
+          <li><a href="/safety">Безопасность</a></li>
+          <li><a href="/community">Правила сообщества</a></li>
+          <li><a href="/feedback">Обратная связь</a></li>
+          <li><a href="/contact">Связаться с нами</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h3>Следите за нами</h3>
+        <ul class="social-links">
+          <li><a href="#"><i class="fab fa-telegram"></i> Telegram</a></li>
+          <li><a href="#"><i class="fab fa-github"></i> GitHub</a></li>
+          <li><a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+          <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2024 Vadim Kharovyuk. Все права защищены.</p>
+      <p>Соединяя сердца и умы.</p>
+    </div>
   </div>
 </footer>
+
+<script>
+  document.querySelector('.nav-toggle').addEventListener('click', function () {
+    document.querySelector('nav ul').classList.toggle('active');
+  });
+
+  document.addEventListener('click', function (e) {
+    const nav = document.querySelector('nav ul');
+    const toggle = document.querySelector('.nav-toggle');
+
+    if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+      nav.classList.remove('active');
+    }
+  });
+
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  });
+</script>
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="ru">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>Lucky Social Network - Объединяя мир</title>-->
+<!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">-->
+<!--  &lt;!&ndash; Подключите ваш CSS файл здесь &ndash;&gt;-->
+<!--</head>-->
+<!--<style>-->
+<!--  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');-->
+
+<!--  * {-->
+<!--    margin: 0;-->
+<!--    padding: 0;-->
+<!--    box-sizing: border-box;-->
+<!--  }-->
+
+<!--  :root {-->
+<!--    &#45;&#45;primary-color: #667eea;-->
+<!--    &#45;&#45;secondary-color: #764ba2;-->
+<!--    &#45;&#45;accent-color: #ffd700;-->
+<!--    &#45;&#45;text-color: #fff;-->
+<!--    &#45;&#45;transition: all 0.3s ease;-->
+<!--    &#45;&#45;box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);-->
+<!--  }-->
+
+<!--  html, body {-->
+<!--    height: 100%;-->
+<!--    scroll-behavior: smooth;-->
+<!--  }-->
+
+<!--  body {-->
+<!--    display: flex;-->
+<!--    flex-direction: column;-->
+<!--    font-family: 'Poppins', sans-serif;-->
+<!--    background: linear-gradient(135deg, var(&#45;&#45;primary-color) 0%, var(&#45;&#45;secondary-color) 100%);-->
+<!--    color: var(&#45;&#45;text-color);-->
+<!--    line-height: 1.6;-->
+<!--    margin: 0;-->
+<!--  }-->
+
+<!--  .container {-->
+<!--    width: 90%;-->
+<!--    max-width: 1200px;-->
+<!--    margin: auto;-->
+<!--    padding: 0 15px;-->
+<!--  }-->
+
+<!--  /* Header Styles */-->
+<!--  header {-->
+<!--    padding: 1rem 0;-->
+<!--    position: fixed;-->
+<!--    width: 100%;-->
+<!--    top: 0;-->
+<!--    z-index: 1000;-->
+<!--    background: rgba(255, 255, 255, 0.1);-->
+<!--    backdrop-filter: blur(10px);-->
+<!--    transition: var(&#45;&#45;transition);-->
+<!--  }-->
+
+<!--  header .logo {-->
+<!--    font-size: 1.5rem;-->
+<!--    font-weight: 600;-->
+<!--    color: var(&#45;&#45;accent-color);-->
+<!--    text-decoration: none;-->
+<!--  }-->
+
+<!--  header nav {-->
+<!--    float: right;-->
+<!--  }-->
+
+<!--  .nav-toggle {-->
+<!--    display: none;-->
+<!--    background: none;-->
+<!--    border: none;-->
+<!--    color: var(&#45;&#45;text-color);-->
+<!--    font-size: 1.5rem;-->
+<!--    cursor: pointer;-->
+<!--  }-->
+
+<!--  header nav ul {-->
+<!--    list-style: none;-->
+<!--    display: flex;-->
+<!--    gap: 1.5rem;-->
+<!--  }-->
+
+<!--  header nav ul li a {-->
+<!--    text-decoration: none;-->
+<!--    color: var(&#45;&#45;text-color);-->
+<!--    font-weight: 300;-->
+<!--    transition: var(&#45;&#45;transition);-->
+<!--    padding: 0.5rem 1rem;-->
+<!--    border-radius: 5px;-->
+<!--  }-->
+
+<!--  header nav ul li a:hover {-->
+<!--    color: var(&#45;&#45;accent-color);-->
+<!--    background: rgba(255, 255, 255, 0.1);-->
+<!--  }-->
+
+<!--  /* Main Content Styles */-->
+<!--  .main-content {-->
+<!--    display: flex;-->
+<!--    margin-top: 6rem;-->
+<!--    gap: 2rem;-->
+<!--    min-height: calc(100vh - 6rem - 300px); /* Учитываем высоту footer */-->
+<!--  }-->
+
+<!--  .info-blocks {-->
+<!--    flex: 3;-->
+<!--    display: grid;-->
+<!--    gap: 1.5rem;-->
+<!--  }-->
+
+<!--  .info-block {-->
+<!--    background: rgba(255, 255, 255, 0.1);-->
+<!--    padding: 1.5rem;-->
+<!--    border-radius: 10px;-->
+<!--    backdrop-filter: blur(5px);-->
+<!--    transition: var(&#45;&#45;transition);-->
+<!--    border: 1px solid rgba(255, 255, 255, 0.1);-->
+<!--  }-->
+
+<!--  .info-block:hover {-->
+<!--    transform: translateY(-5px);-->
+<!--    box-shadow: var(&#45;&#45;box-shadow);-->
+<!--    border-color: var(&#45;&#45;accent-color);-->
+<!--  }-->
+
+<!--  .info-block h2 {-->
+<!--    color: var(&#45;&#45;accent-color);-->
+<!--    margin-bottom: 1rem;-->
+<!--    font-size: 1.5rem;-->
+<!--  }-->
+
+<!--  /* Sidebar Styles */-->
+<!--  aside {-->
+<!--    flex: 1;-->
+<!--    display: flex;-->
+<!--    flex-direction: column;-->
+<!--    gap: 1.5rem;-->
+<!--  }-->
+
+<!--  .auth-links, .popular-users {-->
+<!--    background: rgba(255, 255, 255, 0.1);-->
+<!--    padding: 1.5rem;-->
+<!--    border-radius: 10px;-->
+<!--    backdrop-filter: blur(5px);-->
+<!--  }-->
+
+<!--  .auth-links a, .popular-users a {-->
+<!--    display: block;-->
+<!--    text-align: center;-->
+<!--    background: var(&#45;&#45;accent-color);-->
+<!--    color: #333;-->
+<!--    padding: 0.7rem;-->
+<!--    margin-bottom: 1rem;-->
+<!--    text-decoration: none;-->
+<!--    border-radius: 5px;-->
+<!--    font-weight: 500;-->
+<!--    transition: var(&#45;&#45;transition);-->
+<!--  }-->
+
+<!--  .auth-links a:hover, .popular-users a:hover {-->
+<!--    background: var(&#45;&#45;text-color);-->
+<!--    transform: translateY(-2px);-->
+<!--    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);-->
+<!--  }-->
+
+<!--  /* Footer Styles */-->
+<!--  .footer {-->
+<!--    background: rgba(0, 0, 0, 0.3);-->
+<!--    padding: 4rem 0 2rem;-->
+<!--    margin-top: auto;-->
+<!--    backdrop-filter: blur(10px);-->
+<!--  }-->
+
+<!--  .footer-content {-->
+<!--    display: grid;-->
+<!--    grid-template-columns: repeat(3, 1fr);-->
+<!--    gap: 2rem;-->
+<!--    margin-bottom: 2rem;-->
+<!--  }-->
+
+<!--  .footer-column h3 {-->
+<!--    color: var(&#45;&#45;accent-color);-->
+<!--    margin-bottom: 1.5rem;-->
+<!--    font-size: 1.2rem;-->
+<!--  }-->
+
+<!--  .footer-column ul {-->
+<!--    list-style: none;-->
+<!--  }-->
+
+<!--  .footer-column ul li {-->
+<!--    margin-bottom: 0.5rem;-->
+<!--  }-->
+
+<!--  .footer-column ul li a {-->
+<!--    color: var(&#45;&#45;text-color);-->
+<!--    text-decoration: none;-->
+<!--    transition: var(&#45;&#45;transition);-->
+<!--  }-->
+
+<!--  .footer-column ul li a:hover {-->
+<!--    color: var(&#45;&#45;accent-color);-->
+<!--  }-->
+
+<!--  .footer-bottom {-->
+<!--    text-align: center;-->
+<!--    padding-top: 2rem;-->
+<!--    border-top: 1px solid rgba(255, 255, 255, 0.1);-->
+<!--  }-->
+
+<!--  /* Animations */-->
+<!--  @keyframes fadeIn {-->
+<!--    from {-->
+<!--      opacity: 0;-->
+<!--      transform: translateY(20px);-->
+<!--    }-->
+<!--    to {-->
+<!--      opacity: 1;-->
+<!--      transform: translateY(0);-->
+<!--    }-->
+<!--  }-->
+
+<!--  .info-block, .auth-links, .popular-users {-->
+<!--    animation: fadeIn 0.5s ease-out forwards;-->
+<!--  }-->
+
+<!--  /* Media Queries */-->
+<!--  @media (max-width: 1024px) {-->
+<!--    .container {-->
+<!--      width: 95%;-->
+<!--    }-->
+
+<!--    .main-content {-->
+<!--      margin-top: 5rem;-->
+<!--    }-->
+<!--  }-->
+
+<!--  @media (max-width: 768px) {-->
+<!--    .nav-toggle {-->
+<!--      display: block;-->
+<!--    }-->
+
+<!--    header nav ul {-->
+<!--      display: none;-->
+<!--      position: absolute;-->
+<!--      top: 100%;-->
+<!--      left: 0;-->
+<!--      right: 0;-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      backdrop-filter: blur(10px);-->
+<!--      flex-direction: column;-->
+<!--      padding: 1rem;-->
+<!--    }-->
+
+<!--    header nav ul.active {-->
+<!--      display: flex;-->
+<!--    }-->
+
+<!--    .main-content {-->
+<!--      flex-direction: column;-->
+<!--    }-->
+
+<!--    aside {-->
+<!--      width: 100%;-->
+<!--    }-->
+
+<!--    .footer-content {-->
+<!--      grid-template-columns: repeat(2, 1fr);-->
+<!--    }-->
+<!--  }-->
+
+<!--  @media (max-width: 480px) {-->
+<!--    header .logo {-->
+<!--      font-size: 1.2rem;-->
+<!--    }-->
+
+<!--    .info-block {-->
+<!--      padding: 1rem;-->
+<!--    }-->
+
+<!--    .info-block h2 {-->
+<!--      font-size: 1.3rem;-->
+<!--    }-->
+
+<!--    .footer-content {-->
+<!--      grid-template-columns: 1fr;-->
+<!--    }-->
+
+<!--    .auth-links a, .popular-users a {-->
+<!--      padding: 0.8rem;-->
+<!--      font-size: 0.9rem;-->
+<!--    }-->
+<!--  }-->
+
+<!--  /* Accessibility */-->
+<!--  @media (prefers-reduced-motion: reduce) {-->
+<!--    * {-->
+<!--      animation: none !important;-->
+<!--      transition: none !important;-->
+<!--    }-->
+<!--  }-->
+<!--</style>-->
+<!--<body>-->
+<!--<header>-->
+<!--  <div class="container">-->
+<!--    <a href="/" class="logo">Lucky Social Network</a>-->
+<!--    <button class="nav-toggle" aria-label="Открыть меню">-->
+<!--      <i class="fas fa-bars"></i>-->
+<!--    </button>-->
+<!--    <nav>-->
+<!--      <ul>-->
+<!--        <li><a href="#features"><i class="fas fa-star"></i> Возможности</a></li>-->
+<!--        <li><a href="#about"><i class="fas fa-info-circle"></i> О нас</a></li>-->
+<!--        <li><a href="#contact"><i class="fas fa-envelope"></i> Контакты</a></li>-->
+<!--      </ul>-->
+<!--    </nav>-->
+<!--  </div>-->
+<!--</header>-->
+
+<!--<div class="container main-content">-->
+<!--  <div class="info-blocks">-->
+<!--    <div class="info-block">-->
+<!--      <h2><i class="fas fa-globe"></i> Объединяем мир</h2>-->
+<!--      <p>Lucky Social Network - это место, где каждый может найти свое сообщество и поделиться своими идеями.</p>-->
+<!--    </div>-->
+<!--    <div class="info-block">-->
+<!--      <h2><i class="fas fa-comments"></i> Безграничное общение</h2>-->
+<!--      <p>Общайтесь с людьми со всего мира, расширяйте свой кругозор и находите новых друзей.</p>-->
+<!--    </div>-->
+<!--    <div class="info-block">-->
+<!--      <h2><i class="fas fa-paint-brush"></i> Творите и вдохновляйте</h2>-->
+<!--      <p>Делитесь своим творчеством, вдохновляйте других и находите вдохновение для себя.</p>-->
+<!--    </div>-->
+<!--    &lt;!&ndash;    <div class="info-block">&ndash;&gt;-->
+<!--    &lt;!&ndash;      <h2><i class="fas fa-shield-alt"></i> Безопасность превыше всего</h2>&ndash;&gt;-->
+<!--    &lt;!&ndash;      <p>Мы заботимся о вашей безопасности и конфиденциальности, предоставляя надежную платформу для общения.</p>&ndash;&gt;-->
+<!--    &lt;!&ndash;    </div>&ndash;&gt;-->
+<!--  </div>-->
+
+<!--  <aside>-->
+<!--    <div class="auth-links">-->
+<!--      <a href="/login"><i class="fas fa-sign-in-alt"></i> Войти</a>-->
+<!--      <a href="/register"><i class="fas fa-user-plus"></i> Присоединиться</a>-->
+<!--    </div>-->
+<!--    &lt;!&ndash;    <div class="popular-users">&ndash;&gt;-->
+<!--    &lt;!&ndash;      <h3><i class="fas fa-users"></i> Популярные пользователи</h3>&ndash;&gt;-->
+<!--    &lt;!&ndash;      <ul>&ndash;&gt;-->
+<!--    &lt;!&ndash;        <li th:each="user : ${userList}" th:if="${userStat.index < 3}">&ndash;&gt;-->
+<!--    &lt;!&ndash;          <a th:href="@{/profile/{id}(id=${user.id})}" th:text="${user.username}">&ndash;&gt;-->
+<!--    &lt;!&ndash;            <i class="fas fa-user"></i>&ndash;&gt;-->
+<!--    &lt;!&ndash;          </a>&ndash;&gt;-->
+<!--    &lt;!&ndash;        </li>&ndash;&gt;-->
+<!--    &lt;!&ndash;      </ul>&ndash;&gt;-->
+<!--    &lt;!&ndash;      <a href="/profile-list"><i class="fas fa-list"></i> Посмотреть всех пользователей</a>&ndash;&gt;-->
+<!--    &lt;!&ndash;    </div>&ndash;&gt;-->
+<!--  </aside>-->
+<!--</div>-->
+
+<!--<footer class="footer">-->
+<!--  <div class="container">-->
+<!--    <div class="footer-content">-->
+<!--      &lt;!&ndash; Первая колонка &ndash;&gt;-->
+<!--      <div class="footer-column">-->
+<!--        <h3>О компании</h3>-->
+<!--        <ul>-->
+<!--          <li><a href="/about">О нас</a></li>-->
+<!--          <li><a href="/careers">Карьера</a></li>-->
+<!--          <li><a href="/news">Новости</a></li>-->
+<!--          <li><a href="/privacy">Конфиденциальность</a></li>-->
+<!--          <li><a href="/terms">Условия использования</a></li>-->
+<!--        </ul>-->
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Вторая колонка &ndash;&gt;-->
+<!--      <div class="footer-column">-->
+<!--        <h3>Поддержка</h3>-->
+<!--        <ul>-->
+<!--          <li><a href="/help">Центр помощи</a></li>-->
+<!--          <li><a href="/safety">Безопасность</a></li>-->
+<!--          <li><a href="/community">Правила сообщества</a></li>-->
+<!--          <li><a href="/feedback">Обратная связь</a></li>-->
+<!--          <li><a href="/contact">Связаться с нами</a></li>-->
+<!--        </ul>-->
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Третья колонка &ndash;&gt;-->
+<!--      <div class="footer-column">-->
+<!--        <h3>Следите за нами</h3>-->
+<!--        <ul class="social-links">-->
+<!--          <li><a href="#"><i class="fab fa-telegram"></i> Telegram</a></li>-->
+<!--          <li><a href="#"><i class="fab fa-github"></i> GitHub</a></li>-->
+<!--          <li><a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a></li>-->
+<!--          <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>-->
+<!--        </ul>-->
+<!--      </div>-->
+<!--    </div>-->
+
+<!--    <div class="footer-bottom">-->
+<!--      <p>&copy; 2024 Vadim Kharovyuk. Все права защищены.</p>-->
+<!--      <p>Соединяя сердца и умы.</p>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</footer>-->
+
+<!--<script>-->
+<!--  // Мобильное меню-->
+<!--  document.querySelector('.nav-toggle').addEventListener('click', function () {-->
+<!--    document.querySelector('nav ul').classList.toggle('active');-->
+<!--  });-->
+
+<!--  // Закрытие мобильного меню при клике вне его-->
+<!--  document.addEventListener('click', function (e) {-->
+<!--    const nav = document.querySelector('nav ul');-->
+<!--    const toggle = document.querySelector('.nav-toggle');-->
+
+<!--    if (!nav.contains(e.target) && !toggle.contains(e.target)) {-->
+<!--      nav.classList.remove('active');-->
+<!--    }-->
+<!--  });-->
+
+<!--  // Плавная прокрутка для якорных ссылок-->
+<!--  document.querySelectorAll('a[href^="#"]').forEach(anchor => {-->
+<!--    anchor.addEventListener('click', function (e) {-->
+<!--      e.preventDefault();-->
+<!--      document.querySelector(this.getAttribute('href')).scrollIntoView({-->
+<!--        behavior: 'smooth'-->
+<!--      });-->
+<!--    });-->
+<!--  });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="ru">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>Lucky Social Network - Объединяя мир</title>-->
+<!--  <style>-->
+<!--    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');-->
+
+<!--    * {-->
+<!--      margin: 0;-->
+<!--      padding: 0;-->
+<!--      box-sizing: border-box;-->
+<!--    }-->
+<!--    html, body {-->
+<!--      height: 100%;-->
+<!--    }-->
+<!--    body {-->
+<!--      display: flex;-->
+<!--      flex-direction: column;-->
+<!--      font-family: 'Poppins', sans-serif;-->
+<!--      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);-->
+<!--      color: #fff;-->
+<!--      line-height: 1.6;-->
+<!--      margin: 0;-->
+<!--    }-->
+<!--    .container {-->
+<!--      width: 85%;-->
+<!--      margin: auto;-->
+<!--      overflow: hidden;-->
+<!--      flex: 1;-->
+<!--    }-->
+<!--    header {-->
+<!--      padding: 1rem 0;-->
+<!--      position: fixed;-->
+<!--      width: 100%;-->
+<!--      top: 0;-->
+<!--      z-index: 1000;-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      backdrop-filter: blur(10px);-->
+<!--    }-->
+<!--    header .logo {-->
+<!--      float: left;-->
+<!--      font-size: 1.5rem;-->
+<!--      font-weight: 600;-->
+<!--    }-->
+<!--    header nav {-->
+<!--      float: right;-->
+<!--    }-->
+<!--    header nav ul {-->
+<!--      list-style: none;-->
+<!--    }-->
+<!--    header nav ul li {-->
+<!--      display: inline;-->
+<!--      margin-left: 1.5rem;-->
+<!--    }-->
+<!--    header nav ul li a {-->
+<!--      text-decoration: none;-->
+<!--      color: #fff;-->
+<!--      font-weight: 300;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    header nav ul li a:hover {-->
+<!--      color: #ffd700;-->
+<!--      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);-->
+<!--    }-->
+<!--    .main-content {-->
+<!--      display: flex;-->
+<!--      margin-top: 6rem;-->
+<!--      align-items: flex-start;-->
+<!--      flex: 1;-->
+<!--    }-->
+<!--    .info-blocks {-->
+<!--      flex: 3;-->
+<!--    }-->
+<!--    .info-block {-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      margin-bottom: 1.5rem;-->
+<!--      padding: 1.5rem;-->
+<!--      border-radius: 10px;-->
+<!--      backdrop-filter: blur(5px);-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .info-block:hover {-->
+<!--      transform: translateY(-10px);-->
+<!--      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);-->
+<!--    }-->
+<!--    .info-block h2 {-->
+<!--      margin-bottom: 0.5rem;-->
+<!--      color: #ffd700;-->
+<!--    }-->
+<!--    aside {-->
+<!--      flex: 1;-->
+<!--      margin-left: 2rem;-->
+<!--    }-->
+<!--    .auth-links, .popular-users {-->
+<!--      background: rgba(255, 255, 255, 0.1);-->
+<!--      padding: 1.5rem;-->
+<!--      border-radius: 10px;-->
+<!--      backdrop-filter: blur(5px);-->
+<!--      margin-bottom: 1.5rem;-->
+<!--    }-->
+<!--    .auth-links a, .popular-users a {-->
+<!--      display: block;-->
+<!--      text-align: center;-->
+<!--      background: #ffd700;-->
+<!--      color: #333;-->
+<!--      padding: 0.7rem;-->
+<!--      margin-bottom: 1rem;-->
+<!--      text-decoration: none;-->
+<!--      border-radius: 5px;-->
+<!--      font-weight: 600;-->
+<!--      transition: all 0.3s ease;-->
+<!--    }-->
+<!--    .auth-links a:hover, .popular-users a:hover {-->
+<!--      background: #fff;-->
+<!--      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);-->
+<!--    }-->
+<!--    .popular-users h3 {-->
+<!--      color: #ffd700;-->
+<!--      margin-bottom: 1rem;-->
+<!--    }-->
+<!--    .popular-users ul {-->
+<!--      list-style: none;-->
+<!--      margin-bottom: 1rem;-->
+<!--    }-->
+<!--    .popular-users ul li {-->
+<!--      margin-bottom: 0.5rem;-->
+<!--    }-->
+<!--    footer {-->
+<!--      background: rgba(0, 0, 0, 0.5);-->
+<!--      color: #fff;-->
+<!--      text-align: center;-->
+<!--      padding: 1rem 0;-->
+<!--      margin-top: auto;-->
+<!--    }-->
+<!--    @keyframes fadeIn {-->
+<!--      from { opacity: 0; transform: translateY(20px); }-->
+<!--      to { opacity: 1; transform: translateY(0); }-->
+<!--    }-->
+<!--    .info-block, .auth-links, .popular-users {-->
+<!--      animation: fadeIn 0.5s ease-out forwards;-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--  <div class="container">-->
+<!--    <div class="logo">Lucky Social Network</div>-->
+<!--    <nav>-->
+<!--      <ul>-->
+<!--&lt;!&ndash;        <li><a href="/home">Моя страница</a></li>&ndash;&gt;-->
+<!--        <li><a href="#features">Возможности</a></li>-->
+<!--        <li><a href="#about">О нас</a></li>-->
+<!--        <li><a href="#contact">Контакты</a></li>-->
+<!--      </ul>-->
+<!--    </nav>-->
+<!--  </div>-->
+<!--</header>-->
+
+<!--<div class="container main-content">-->
+<!--  <div class="info-blocks">-->
+<!--    <div class="info-block">-->
+<!--      <h2>Объединяем мир</h2>-->
+<!--      <p>Lucky Social Network - это место, где каждый может найти свое сообщество и поделиться своими идеями.</p>-->
+<!--    </div>-->
+<!--    <div class="info-block">-->
+<!--      <h2>Безграничное общение</h2>-->
+<!--      <p>Общайтесь с людьми со всего мира, расширяйте свой кругозор и находите новых друзей.</p>-->
+<!--    </div>-->
+<!--    <div class="info-block">-->
+<!--      <h2>Творите и вдохновляйте</h2>-->
+<!--      <p>Делитесь своим творчеством, вдохновляйте других и находите вдохновение для себя.</p>-->
+<!--    </div>-->
+<!--    <div class="info-block">-->
+<!--      <h2>Безопасность превыше всего</h2>-->
+<!--      <p>Мы заботимся о вашей безопасности и конфиденциальности, предоставляя надежную платформу для общения.</p>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <aside>-->
+<!--    <div class="auth-links">-->
+<!--      <a href="/login">Войти</a>-->
+<!--      <a href="/register">Присоединиться</a>-->
+<!--    </div>-->
+<!--    <div class="popular-users">-->
+<!--      <h3>Популярные пользователи</h3>-->
+<!--      <ul>-->
+<!--        <li th:each="user : ${userList}" th:if="${userStat.index < 3}">-->
+<!--          <a th:href="@{/profile/{id}(id=${user.id})}" th:text="${user.username}"></a>-->
+<!--        </li>-->
+
+<!--      </ul>-->
+<!--      <a href="/profile-list">Посмотреть всех пользователей</a>-->
+<!--    </div>-->
+<!--  </aside>-->
+<!--</div>-->
+
+<!--<footer>-->
+<!--  <div class="container">-->
+<!--    <p>&copy; 2024 Vadim Kharovyuk.<br>-->
+<!--      Соединяя сердца и умы.</p>-->
+<!--  </div>-->
+<!--</footer>-->
+<!--</body>-->
+<!--</html>-->

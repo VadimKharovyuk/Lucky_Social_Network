@@ -6,23 +6,32 @@
   <title>Список друзей - Lucky Social Network</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
   <style>
     :root {
       --fb-blue: #1877f2;
       --fb-bg: #f0f2f5;
       --fb-text: #050505;
       --fb-secondary: #65676b;
+      --shadow-1: 0 2px 4px rgba(0, 0, 0, 0.1);
+      --shadow-2: 0 4px 8px rgba(0, 0, 0, 0.2);
+      --transition: all 0.3s ease;
     }
 
     body {
       font-family: 'Poppins', sans-serif;
       background-color: var(--fb-bg);
       color: var(--fb-text);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
     }
 
+    /* Header Styles */
     header {
       background-color: white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-1);
       padding: 10px 0;
       position: fixed;
       width: 100%;
@@ -34,60 +43,133 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 0 20px;
     }
 
     .logo {
       color: var(--fb-blue);
       font-size: 24px;
       font-weight: bold;
+      text-decoration: none;
     }
 
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--fb-blue);
+      cursor: pointer;
+    }
+
+    /* Navigation Styles */
     nav ul {
       display: flex;
       list-style-type: none;
       margin: 0;
       padding: 0;
-    }
-
-    nav ul li {
-      margin-left: 20px;
+      gap: 20px;
     }
 
     nav ul li a {
       color: var(--fb-secondary);
       text-decoration: none;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: var(--transition);
     }
 
-    .main-container {
-      margin-top: 80px;
+    nav ul li a:hover {
+      background-color: var(--fb-bg);
+      color: var(--fb-blue);
+    }
+
+    /* Page Layout */
+    .page-container {
+      display: flex;
+      margin-top: 60px;
       padding: 20px;
+      gap: 20px;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 280px;
+      position: sticky;
+      top: 80px;
+      height: calc(100vh - 80px);
+    }
+
+    .side-nav {
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: var(--shadow-1);
+    }
+
+    .side-nav-link {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      color: var(--fb-text);
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      transition: var(--transition);
+    }
+
+    .side-nav-link i {
+      width: 24px;
+      margin-right: 12px;
+      font-size: 20px;
+      color: var(--fb-blue);
+    }
+
+    .side-nav-link:hover {
+      background-color: var(--fb-bg);
+    }
+
+    .side-nav-link.active {
+      background-color: #e7f3ff;
+      color: var(--fb-blue);
+    }
+
+    /* Main Content Styles */
+    .main-container {
+      flex: 1;
+      min-width: 0;
     }
 
     .content-container {
       background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
+      border-radius: 12px;
+      box-shadow: var(--shadow-1);
+      padding: 24px;
     }
 
-    h1 {
-      color: var(--fb-text);
-      font-weight: 600;
-      margin-bottom: 20px;
+    /* Friends List Styles */
+    .friends-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .friend-card {
       display: flex;
       align-items: center;
-      padding: 15px 0;
-      border-bottom: 1px solid var(--fb-bg);
+      padding: 16px;
+      border-radius: 8px;
+      background: white;
+      transition: var(--transition);
+      border: 1px solid var(--fb-bg);
     }
 
-    .friend-card:last-child {
-      border-bottom: none;
+    .friend-card:hover {
+      box-shadow: var(--shadow-2);
     }
 
     .friend-avatar {
@@ -95,54 +177,196 @@
       height: 60px;
       border-radius: 50%;
       object-fit: cover;
-      margin-right: 15px;
+      margin-right: 16px;
     }
 
     .friend-info {
-      flex-grow: 1;
+      flex: 1;
     }
 
     .friend-info h3 {
       margin: 0;
       font-size: 18px;
+      color: var(--fb-text);
     }
 
-    .friend-info p {
-      margin: 5px 0 0;
+    .friend-username {
       color: var(--fb-secondary);
       font-size: 14px;
+      margin: 4px 0;
+    }
+
+    .friend-email {
+      color: var(--fb-secondary);
+      font-size: 14px;
+      margin: 0;
     }
 
     .friend-actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Button Styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: var(--transition);
     }
 
     .btn-primary {
       background-color: var(--fb-blue);
-      border-color: var(--fb-blue);
+      color: white;
+      border: none;
     }
 
     .btn-danger {
       background-color: #f02849;
-      border-color: #f02849;
+      color: white;
+      border: none;
     }
 
-    .current-user-avatar {
+    /* Empty State */
+    .empty-state {
       text-align: center;
-      margin-top: 30px;
+      padding: 40px;
+      color: var(--fb-secondary);
     }
 
-    .current-user-avatar img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: var(--fb-blue);
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1200px) {
+      .sidebar {
+        width: 240px;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .page-container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        position: static;
+        height: auto;
+      }
+
+      .side-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .side-nav-link {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+      }
+
+      .side-nav-link i {
+        margin-right: 8px;
+      }
     }
 
     @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: block;
+      }
+
       nav ul {
         display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 16px;
+        box-shadow: var(--shadow-1);
+      }
+
+      nav.active ul {
+        display: flex;
+      }
+
+      .friend-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+      }
+
+      .friend-avatar {
+        margin-right: 0;
+        width: 80px;
+        height: 80px;
+      }
+
+      .friend-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-container {
+        padding: 10px;
+      }
+
+      .content-container {
+        padding: 16px;
+      }
+
+      .side-nav-link {
+        min-width: 100%;
+      }
+
+      .friend-info h3 {
+        font-size: 16px;
+      }
+
+      .friend-username,
+      .friend-email {
+        font-size: 13px;
+      }
+    }
+
+    /* Animation */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .friend-card {
+      animation: slideIn 0.3s ease-out forwards;
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
       }
     }
   </style>
@@ -151,77 +375,344 @@
 <header>
   <div class="container">
     <div class="logo">Lucky Social Network</div>
+    <button class="mobile-menu-toggle">
+      <i class="fas fa-bars"></i>
+    </button>
     <nav>
       <ul>
-        <li><a href="/home">Моя страница</a></li>
-        <li><a href="/chat/list">Мои сообщения</a></li>
-        <li><a href="#about">О нас</a></li>
-        <li><a href="/users/list">Найти друзей</a></li>
-        <li><a href="#contact">Контакты</a></li>
+        <li><a href="/home"><i class="fas fa-home"></i> Моя страница</a></li>
+        <li><a href="/chat/list"><i class="fas fa-envelope"></i> Мои сообщения</a></li>
+        <li><a href="#about"><i class="fas fa-info-circle"></i> О нас</a></li>
+        <li><a href="/users/list"><i class="fas fa-users"></i> Найти друзей</a></li>
+        <li><a href="#contact"><i class="fas fa-phone"></i> Контакты</a></li>
       </ul>
     </nav>
   </div>
 </header>
 
-<div class="main-container">
-  <div class="content-container">
-    <h1>Список друзей</h1>
+<div class="page-container">
+  <aside class="sidebar">
+    <nav class="side-nav">
+      <a th:href="@{/profile/{id}(id=${currentUserI})}" class="side-nav-link">
+        <i class="fas fa-user"></i>
+        <span>Моя страница</span>
+      </a>
+      <a href="/posts" class="side-nav-link">
+        <i class="fas fa-newspaper"></i>
+        <span>Новости</span>
+      </a>
+      <a href="/chat/list" class="side-nav-link">
+        <i class="fas fa-envelope"></i>
+        <span>Сообщения</span>
+      </a>
+      <a href="/users/friends" class="side-nav-link active">
+        <i class="fas fa-users"></i>
+        <span>Друзья</span>
+      </a>
+      <a href="/groups/my" class="side-nav-link">
+        <i class="fas fa-users-rectangle"></i>
+        <span>Группы</span>
+      </a>
+      <a href="/albums" class="side-nav-link">
+        <i class="fas fa-images"></i>
+        <span>Фотографии</span>
+      </a>
+      <a href="/notifications" class="side-nav-link">
+        <i class="fas fa-bell"></i>
+        <span>Уведомления</span>
+      </a>
+    </nav>
+  </aside>
 
+  <main class="main-container">
+    <div class="content-container">
+      <h1>Список друзей</h1>
 
-    <!-- Проверка, есть ли друзья -->
-    <div th:if="${friends.isEmpty()}">
-      <p>У вас пока нет друзей.</p>
-    </div>
+      <div th:if="${friends.isEmpty()}" class="empty-state">
+        <i class="fas fa-user-friends"></i>
+        <p>У вас пока нет друзей.</p>
+      </div>
 
-    <!-- Отображение списка друзей -->
-    <div th:if="${!friends.isEmpty()}">
-      <div class="friend-card" th:each="friend : ${friends}">
-        <!-- Аватар друга -->
-        <img th:if="${friendAvatars.get(friend.id) != null}"
-             th:src="${friendAvatars.get(friend.id)}"
-             class="friend-avatar"
-             th:alt="${'Аватар ' + friend.username}">
-        <img th:unless="${friendAvatars.get(friend.id) != null}"
-             src="/default-avatar.jpg"
-             class="friend-avatar"
-             th:alt="${'Аватар по умолчанию для ' + friend.username}">
+      <div th:if="${!friends.isEmpty()}" class="friends-list">
+        <div class="friend-card" th:each="friend : ${friends}">
+          <img th:if="${friendAvatars.get(friend.id) != null}"
+               th:src="${friendAvatars.get(friend.id)}"
+               class="friend-avatar"
+               th:alt="${'Аватар ' + friend.username}">
+          <img th:unless="${friendAvatars.get(friend.id) != null}"
+               src="/default-avatar.jpg"
+               class="friend-avatar"
+               th:alt="${'Аватар по умолчанию для ' + friend.username}">
 
+          <div class="friend-info">
+            <h3>
+                                <span th:if="${not #strings.isEmpty(friend.firstName) and not #strings.isEmpty(friend.lastName)}"
+                                      th:text="${friend.firstName + ' ' + friend.lastName}">Имя Фамилия</span>
+              <span th:unless="${not #strings.isEmpty(friend.firstName) and not #strings.isEmpty(friend.lastName)}"
+                    th:text="${friend.username}">Username</span>
+            </h3>
+            <p class="friend-username" th:text="${'@' + friend.username}">@username</p>
+            <p class="friend-email" th:text="${friend.email}">Email друга</p>
+          </div>
 
-        <!-- Информация о друге -->
-        <div class="friend-info">
-          <h3>
-        <span th:if="${not #strings.isEmpty(friend.firstName) and not #strings.isEmpty(friend.lastName)}"
-              th:text="${friend.firstName + ' ' + friend.lastName}">Имя Фамилия</span>
-            <span th:unless="${not #strings.isEmpty(friend.firstName) and not #strings.isEmpty(friend.lastName)}"
-                  th:text="${friend.username}">Username</span>
-          </h3>
-          <p class="friend-username" th:text="${'@' + friend.username}">@username</p>
-          <p th:text="${friend.email}">Email друга</p>
-        </div>
-        <!--        &lt;!&ndash; Информация о друге &ndash;&gt;-->
-        <!--        <div class="friend-info">-->
-        <!--          <h3 th:text="${friend.username}">Имя друга</h3>-->
-        <!--          <p th:text="${friend.email}">Email друга</p>-->
-        <!--        </div>-->
-
-        <!-- Действия с другом -->
-        <div class="friend-actions">
-          <a th:href="@{'/profile/' + ${friend.id}}" class="btn btn-primary btn-sm">Посмотреть профиль</a>
-          <a th:if="${friend.id != currentUserId}"
-             th:href="@{/chat/start/{recipientId}(recipientId=${friend.id})}"
-             class="btn btn-primary btn-sm">Отправить сообщение</a>
-          <form th:action="@{/users/delete/{friendId}(friendId=${friend.id})}" method="post" class="d-inline"
-                onsubmit="return confirm('Вы уверены, что хотите удалить этого друга?');">
-            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-          </form>
+          <div class="friend-actions">
+            <a th:href="@{'/profile/' + ${friend.id}}" class="btn btn-primary btn-sm">
+              <i class="fas fa-user"></i> Профиль
+            </a>
+            <a th:if="${friend.id != currentUserId}"
+               th:href="@{/chat/start/{recipientId}(recipientId=${friend.id})}"
+               class="btn btn-primary btn-sm">
+              <i class="fas fa-envelope"></i> Сообщение
+            </a>
+            <form th:action="@{/users/delete/{friendId}(friendId=${friend.id})}"
+                  method="post"
+                  class="d-inline"
+                  onsubmit="return confirm('Вы уверены, что хотите удалить этого друга?');">
+              <button type="submit" class="btn btn-danger btn-sm">
+                <i class="fas fa-user-minus"></i> Удалить
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-
-
-  </div>
+  </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelector('.mobile-menu-toggle').addEventListener('click', function () {
+    document.querySelector('nav').classList.toggle('active');
+  });
+</script>
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>Список друзей - Lucky Social Network</title>-->
+<!--  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">-->
+<!--  <style>-->
+<!--    :root {-->
+<!--      &#45;&#45;fb-blue: #1877f2;-->
+<!--      &#45;&#45;fb-bg: #f0f2f5;-->
+<!--      &#45;&#45;fb-text: #050505;-->
+<!--      &#45;&#45;fb-secondary: #65676b;-->
+<!--    }-->
+
+<!--    body {-->
+<!--      font-family: 'Poppins', sans-serif;-->
+<!--      background-color: var(&#45;&#45;fb-bg);-->
+<!--      color: var(&#45;&#45;fb-text);-->
+<!--    }-->
+
+<!--    header {-->
+<!--      background-color: white;-->
+<!--      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
+<!--      padding: 10px 0;-->
+<!--      position: fixed;-->
+<!--      width: 100%;-->
+<!--      top: 0;-->
+<!--      z-index: 1000;-->
+<!--    }-->
+
+<!--    header .container {-->
+<!--      display: flex;-->
+<!--      justify-content: space-between;-->
+<!--      align-items: center;-->
+<!--    }-->
+
+<!--    .logo {-->
+<!--      color: var(&#45;&#45;fb-blue);-->
+<!--      font-size: 24px;-->
+<!--      font-weight: bold;-->
+<!--    }-->
+
+<!--    nav ul {-->
+<!--      display: flex;-->
+<!--      list-style-type: none;-->
+<!--      margin: 0;-->
+<!--      padding: 0;-->
+<!--    }-->
+
+<!--    nav ul li {-->
+<!--      margin-left: 20px;-->
+<!--    }-->
+
+<!--    nav ul li a {-->
+<!--      color: var(&#45;&#45;fb-secondary);-->
+<!--      text-decoration: none;-->
+<!--      font-weight: 500;-->
+<!--    }-->
+
+<!--    .main-container {-->
+<!--      margin-top: 80px;-->
+<!--      padding: 20px;-->
+<!--    }-->
+
+<!--    .content-container {-->
+<!--      background-color: white;-->
+<!--      border-radius: 8px;-->
+<!--      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
+<!--      padding: 20px;-->
+<!--      max-width: 800px;-->
+<!--      margin: 0 auto;-->
+<!--    }-->
+
+<!--    h1 {-->
+<!--      color: var(&#45;&#45;fb-text);-->
+<!--      font-weight: 600;-->
+<!--      margin-bottom: 20px;-->
+<!--    }-->
+
+<!--    .friend-card {-->
+<!--      display: flex;-->
+<!--      align-items: center;-->
+<!--      padding: 15px 0;-->
+<!--      border-bottom: 1px solid var(&#45;&#45;fb-bg);-->
+<!--    }-->
+
+<!--    .friend-card:last-child {-->
+<!--      border-bottom: none;-->
+<!--    }-->
+
+<!--    .friend-avatar {-->
+<!--      width: 60px;-->
+<!--      height: 60px;-->
+<!--      border-radius: 50%;-->
+<!--      object-fit: cover;-->
+<!--      margin-right: 15px;-->
+<!--    }-->
+
+<!--    .friend-info {-->
+<!--      flex-grow: 1;-->
+<!--    }-->
+
+<!--    .friend-info h3 {-->
+<!--      margin: 0;-->
+<!--      font-size: 18px;-->
+<!--    }-->
+
+<!--    .friend-info p {-->
+<!--      margin: 5px 0 0;-->
+<!--      color: var(&#45;&#45;fb-secondary);-->
+<!--      font-size: 14px;-->
+<!--    }-->
+
+<!--    .friend-actions {-->
+<!--      display: flex;-->
+<!--      gap: 10px;-->
+<!--    }-->
+
+<!--    .btn-primary {-->
+<!--      background-color: var(&#45;&#45;fb-blue);-->
+<!--      border-color: var(&#45;&#45;fb-blue);-->
+<!--    }-->
+
+<!--    .btn-danger {-->
+<!--      background-color: #f02849;-->
+<!--      border-color: #f02849;-->
+<!--    }-->
+
+<!--    .current-user-avatar {-->
+<!--      text-align: center;-->
+<!--      margin-top: 30px;-->
+<!--    }-->
+
+<!--    .current-user-avatar img {-->
+<!--      width: 80px;-->
+<!--      height: 80px;-->
+<!--      border-radius: 50%;-->
+<!--      object-fit: cover;-->
+<!--    }-->
+
+<!--    @media (max-width: 768px) {-->
+<!--      nav ul {-->
+<!--        display: none;-->
+<!--      }-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--  <div class="container">-->
+<!--    <div class="logo">Lucky Social Network</div>-->
+<!--    <nav>-->
+<!--      <ul>-->
+<!--        <li><a href="/home">Моя страница</a></li>-->
+<!--        <li><a href="/chat/list">Мои сообщения</a></li>-->
+<!--        <li><a href="#about">О нас</a></li>-->
+<!--        <li><a href="/users/list">Найти друзей</a></li>-->
+<!--        <li><a href="#contact">Контакты</a></li>-->
+<!--      </ul>-->
+<!--    </nav>-->
+<!--  </div>-->
+<!--</header>-->
+
+<!--<div class="main-container">-->
+<!--  <div class="content-container">-->
+<!--    <h1>Список друзей</h1>-->
+
+
+<!--    &lt;!&ndash; Проверка, есть ли друзья &ndash;&gt;-->
+<!--    <div th:if="${friends.isEmpty()}">-->
+<!--      <p>У вас пока нет друзей.</p>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Отображение списка друзей &ndash;&gt;-->
+<!--    <div th:if="${!friends.isEmpty()}">-->
+<!--      <div class="friend-card" th:each="friend : ${friends}">-->
+<!--        &lt;!&ndash; Аватар друга &ndash;&gt;-->
+<!--        <img th:if="${friendAvatars.get(friend.id) != null}"-->
+<!--             th:src="${friendAvatars.get(friend.id)}"-->
+<!--             class="friend-avatar"-->
+<!--             th:alt="${'Аватар ' + friend.username}">-->
+<!--        <img th:unless="${friendAvatars.get(friend.id) != null}"-->
+<!--             src="/default-avatar.jpg"-->
+<!--             class="friend-avatar"-->
+<!--             th:alt="${'Аватар по умолчанию для ' + friend.username}">-->
+
+
+<!--        &lt;!&ndash; Информация о друге &ndash;&gt;-->
+<!--        <div class="friend-info">-->
+<!--          <h3>-->
+<!--        <span th:if="${not #strings.isEmpty(friend.firstName) and not #strings.isEmpty(friend.lastName)}"-->
+<!--              th:text="${friend.firstName + ' ' + friend.lastName}">Имя Фамилия</span>-->
+<!--            <span th:unless="${not #strings.isEmpty(friend.firstName) and not #strings.isEmpty(friend.lastName)}"-->
+<!--                  th:text="${friend.username}">Username</span>-->
+<!--          </h3>-->
+<!--          <p class="friend-username" th:text="${'@' + friend.username}">@username</p>-->
+<!--          <p th:text="${friend.email}">Email друга</p>-->
+<!--        </div>-->
+<!--        &lt;!&ndash;        &lt;!&ndash; Информация о друге &ndash;&gt;&ndash;&gt;-->
+<!--        &lt;!&ndash;        <div class="friend-info">&ndash;&gt;-->
+<!--        &lt;!&ndash;          <h3 th:text="${friend.username}">Имя друга</h3>&ndash;&gt;-->
+<!--        &lt;!&ndash;          <p th:text="${friend.email}">Email друга</p>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </div>&ndash;&gt;-->
+
+<!--        &lt;!&ndash; Действия с другом &ndash;&gt;-->
+<!--        <div class="friend-actions">-->
+<!--          <a th:href="@{'/profile/' + ${friend.id}}" class="btn btn-primary btn-sm">Посмотреть профиль</a>-->
+<!--          <a th:if="${friend.id != currentUserId}"-->
+<!--             th:href="@{/chat/start/{recipientId}(recipientId=${friend.id})}"-->
+<!--             class="btn btn-primary btn-sm">Отправить сообщение</a>-->
+<!--          <form th:action="@{/users/delete/{friendId}(friendId=${friend.id})}" method="post" class="d-inline"-->
+<!--                onsubmit="return confirm('Вы уверены, что хотите удалить этого друга?');">-->
+<!--            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>-->
+<!--          </form>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+
+<!--  </div>-->
+<!--</div>-->
+
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->
