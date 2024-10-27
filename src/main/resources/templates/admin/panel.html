@@ -101,6 +101,11 @@
         </td>
     </tr>
 </table>
+<div>
+    <form th:action="@{/moderator/chats}" method="get">
+        <button type="submit" class="btn-info">Moderator Chat</button>
+    </form>
+</div>
 
 <h2>Convert User to Admin</h2>
 <form th:action="@{/admin/convert}" method="post">

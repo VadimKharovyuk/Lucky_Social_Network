@@ -14,6 +14,11 @@ public class LuckySocialNetworkApplication {
         SpringApplication.run(LuckySocialNetworkApplication.class, args);
     }
 
+    //убрать роль из кеша
+    //настройки добавить навигацию
+    //профиль добавить <adide>
+
     //docker buildx build --platform linux/amd64 -t lucky1911/lucky_social_network:latest . --push
+    //push Docker Hub
 
 }
