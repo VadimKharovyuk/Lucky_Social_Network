@@ -290,10 +290,10 @@
     <div class="navbar-content">
         <a href="#" class="logo">Lucky Social Network</a>
         <div class="nav-links">
-            <a href="#">Главная</a>
-            <a href="#">Профиль</a>
-            <a href="#">Сообщения</a>
-            <a href="#">Уведомления</a>
+            <a href="/">Главная</a>
+            <a th:href="@{/profile/{id}(id=${currentUser.id})}">Моя страница</a>
+            <a href="/chat/list">Сообщения</a>
+            <a href="/notifications">Уведомления</a>
         </div>
     </div>
 </nav>

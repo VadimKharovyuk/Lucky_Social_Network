@@ -202,6 +202,7 @@ public class GroupController {
 
         Page<Group> groupPage = groupService.getCurrentUserGroups(page, size, sortBy, sortDirection, type);
         List<Group> allGroups = groupService.getAllGroups();
+        User currentUser = userService.getCurrentUser();
 
         model.addAttribute("groups", groupPage.getContent());
         model.addAttribute("allGroups", allGroups);
@@ -211,13 +212,17 @@ public class GroupController {
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("currentType", type);
+        model.addAttribute("currentUser", currentUser);
 
         return "groups/my-groups";
     }
 
     @GetMapping("/all")
     public String listGroups(Model model) {
+        User currentUser = userService.getCurrentUser();
         model.addAttribute("groups", groupService.getAllGroups());
+        model.addAttribute("currentUser", currentUser);
+
         return "groups/list";
     }
 
@@ -282,7 +287,7 @@ public class GroupController {
     public String deleteGroup(@PathVariable Long groupId) {
         Group group = groupService.getGroupById(groupId);
         User currentUser = userService.getCurrentUser();
-        // Проверяем, является ли текущий пользователь владельцем группы
+
         if (!group.getOwner().getId().equals(currentUser.getId())) {
             throw new RuntimeException("Only group owner can delete the group");
         }

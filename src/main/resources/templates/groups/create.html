@@ -261,7 +261,7 @@
 <div class="container">
     <aside class="sidebar">
         <nav class="side-nav">
-            <a href="/profile" class="side-nav-link">
+            <a th:href="@{/profile/{id}(id=${currentUser.id})}" class="side-nav-link">
                 <i class="fas fa-user"></i>
                 <span>Моя страница</span>
             </a>
@@ -269,19 +269,19 @@
                 <i class="fas fa-newspaper"></i>
                 <span>Новости</span>
             </a>
-            <a href="/messages" class="side-nav-link">
+            <a href="/chat/list" class="side-nav-link">
                 <i class="fas fa-envelope"></i>
                 <span>Сообщения</span>
             </a>
-            <a href="/friends" class="side-nav-link">
+            <a href="/users/friends" class="side-nav-link">
                 <i class="fas fa-users"></i>
                 <span>Друзья</span>
             </a>
-            <a href="/groups" class="side-nav-link active">
+            <a href="/groups/my" class="side-nav-link active">
                 <i class="fas fa-users-rectangle"></i>
                 <span>Группы</span>
             </a>
-            <a href="/photos" class="side-nav-link">
+            <a href="/posts" class="side-nav-link">
                 <i class="fas fa-images"></i>
                 <span>Фотографии</span>
             </a>
