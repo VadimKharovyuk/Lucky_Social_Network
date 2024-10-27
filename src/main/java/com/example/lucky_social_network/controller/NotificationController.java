@@ -1,6 +1,7 @@
 package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.dto.NotificationDto;
+import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.NotificationService;
 import com.example.lucky_social_network.service.PostService;
 import com.example.lucky_social_network.service.UserService;
@@ -30,9 +31,11 @@ public class NotificationController {
         if (currentUserId == null) {
             return "redirect:/login";
         }
+        User currentUser = userService.getUserById(currentUserId);
 
         List<NotificationDto> notificationDtos = notificationService.getUserNotificationsWithDetails(currentUserId);
         model.addAttribute("notifications", notificationDtos);
+        model.addAttribute("currentUser", currentUser);
 
         long unreadCount = notificationService.getUnreadNotificationCount(currentUserId);
         model.addAttribute("notificationCount", unreadCount);

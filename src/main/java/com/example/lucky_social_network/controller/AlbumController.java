@@ -26,6 +26,7 @@ public class AlbumController {
                            Model model) {
         User currentUser = userService.getCurrentUser();
         Album album = albumService.getAlbumById(albumId, currentUser);
+        model.addAttribute("currentUser", currentUser);
         model.addAttribute("album", album);
         model.addAttribute("isOwner", albumService.isAlbumOwner(albumId, currentUser));
         return "albums/view";
@@ -37,6 +38,7 @@ public class AlbumController {
         User currentUser = userService.getCurrentUser();
         Page<Album> albums = albumService.getAllUserAlbums(currentUser.getId(), currentUser, pageable);
         model.addAttribute("albums", albums);
+        model.addAttribute("currentUser", currentUser);
         return "albums/list";
     }
 
