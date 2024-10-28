@@ -1,0 +1,369 @@
+<!-- templates/admin/blog/edit.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование блога | Lucky Social Network</title>
+    <style>
+        :root {
+            --primary-color: #4C75A3;
+            --secondary-color: #E5EBF1;
+            --text-color: #2C2D2E;
+            --link-color: #2A5885;
+            --error-color: #E64646;
+        }
+
+        .blog-form-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .form-header {
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--secondary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-header h1 {
+            font-size: 24px;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #D3D9DE;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .image-upload {
+            border: 2px dashed #D3D9DE;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .image-upload:hover {
+            border-color: var(--primary-color);
+        }
+
+        .image-upload input[type="file"] {
+            display: none;
+        }
+
+        .image-upload-label {
+            color: var(--link-color);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .current-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .image-item {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .image-item .delete-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #426898;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background: #DAE2EA;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-published {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .status-draft {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+    </style>
+</head>
+<body>
+<div class="blog-form-container">
+    <div class="form-header">
+        <h1>Редактирование поста</h1>
+        <span class="status-badge"
+              th:classappend="${blog.published ? 'status-published' : 'status-draft'}"
+              th:text="${blog.published ? 'Опубликован' : 'Черновик'}">
+            </span>
+    </div>
+
+    <form th:action="@{/admin/blog/edit/{id}(id=${blog.id})}"
+          method="post"
+          enctype="multipart/form-data"
+          th:object="${blog}">
+
+        <!-- ID блога -->
+        <input type="hidden" th:field="*{id}">
+
+        <div class="form-group">
+            <label for="title">Заголовок</label>
+            <input type="text"
+                   id="title"
+                   name="title"
+                   th:field="*{title}"
+                   class="form-control"
+                   required>
+            <span class="error-message"
+                  th:if="${#fields.hasErrors('title')}"
+                  th:errors="*{title}"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="type">Тип публикации</label>
+            <select id="type"
+                    name="type"
+                    th:field="*{type}"
+                    class="form-control"
+                    required>
+                <option value="">Выберите тип</option>
+                <option th:each="blogType : ${blogTypes}"
+                        th:value="${blogType.name()}"
+                        th:text="${blogType.displayName}">
+                </option>
+            </select>
+            <span class="error-message"
+                  th:if="${#fields.hasErrors('type')}"
+                  th:errors="*{type}"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="content">Содержание</label>
+            <textarea id="content"
+                      name="content"
+                      th:field="*{content}"
+                      class="form-control"
+                      rows="10"
+                      required></textarea>
+            <span class="error-message"
+                  th:if="${#fields.hasErrors('content')}"
+                  th:errors="*{content}"></span>
+        </div>
+
+        <!-- Текущие изображения -->
+        <div class="form-group" th:if="${!#lists.isEmpty(blog.imageUrls)}">
+            <label>Текущие изображения</label>
+            <div class="current-images">
+                <div class="image-item" th:each="imageUrl, stat : *{imageUrls}">
+                    <img th:src="${imageUrl}" th:alt="'Изображение ' + ${stat.count}">
+                    <input type="hidden" th:field="*{imageUrls[__${stat.index}__]}">
+                    <button type="button" class="delete-image"
+                            th:onclick="'removeImage(' + ${stat.index} + ')'">×
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Загрузка новых изображений -->
+        <div class="form-group">
+            <div class="image-upload" id="imageUpload">
+                <label for="newImages" class="image-upload-label">
+                    Добавить новые изображения
+                    <div>Перетащите файлы сюда или кликните для выбора</div>
+                </label>
+                <input type="file"
+                       id="newImages"
+                       name="newImages"
+                       accept="image/*"
+                       multiple>
+                <div class="image-preview" id="imagePreview"></div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <a th:href="@{/admin/blog}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Превью новых изображений
+    document.getElementById('newImages').addEventListener('change', function (e) {
+        const preview = document.getElementById('imagePreview');
+        preview.innerHTML = '';
+
+        [...e.target.files].forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = '150px';
+                img.style.height = '150px';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '8px';
+                preview.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // Удаление текущих изображений
+    function removeImage(index) {
+        const imageItems = document.querySelectorAll('.image-item');
+        if (imageItems[index]) {
+            imageItems[index].remove();
+        }
+    }
+
+    // Drag and drop функционал
+    const dropZone = document.getElementById('imageUpload');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        dropZone.style.borderColor = '#4C75A3';
+    }
+
+    function unhighlight(e) {
+        dropZone.style.borderColor = '#D3D9DE';
+    }
+
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        document.getElementById('newImages').files = files;
+
+        // Trigger change event to show preview
+        const event = new Event('change');
+        document.getElementById('newImages').dispatchEvent(event);
+    }
+</script>
+</body>
+</html>

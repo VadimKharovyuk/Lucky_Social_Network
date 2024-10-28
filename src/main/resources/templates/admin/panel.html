@@ -1,128 +1,413 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Admin Panel</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора | Lucky Social Network</title>
     <style>
+        :root {
+            --primary-color: #4C75A3;
+            --secondary-color: #E5EBF1;
+            --text-color: #2C2D2E;
+            --link-color: #2A5885;
+            --success-color: #4BB34B;
+            --danger-color: #E64646;
+            --warning-color: #FFA000;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             margin: 0;
+            padding: 0;
+            background-color: #EDEEF0;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
         }
 
-        h1, h2 {
-            color: #333;
-            text-align: center;
+        .page-header {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        table {
+        .page-title {
+            font-size: 24px;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            background: var(--secondary-color);
+            border-bottom: 1px solid #DAE2EA;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .admin-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
         }
 
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 10px;
+        .admin-table th {
+            background: var(--secondary-color);
+            font-weight: 500;
             text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #DAE2EA;
         }
 
-        th {
-            background-color: #f2f2f2;
+        .admin-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--secondary-color);
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        .admin-table tr:last-child td {
+            border-bottom: none;
         }
 
-        tr:hover {
-            background-color: #f1f1f1;
+        .admin-table tr:hover {
+            background: #F5F6F8;
         }
 
-        form {
-            display: inline;
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
-        select {
-            padding: 5px;
-            margin-right: 10px;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            text-decoration: none;
-            cursor: pointer;
+        .select-input {
+            padding: 8px 12px;
+            border: 1px solid #D3D9DE;
+            border-radius: 6px;
             font-size: 14px;
-            border-radius: 4px;
+            min-width: 150px;
         }
 
-        button:hover {
-            background-color: #45a049;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #426898;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #43A043;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #D93E3E;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #F59300;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .convert-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .admin-role {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .role-super {
+            background: #E3F2FD;
+            color: var(--link-color);
+        }
+
+        .role-admin {
+            background: #E8F5E9;
+            color: var(--success-color);
         }
     </style>
 </head>
 <body>
-<h1>Admin Panel</h1>
+<div class="container">
+    <header class="page-header">
+        <h1 class="page-title">Панель администратора</h1>
+    </header>
 
-<h2>Current Admins</h2>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Role</th>
-        <th>Actions</th>
-    </tr>
-    <tr th:each="admin : ${admins}">
-        <td th:text="${admin.id}"></td>
-        <td th:text="${admin.user.username}"></td>
-        <td th:text="${admin.role}"></td>
-        <td>
-            <form th:action="@{/admin/update-role}" method="post">
-                <input type="hidden" name="adminId" th:value="${admin.id}">
-                <select name="newRole">
+    <div class="navigation-buttons">
+        <form th:action="@{/moderator/chats}" method="get">
+            <button type="submit" class="btn btn-primary">Чат модераторов</button>
+        </form>
+        <form th:action="@{/admin/blog}" method="get">
+            <button type="submit" class="btn btn-primary">Управление блогом</button>
+        </form>
+    </div>
+
+    <div class="admin-card">
+        <div class="card-header">
+            <h2 class="card-title">Список администраторов</h2>
+        </div>
+        <div class="card-content">
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя пользователя</th>
+                    <th>Роль</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="admin : ${admins}">
+                    <td th:text="${admin.id}"></td>
+                    <td th:text="${admin.user.username}"></td>
+                    <td>
+                                <span class="admin-role"
+                                      th:classappend="${admin.role == 'SUPER_ADMIN' ? 'role-super' : 'role-admin'}"
+                                      th:text="${admin.role}">
+                                </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <form th:action="@{/admin/update-role}" method="post">
+                                <input type="hidden" name="adminId" th:value="${admin.id}">
+                                <select name="newRole" class="select-input">
+                                    <option th:each="role : ${adminRoles}"
+                                            th:value="${role}"
+                                            th:text="${role}"
+                                            th:selected="${role == admin.role}">
+                                    </option>
+                                </select>
+                                <button type="submit" class="btn btn-warning">Изменить роль</button>
+                            </form>
+                            <form th:action="@{/admin/remove}" method="post">
+                                <input type="hidden" name="adminId" th:value="${admin.id}">
+                                <button type="submit" class="btn btn-danger">Удалить</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="card-header">
+            <h2 class="card-title">Назначить администратора</h2>
+        </div>
+        <div class="card-content">
+            <form th:action="@{/admin/convert}" method="post" class="convert-form">
+                <select name="userId" class="select-input" required>
+                    <option value="">Выберите пользователя</option>
+                    <option th:each="user : ${users}"
+                            th:value="${user.id}"
+                            th:text="${user.username}">
+                    </option>
+                </select>
+                <select name="role" class="select-input" required>
+                    <option value="">Выберите роль</option>
                     <option th:each="role : ${adminRoles}"
                             th:value="${role}"
-                            th:text="${role}"
-                            th:selected="${role == admin.role}"></option>
+                            th:text="${role}">
+                    </option>
                 </select>
-                <button type="submit">Update Role</button>
+                <button type="submit" class="btn btn-success">Назначить администратором</button>
             </form>
-            <form th:action="@{/admin/remove}" method="post">
-                <input type="hidden" name="adminId" th:value="${admin.id}">
-                <button type="submit">Remove Admin</button>
-            </form>
-        </td>
-    </tr>
-</table>
-<div>
-    <form th:action="@{/moderator/chats}" method="get">
-        <button type="submit" class="btn-info">Moderator Chat</button>
-    </form>
+        </div>
+    </div>
 </div>
-
-<h2>Convert User to Admin</h2>
-<form th:action="@{/admin/convert}" method="post">
-    <select name="userId">
-        <option th:each="user : ${users}"
-                th:value="${user.id}"
-                th:text="${user.username}"></option>
-    </select>
-    <select name="role">
-        <option th:each="role : ${adminRoles}"
-                th:value="${role}"
-                th:text="${role}"></option>
-    </select>
-    <button type="submit">Convert to Admin</button>
-</form>
 </body>
 </html>
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Admin Panel</title>-->
+<!--    <link rel="stylesheet" href="/css/styles.css">-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            background-color: #f0f0f0;-->
+<!--            margin: 0;-->
+<!--            padding: 20px;-->
+<!--        }-->
+
+<!--        h1, h2 {-->
+<!--            color: #333;-->
+<!--            text-align: center;-->
+<!--        }-->
+
+<!--        table {-->
+<!--            width: 100%;-->
+<!--            border-collapse: collapse;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        table, th, td {-->
+<!--            border: 1px solid #ddd;-->
+<!--        }-->
+
+<!--        th, td {-->
+<!--            padding: 10px;-->
+<!--            text-align: left;-->
+<!--        }-->
+
+<!--        th {-->
+<!--            background-color: #f2f2f2;-->
+<!--        }-->
+
+<!--        tr:nth-child(even) {-->
+<!--            background-color: #f9f9f9;-->
+<!--        }-->
+
+<!--        tr:hover {-->
+<!--            background-color: #f1f1f1;-->
+<!--        }-->
+
+<!--        form {-->
+<!--            display: inline;-->
+<!--        }-->
+
+<!--        select {-->
+<!--            padding: 5px;-->
+<!--            margin-right: 10px;-->
+<!--        }-->
+
+<!--        button {-->
+<!--            background-color: #4CAF50;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 8px 16px;-->
+<!--            text-decoration: none;-->
+<!--            cursor: pointer;-->
+<!--            font-size: 14px;-->
+<!--            border-radius: 4px;-->
+<!--        }-->
+
+<!--        button:hover {-->
+<!--            background-color: #45a049;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Admin Panel</h1>-->
+
+<!--<h2>Current Admins</h2>-->
+<!--<table>-->
+<!--    <tr>-->
+<!--        <th>ID</th>-->
+<!--        <th>Username</th>-->
+<!--        <th>Role</th>-->
+<!--        <th>Actions</th>-->
+<!--    </tr>-->
+<!--    <tr th:each="admin : ${admins}">-->
+<!--        <td th:text="${admin.id}"></td>-->
+<!--        <td th:text="${admin.user.username}"></td>-->
+<!--        <td th:text="${admin.role}"></td>-->
+<!--        <td>-->
+<!--            <form th:action="@{/admin/update-role}" method="post">-->
+<!--                <input type="hidden" name="adminId" th:value="${admin.id}">-->
+<!--                <select name="newRole">-->
+<!--                    <option th:each="role : ${adminRoles}"-->
+<!--                            th:value="${role}"-->
+<!--                            th:text="${role}"-->
+<!--                            th:selected="${role == admin.role}"></option>-->
+<!--                </select>-->
+<!--                <button type="submit">Update Role</button>-->
+<!--            </form>-->
+<!--            <form th:action="@{/admin/remove}" method="post">-->
+<!--                <input type="hidden" name="adminId" th:value="${admin.id}">-->
+<!--                <button type="submit">Remove Admin</button>-->
+<!--            </form>-->
+<!--        </td>-->
+<!--    </tr>-->
+<!--</table>-->
+<!--<div>-->
+<!--    <form th:action="@{/moderator/chats}" method="get">-->
+<!--        <button type="submit" class="btn-info">Moderator Chat</button>-->
+<!--    </form>-->
+<!--</div>-->
+<!--<br><br>-->
+<!--<form th:action="@{/admin/blog}" method="get">-->
+<!--    <button type="submit" class="btn-info">Blog Page</button>-->
+<!--</form>-->
+<!--</div>-->
+
+<!--<h2>Convert User to Admin</h2>-->
+<!--<form th:action="@{/admin/convert}" method="post">-->
+<!--    <select name="userId">-->
+<!--        <option th:each="user : ${users}"-->
+<!--                th:value="${user.id}"-->
+<!--                th:text="${user.username}"></option>-->
+<!--    </select>-->
+<!--    <select name="role">-->
+<!--        <option th:each="role : ${adminRoles}"-->
+<!--                th:value="${role}"-->
+<!--                th:text="${role}"></option>-->
+<!--    </select>-->
+<!--    <button type="submit">Convert to Admin</button>-->
+<!--</form>-->
+<!--</body>-->
+<!--</html>-->
 
 
 <!--<!DOCTYPE html>-->

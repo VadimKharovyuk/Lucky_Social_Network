@@ -1,0 +1,230 @@
+<!-- templates/blog/view.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${blog.title + ' | Lucky Social Network'}">Просмотр блога</title>
+    <style>
+        :root {
+            --primary-color: #4C75A3;
+            --secondary-color: #E5EBF1;
+            --text-color: #2C2D2E;
+            --link-color: #2A5885;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #EDEEF0;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 15px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .blog-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .blog-header {
+            margin-bottom: 20px;
+        }
+
+        .blog-type {
+            display: inline-block;
+            padding: 4px 8px;
+            background: var(--secondary-color);
+            color: var(--link-color);
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .blog-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 0 15px 0;
+            color: var(--text-color);
+        }
+
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #818C99;
+            font-size: 14px;
+        }
+
+        .blog-images {
+            margin: 20px 0;
+        }
+
+        .blog-images img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .blog-text {
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 20px;
+        }
+
+        .recent-posts {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .recent-posts-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 15px 0;
+        }
+
+        .recent-post-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--secondary-color);
+        }
+
+        .recent-post-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-post-link {
+            color: var(--link-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .recent-post-link:hover {
+            text-decoration: underline;
+        }
+
+        .recent-post-meta {
+            font-size: 13px;
+            color: #818C99;
+            margin-top: 5px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--link-color);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .back-link::before {
+            content: '←';
+            margin-right: 5px;
+        }
+
+        /* Адаптивная верстка */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .blog-title {
+                font-size: 20px;
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
+
+        /* Форматирование текста */
+        .blog-text p {
+            margin: 0 0 15px 0;
+        }
+
+        .blog-text h2 {
+            font-size: 20px;
+            margin: 25px 0 15px 0;
+        }
+
+        .blog-text ul, .blog-text ol {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .blog-text li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <main>
+        <a th:href="@{/news}" class="back-link">Вернуться к списку</a>
+
+        <article class="blog-content">
+            <header class="blog-header">
+                <span class="blog-type" th:text="${blog.type}">Тип</span>
+                <h1 class="blog-title" th:text="${blog.title}">Заголовок</h1>
+                <div class="blog-meta">
+                    <span th:text="${#temporals.format(blog.createdAt, 'dd MMMM yyyy')}">Дата</span>
+                    <span th:text="${blog.viewCount + ' просмотров'}">0 просмотров</span>
+                </div>
+            </header>
+
+            <!-- Изображения -->
+            <div class="blog-images" th:if="${not #lists.isEmpty(blog.imageUrls)}">
+                <img th:each="imageUrl : ${blog.imageUrls}"
+                     th:src="${imageUrl}"
+                     th:alt="${blog.title}">
+            </div>
+
+            <!-- Основной текст -->
+            <div class="blog-text" th:utext="${#strings.replace(#strings.escapeXml(blog.content), '&#10;', '<br/>')}">
+                Содержание блога
+            </div>
+        </article>
+    </main>
+
+    <aside class="sidebar">
+        <div class="recent-posts">
+            <h2 class="recent-posts-title">Последние публикации</h2>
+            <div class="recent-post-item" th:each="recentBlog : ${recentBlogs}">
+                <a th:href="@{/news/{id}(id=${recentBlog.id})}"
+                   class="recent-post-link"
+                   th:text="${recentBlog.title}">
+                    Заголовок
+                </a>
+                <div class="recent-post-meta">
+                    <span th:text="${#temporals.format(recentBlog.createdAt, 'dd.MM.yyyy')}">Дата</span>
+                    •
+                    <span th:text="${recentBlog.viewCount + ' просмотров'}">0 просмотров</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+</body>
+</html>

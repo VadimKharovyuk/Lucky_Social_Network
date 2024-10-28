@@ -3,7 +3,6 @@ package com.example.lucky_social_network.controller;
 import com.example.lucky_social_network.model.Admin;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.AdminService;
-import com.example.lucky_social_network.service.SupportTicketService;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +22,7 @@ import java.util.List;
 public class AdminController {
     private final AdminService adminService;
     private final UserService userService;
-    private final SupportTicketService supportTicketService;
+ 
 
     @GetMapping
 //    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")

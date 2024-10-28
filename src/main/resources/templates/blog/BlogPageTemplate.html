@@ -184,6 +184,46 @@
         .hidden {
             display: none;
         }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            color: #818C99;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .post-views {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            border-radius: 4px;
+            background: var(--secondary-color);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .pagination a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .no-posts {
+            text-align: center;
+            padding: 40px;
+            color: #818C99;
+        }
     </style>
 </head>
 <body>
@@ -193,6 +233,9 @@
         <nav>
             <a href="/news" style="color: var(--link-color); text-decoration: none; margin-right: 15px;">Новости</a>
         </nav>
+        <nav>
+            <a href="/register" style="color: var(--link-color); text-decoration: none; margin-right: 15px;">Зарегистрироваться</a>
+        </nav>
     </div>
 </header>
 
@@ -201,36 +244,70 @@
         <h1 class="page-title">Новости Lucky Social Network</h1>
     </div>
 </section>
-
 <main class="main-container">
     <nav class="navigation">
         <ul class="nav-list">
-            <li class="nav-item active" data-category="all">Все записи</li>
-            <li class="nav-item" data-category="product">Продукт</li>
-            <li class="nav-item" data-category="events">События</li>
-            <li class="nav-item" data-category="api">API</li>
-            <li class="nav-item" data-category="development">Разработка</li>
-            <li class="nav-item" data-category="security">Безопасность</li>
+            <!-- Активный класс добавляется на основе currentType -->
+            <li class="nav-item"
+                th:class="${currentType == null ? 'nav-item active' : 'nav-item'}"
+                th:data-category="all">
+                <a th:href="@{/news}" class="nav-link">Все записи</a>
+            </li>
+
+            <li class="nav-item" th:each="type : ${blogTypes}"
+                th:class="${currentType == type ? 'nav-item active' : 'nav-item'}"
+                th:data-category="${type.name().toLowerCase()}">
+                <a th:href="@{/news(type=${type})}"
+                   class="nav-link"
+                   th:text="${type.displayName}">Тип</a>
+            </li>
         </ul>
     </nav>
 
     <section class="content">
-        <article class="blog-post" data-type="product">
+        Проверка на наличие блогов
+        <div th:if="${blogs.empty}" class="no-posts">
+            <p>Пока нет доступных записей</p>
+        </div>
+
+        <!-- Список блогов -->
+        <article th:each="blog : ${blogs}"
+                 class="blog-post"
+                 th:data-type="${blog.type.toLowerCase()}">
             <div class="post-header">
-                <span class="post-type">Продукт</span>
-                <h2 class="post-title">Новое обновление платформы</h2>
+                <span class="post-type" th:text="${blog.type}">Тип</span>
+                <h2 class="post-title">
+                    <a th:href="@{/news/{id}(id=${blog.id})}"
+                       th:text="${blog.title}">Заголовок</a>
+                </h2>
             </div>
-            <img src="/api/placeholder/600/300" alt="Обновление платформы" class="post-image">
-            <p>Текст поста будет здесь...</p>
+
+            <!-- Проверка на наличие изображений -->
+            <div th:if="${!blog.imageUrls.empty}" class="post-images">
+                <img th:src="${blog.imageUrls[0]}"
+                     th:alt="${blog.title}"
+                     class="post-image">
+            </div>
+
+            <!-- Превью контента -->
+            <p th:text="${#strings.abbreviate(blog.content, 300)}">Контент</p>
+
+            <div class="post-footer">
+                    <span class="post-views"
+                          th:text="${blog.viewCount + ' просмотров'}">0 просмотров</span>
+                <span class="post-date"
+                      th:text="${#temporals.format(blog.createdAt, 'dd.MM.yyyy')}">Дата</span>
+            </div>
         </article>
 
-        <article class="blog-post" data-type="security">
-            <div class="post-header">
-                <span class="post-type">Безопасность</span>
-                <h2 class="post-title">Улучшения в системе безопасности</h2>
-            </div>
-            <p>Текст поста будет здесь...</p>
-        </article>
+        <!-- Пагинация -->
+        <div class="pagination" th:if="${blogs.totalPages > 1}">
+            <a th:each="pageNumber : ${#numbers.sequence(0, blogs.totalPages - 1)}"
+               th:href="@{/news(page=${pageNumber}, type=${currentType})}"
+               th:text="${pageNumber + 1}"
+               th:class="${pageNumber == blogs.number ? 'active' : ''}">
+            </a>
+        </div>
     </section>
 
     <aside class="aside">
@@ -254,6 +331,23 @@
         </div>
     </aside>
 </main>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // Обработка клика для фильтрации через JavaScript (опционально)
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const category = item.dataset.category;
+                if (category === 'all') {
+                    window.location.href = '/news';
+                } else {
+                    window.location.href = `/news?type=${category.toUpperCase()}`;
+                }
+            });
+        });
+    });
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

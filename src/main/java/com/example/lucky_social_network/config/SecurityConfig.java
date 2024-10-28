@@ -18,8 +18,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                                .requestMatchers("/", "/chat/send", "/register", "/admin/**",
-                                        "/login", "/css/**", "/", "/profile-list", "/about", "/blog",
+                                .requestMatchers("/", "/chat/send", "/register",
+                                        "/login", "/css/**", "/", "/profile-list", "/about", "/news",
                                         "/js/**")
                                 .permitAll()
 //                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
