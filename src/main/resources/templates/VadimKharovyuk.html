@@ -61,6 +61,7 @@
             transition: color 0.3s, transform 0.3s;
             position: relative;
             padding: 0.5rem 1rem;
+            white-space: nowrap; /* Предотвращает перенос текста */
         }
 
         .nav a:hover {
@@ -81,6 +82,40 @@
 
         .nav a:hover::after {
             width: 100%;
+        }
+
+        /* Медиа-запрос для мобильных устройств */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 0.5rem;
+            }
+
+            .nav ul {
+                flex-direction: row; /* Изменено с column на row */
+                justify-content: space-around; /* Равномерное распределение элементов */
+                flex-wrap: nowrap; /* Предотвращает перенос на новую строку */
+                gap: 0.5rem; /* Уменьшенный отступ между элементами */
+            }
+
+            .nav a {
+                padding: 0.5rem;
+                font-size: 0.9rem; /* Немного уменьшаем размер шрифта */
+                display: inline-block;
+                width: auto; /* Отменяем ширину 100% */
+            }
+
+            .nav li {
+                flex: 1; /* Равномерное распределение пространства */
+                text-align: center;
+            }
+        }
+
+        /* Для очень маленьких экранов */
+        @media (max-width: 380px) {
+            .nav a {
+                font-size: 0.8rem; /* Еще меньше шрифт */
+                padding: 0.4rem;
+            }
         }
 
         /* Стили для секции контактов */
@@ -402,6 +437,156 @@
                 padding: 1rem;
             }
         }
+
+        /* Обновленные медиа-запросы для лучшей адаптивности */
+        @media (max-width: 768px) {
+            /* Контейнер */
+            .container {
+                padding: 1rem;
+            }
+
+            /* Навигация */
+            .nav {
+                padding: 0.5rem;
+            }
+
+            .nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .nav a {
+                display: block;
+                width: 100%;
+                text-align: center;
+                padding: 0.8rem;
+            }
+
+            /* Контентные блоки */
+            .content-block {
+                flex-direction: column !important;
+                padding: 1.5rem;
+                margin: 1.5rem auto;
+                gap: 1.5rem;
+            }
+
+            .block-text {
+                padding: 0;
+                text-align: center;
+            }
+
+            .block-text h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .block-text p {
+                font-size: 1rem;
+                line-height: 1.5;
+            }
+
+            .block-image img {
+                height: 200px; /* Уменьшенная высота для мобильных */
+            }
+
+            /* Сервисы */
+            .services-section {
+                padding: 2rem 0;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 0;
+            }
+
+            .service-card {
+                padding: 1.5rem;
+            }
+
+            .service-title {
+                font-size: 1.3rem;
+            }
+
+            .service-description {
+                font-size: 0.95rem;
+            }
+
+            .service-features {
+                padding-left: 0;
+            }
+
+            .service-features li {
+                font-size: 0.9rem;
+            }
+
+            /* Заголовки секций */
+            .section-title {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .section-subtitle {
+                font-size: 1rem;
+                padding: 0 1rem;
+                margin-bottom: 2rem;
+            }
+
+            /* Футер и контакты */
+            footer {
+                padding: 1.5rem 1rem;
+            }
+
+            #contacts {
+                padding: 2rem 0;
+            }
+
+            .social-links {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1.5rem;
+            }
+
+            .social-links a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* Дополнительные стили для очень маленьких экранов */
+        @media (max-width: 480px) {
+            .block-text h2 {
+                font-size: 1.3rem;
+            }
+
+            .service-card {
+                padding: 1rem;
+            }
+
+            .service-icon {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Улучшение читаемости на средних экранах */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-block {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -575,6 +760,7 @@
             <a href="https://www.instagram.com/name_lucky_lucky_/" target="_blank">Instagram</a>
             <a href="https://wa.me/phonenumber" target="_blank">WhatsApp</a>
             <a href="mailto:vadimKh17@gmail.com">Email</a>
+            <a href="https://www.facebook.com/profile.php?id=100009226154613">FaceBook</a>
         </div>
     </section>
 </footer>
