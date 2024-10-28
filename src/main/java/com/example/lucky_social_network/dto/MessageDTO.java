@@ -35,7 +35,6 @@ public class MessageDTO {
     }
 
 
-    // Enum для типов удаления
     public enum DeleteAction {
         SINGLE_MESSAGE,    // Удаление одного сообщения
         CHAT_HISTORY      // Удаление истории чата

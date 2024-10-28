@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 @Data
 public class NotificationDto {
     private Long id;
+
+    private Long commentAuthorId;
     private String message;
     private LocalDateTime createdAt;
     private boolean isRead;
@@ -15,5 +17,4 @@ public class NotificationDto {
     private Long postId;
     private String postContent;
 
-    // Геттеры и сеттеры
 }

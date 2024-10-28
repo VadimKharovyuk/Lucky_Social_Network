@@ -5,9 +5,7 @@ import com.example.lucky_social_network.model.Comment;
 import com.example.lucky_social_network.model.Notification;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
-import com.example.lucky_social_network.repository.CommentRepository;
 import com.example.lucky_social_network.repository.NotificationRepository;
-import com.example.lucky_social_network.repository.PostRepository;
 import com.example.lucky_social_network.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +20,7 @@ import java.util.stream.Collectors;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
+
 
     public void createCommentNotification(Post post, Comment comment) {
         if (!post.getAuthor().getId().equals(comment.getAuthor().getId())) {
@@ -63,7 +60,7 @@ public class NotificationService {
 
 
     public List<NotificationDto> getUserNotificationsWithDetails(Long userId) {
-        List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Notification> notifications = notificationRepository.findByUserIdWithDetails(userId);
         return notifications.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -76,20 +73,19 @@ public class NotificationService {
         dto.setCreatedAt(notification.getCreatedAt());
         dto.setRead(notification.isRead());
 
-        if (notification.getComment().getId() != null) {
-            Comment comment = commentRepository.findById(notification.getComment().getId())
-                    .orElse(null);
-            if (comment != null) {
-                dto.setCommentContent(comment.getContent());
-                dto.setCommentAuthorName(comment.getAuthor().getUsername());
+        if (notification.getComment() != null) {
+            dto.setCommentContent(notification.getComment().getContent());
 
-                Post post = postRepository.findById(comment.getPost().getId())
-                        .orElse(null);
-                if (post != null) {
-                    dto.setPostId(post.getId());
-                    dto.setPostContent(post.getContent());
-                }
+            User author = notification.getComment().getAuthor();
+            if (author != null) {
+                dto.setCommentAuthorId(author.getId());
+                dto.setCommentAuthorName(author.getUsername());
             }
+        }
+
+        if (notification.getPost() != null) {
+            dto.setPostId(notification.getPost().getId());
+            dto.setPostContent(notification.getPost().getContent());
         }
 
         return dto;

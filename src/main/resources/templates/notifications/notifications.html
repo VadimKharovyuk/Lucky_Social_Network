@@ -397,9 +397,14 @@
                 </div>
             </div>
 
+            <!--            <div th:if="${notification.commentContent}" class="comment-content">-->
+            <!--                <p th:text="${notification.commentContent}"></p>-->
+            <!--                <small>Автор: <span th:text="${notification.commentAuthorName}"></span></small>-->
+            <!--            </div>-->
             <div th:if="${notification.commentContent}" class="comment-content">
                 <p th:text="${notification.commentContent}"></p>
-                <small>Автор: <span th:text="${notification.commentAuthorName}"></span></small>
+                <small>Автор: <a th:href="@{/profile/{id}(id=${notification.commentAuthorId})}"
+                                 th:text="${notification.getCommentAuthorName()}"></a></small>
             </div>
 
             <a th:if="${notification.postId}"

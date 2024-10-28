@@ -39,6 +39,7 @@ public class NotificationController {
 
         long unreadCount = notificationService.getUnreadNotificationCount(currentUserId);
         model.addAttribute("notificationCount", unreadCount);
+        // Добавляем информацию о текущем пользователе
 
         return "notifications/notifications";
     }
