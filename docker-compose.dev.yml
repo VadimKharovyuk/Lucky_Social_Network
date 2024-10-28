@@ -1,9 +1,8 @@
-# docker-compose.dev.yml
 version: '3.8'
 
 services:
   app:
-    build: .    # Это означает, что образ будет собираться локально из Dockerfile
+    build: .
     ports:
       - "1050:1050"
     environment:
@@ -11,16 +10,28 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=19111993
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
+      # Обновленные настройки Redis
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_DATABASE=0
+      - SPRING_DATA_REDIS_TIMEOUT=10000
+      # RabbitMQ настройки
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PORT=5672
       - SPRING_RABBITMQ_USERNAME=guest
       - SPRING_RABBITMQ_PASSWORD=guest
     depends_on:
-      - db
-      - redis
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:1050/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   db:
     image: postgres:13
@@ -32,6 +43,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7
@@ -40,6 +56,11 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -51,17 +72,124 @@ services:
       - RABBITMQ_DEFAULT_PASS=guest
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   postgres_data:
   redis_data:
   rabbitmq_data:
 
+networks:
+  default:
+    driver: bridge
 
-#    # 1. Запускаете проект для разработки
-#    docker-compose -f docker-compose.dev.yml up -d
+
+
+
+
+
+
+#version: '3.8'
 #
-#    # 2. Вносите изменения в код
+#services:
+#  app:
+#    build: .
+#    ports:
+#      - "1050:1050"
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/Lucky_Social_Network
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=19111993
+#      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#    depends_on:
+#      - db
 #
-#    # 3. Пересобираете и перезапускаете контейнеры
-#    docker-compose -f docker-compose.dev.yml up -d --build
+#  db:
+#    image: postgres:13
+#    environment:
+#      - POSTGRES_DB=Lucky_Social_Network
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=19111993
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    ports:
+#      - "5432:5432"
+#
+#volumes:
+#  postgres_data:
+
+
+
+
+
+## docker-compose.dev.yml
+#version: '3.8'
+#
+#services:
+#  app:
+#    build: .    # Это означает, что образ будет собираться локально из Dockerfile
+#    ports:
+#      - "1050:1050"
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/Lucky_Social_Network
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=19111993
+#      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#      - SPRING_REDIS_HOST=redis
+#      - SPRING_REDIS_PORT=6379
+#      - SPRING_RABBITMQ_HOST=rabbitmq
+#      - SPRING_RABBITMQ_PORT=5672
+#      - SPRING_RABBITMQ_USERNAME=guest
+#      - SPRING_RABBITMQ_PASSWORD=guest
+#    depends_on:
+#      - db
+#      - redis
+#      - rabbitmq
+#
+#  db:
+#    image: postgres:13
+#    environment:
+#      - POSTGRES_DB=Lucky_Social_Network
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=19111993
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    ports:
+#      - "5432:5432"
+#
+#  redis:
+#    image: redis:7
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - redis_data:/data
+#    command: redis-server --appendonly yes
+#
+#  rabbitmq:
+#    image: rabbitmq:3-management
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+#    environment:
+#      - RABBITMQ_DEFAULT_USER=guest
+#      - RABBITMQ_DEFAULT_PASS=guest
+#    volumes:
+#      - rabbitmq_data:/var/lib/rabbitmq
+#
+#volumes:
+#  postgres_data:
+#  redis_data:
+#  rabbitmq_data:
+#
+#
+##    # 1. Запускаете проект для разработки
+##    docker-compose -f docker-compose.dev.yml up -d
+##
+##    # 2. Вносите изменения в код
+##
+##    # 3. Пересобираете и перезапускаете контейнеры
+##    docker-compose -f docker-compose.dev.yml up -d --build

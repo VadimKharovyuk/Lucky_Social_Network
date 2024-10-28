@@ -244,6 +244,33 @@
       color: var(--fb-blue);
     }
 
+    .friend-card {
+      transform: translateY(0);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .friend-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--fb-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #BCC0C4;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #A4A7AB;
+    }
+
     /* Responsive Styles */
     @media (max-width: 1200px) {
       .sidebar {
@@ -367,6 +394,21 @@
       * {
         animation: none !important;
         transition: none !important;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fb-bg: #18191A;
+          --fb-text: #E4E6EB;
+          --fb-secondary: #B0B3B8;
+        }
+
+        .content-container,
+        .side-nav,
+        .friend-card {
+          background: #242526;
+          border-color: #3E4042;
+        }
       }
     }
   </style>
