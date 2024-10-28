@@ -26,10 +26,10 @@ public class SecurityConfig {
                                 .requestMatchers("/moderator/**").hasAnyRole("JUNIOR_ADMIN", "SENIOR_ADMIN", "SUPER_ADMIN")
                                 .anyRequest().authenticated()
                 )
-                .formLogin((form) -> form
+                .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/posts")
+                        .defaultSuccessUrl("/posts", true)
+                        .failureUrl("/login?error")
                         .permitAll()
                 )
                 .logout((logout) -> logout
