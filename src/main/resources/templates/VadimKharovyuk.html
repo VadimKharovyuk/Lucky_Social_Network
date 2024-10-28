@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О нас - Vadim Kharovyuk</title>
+    <style>
+        :root {
+            --background-color: #0a192f;
+            --text-color: #e6f1ff;
+            --accent-color-1: #112240;
+            --accent-color-2: #233554;
+            --accent-color-3: #64ffda;
+            --accent-color-4: #1d4ed8;
+            --secondary-color: #8892b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg,
+            var(--background-color) 0%,
+            var(--accent-color-4) 25%,
+            var(--accent-color-1) 50%,
+            var(--accent-color-2) 75%,
+            var(--background-color) 100%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .nav {
+            background: rgba(10, 25, 47, 0.95);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--accent-color-3);
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.3s, transform 0.3s;
+            position: relative;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav a:hover {
+            color: var(--accent-color-3);
+            transform: translateY(-2px);
+        }
+
+        .nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent-color-3);
+            transition: width 0.3s;
+        }
+
+        .nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Стили для секции контактов */
+        #contacts {
+            padding: 4rem 0;
+            scroll-margin-top: 80px; /* Отступ для корректного скролла с учетом фиксированной навигации */
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding: 2rem;
+            background: rgba(17, 34, 64, 0.7);
+            border-radius: 15px;
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .social-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.7rem 1.5rem;
+            border: 1px solid var(--accent-color-3);
+            border-radius: 5px;
+            transition: all 0.3s;
+            background: rgba(100, 255, 218, 0.1);
+        }
+
+        .social-links a:hover {
+            background: var(--accent-color-3);
+            color: var(--background-color);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .social-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .content-block {
+            display: flex;
+            margin-bottom: 3rem;
+            gap: 2rem;
+            align-items: center;
+            padding: 2rem;
+            background: rgba(17, 34, 64, 0.7);
+            border-radius: 15px;
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            backdrop-filter: blur(5px);
+
+            /* Добавленные стили из section-subtitle */
+            text-align: center;
+            color: var(--secondary-color);
+            max-width: 1200px; /* Увеличил с 600px для контентного блока */
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+
+            /* Дополнительные улучшения */
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-block:hover {
+            border-color: var(--accent-color-3);
+            box-shadow: 0 0 50px rgba(100, 255, 218, 0.6);
+            transform: translateY(-5px);
+        }
+
+        /* Обновляем стили для текста внутри блока */
+        .block-text {
+            text-align: left; /* Оставляем текст выровненным по левому краю */
+        }
+
+        .block-text h2 {
+            color: var(--accent-color-3);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .block-text p {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .content-block {
+                flex-direction: column;
+                padding: 1.5rem;
+                margin: 2rem auto;
+            }
+        }
+
+        .block-text {
+            flex: 1;
+            padding: 2rem;
+            border-radius: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .block-text:hover {
+            transform: translateY(-5px);
+        }
+
+        .block-text h2 {
+            color: var(--accent-color-3);
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .block-text p {
+            color: var(--secondary-color);
+            line-height: 1.8;
+        }
+
+        .block-text em {
+            color: var(--text-color);
+        }
+
+        .block-image {
+            flex: 1;
+        }
+
+        .block-image img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .block-image img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(100, 255, 218, 0.2);
+        }
+
+        footer {
+            background: rgba(10, 25, 47, 0.95);
+            color: var(--text-color);
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--accent-color-3);
+        }
+
+        footer h3 {
+            text-align: center;
+            color: var(--accent-color-3);
+            margin-bottom: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.7rem 1.5rem;
+            border: 1px solid var(--accent-color-3);
+            border-radius: 5px;
+            transition: all 0.3s;
+            background: rgba(100, 255, 218, 0.1);
+        }
+
+        .social-links a:hover {
+            background: var(--accent-color-3);
+            color: var(--background-color);
+            transform: translateY(-3px);
+        }
+
+        .services-section {
+            padding: 5rem 0;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .service-card {
+            background: rgba(17, 34, 64, 0.7);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg,
+            var(--accent-color-3) 0%,
+            var(--accent-color-4) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-color-3);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            color: var(--accent-color-3);
+            margin-bottom: 1rem;
+        }
+
+        .service-title {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-description {
+            color: var(--secondary-color);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .service-features {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .service-features li {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .service-features li::before {
+            content: '→';
+            color: var(--accent-color-3);
+            margin-right: 0.5rem;
+        }
+
+        .service-price {
+            color: var(--accent-color-3);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            text-align: right;
+        }
+
+        .section-title {
+            text-align: center;
+            color: var(--accent-color-3);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--secondary-color);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        /* Добавляем плавный скролл для всей страницы */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 768px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-block {
+                flex-direction: column !important;
+                padding: 1rem;
+            }
+
+            .nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .block-text {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Остальной HTML код остается тем же -->
+<nav class="nav">
+    <ul>
+        <li><a href="/">Главная</a></li>
+        <li><a href="#services">Услуги</a></li>
+        <li><a href="#contacts">Контакты</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <div class="content-block">
+        <div class="block-text">
+            <h2>Vadim Kharovyuk</h2>
+            <p>Я профессиональный Software Engineer, специализирующийся на разработке веб-приложений. Создаю
+                качественные, масштабируемые решения для бизнеса и частных клиентов. Мой опыт позволяет реализовывать
+                проекты любой сложности, от простых лендингов до сложных корпоративных систем.</p>
+        </div>
+        <div class="block-image">
+            <img src="https://scontent.ffjr1-1.fna.fbcdn.net/v/t39.30808-6/440850797_3721696354814533_3303651326190296084_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_ohc=DP0KBs05jYwQ7kNvgG3n-nQ&_nc_zt=23&_nc_ht=scontent.ffjr1-1.fna&_nc_gid=A-3F4TD4Eb3dTQu9rTCjuX2&oh=00_AYBj9ccKNWXosXUR3GKdYlfD5YeukGTaAblb-WKYYu1DIg&oe=6724B094"
+                 alt="Vadim Kharovyuk">
+        </div>
+    </div>
+
+    <div class="content-block">
+        <div class="block-text">
+            <h2>Отзыв клиента</h2>
+            <p>"Работа с Вадимом была очень продуктивной. Он создал именно тот сайт, который был нужен нашей компании.
+                Особенно впечатлило внимание к деталям и готовность учесть все наши пожелания. Рекомендуем его как
+                профессионала своего дела!"</p>
+            <p><em>- Александр, CEO Tech Solutions</em></p>
+        </div>
+        <div class="block-image">
+            <img src="https://static.tildacdn.com/tild3935-6461-4038-a661-613637326335/email_love_like.svg"
+                 alt="Проект 1">
+        </div>
+    </div>
+
+    <div class="content-block">
+        <div class="block-text">
+            <h2>Успешный проект</h2>
+            <p>"Вадим разработал для нас интернет-магазин, который превзошел все ожидания. Сайт работает быстро, удобен
+                в управлении и отлично выглядит. Особенно порадовала оперативная техническая поддержка после запуска
+                проекта."</p>
+            <p><em>- Мария, владелец онлайн-магазина</em></p>
+        </div>
+        <div class="block-image">
+            <img src="https://static.tildacdn.com/tild3935-6461-4038-a661-613637326335/email_love_like.svg"
+                 alt="Проект 2">
+        </div>
+    </div>
+
+    <div class="content-block">
+        <div class="block-text">
+            <h2>Инновационные решения</h2>
+            <p>"Сотрудничество с Вадимом позволило нам создать уникальное веб-приложение для нашего стартапа. Его
+                технические знания и креативный подход помогли реализовать все наши идеи."</p>
+            <p><em>- Дмитрий, основатель стартапа</em></p>
+        </div>
+        <div class="block-image">
+            <img src="https://static.tildacdn.com/tild3935-6461-4038-a661-613637326335/email_love_like.svg"
+                 alt="Проект 3">
+        </div>
+    </div>
+    <section id="services" class="services-section container">
+        <h2 class="section-title">Мои Услуги</h2>
+        <p class="section-subtitle">Создаю современные веб-решения для вашего бизнеса с фокусом на производительность,
+            безопасность и удобство использования</p>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">🛍️</div>
+                <h3 class="service-title">Интернет-магазин</h3>
+                <p class="service-description">Разработка современных e-commerce решений с полным функционалом для
+                    вашего бизнеса</p>
+                <ul class="service-features">
+                    <li>Адаптивный дизайн</li>
+                    <li>Интеграция платёжных систем</li>
+                    <li>Система управления заказами</li>
+                    <li>SEO-оптимизация</li>
+                    <li>Интеграция с 1С, CRM</li>
+                </ul>
+                <!--                <div class="service-price">от 150 000 ₽</div>-->
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">👔</div>
+                <h3 class="service-title">Корпоративный сайт</h3>
+                <p class="service-description">Создание представительства вашей компании в интернете с современным
+                    дизайном</p>
+                <ul class="service-features">
+                    <li>Уникальный дизайн</li>
+                    <li>Система управления контентом</li>
+                    <li>Корпоративная почта</li>
+                    <li>Интеграция с CRM</li>
+                    <li>Многоязычность</li>
+                </ul>
+                <!--                <div class="service-price">от 100 000 ₽</div>-->
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">🎨</div>
+                <h3 class="service-title">Портфолио / Лендинг</h3>
+                <p class="service-description">Разработка эффективных одностраничных сайтов для презентации ваших
+                    услуг</p>
+                <ul class="service-features">
+                    <li>Современный дизайн</li>
+                    <li>Анимации и эффекты</li>
+                    <li>Оптимизация конверсии</li>
+                    <li>Быстрая загрузка</li>
+                    <li>Формы обратной связи</li>
+                </ul>
+                <!--                <div class="service-price">от 40 000 ₽</div>-->
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">🔄</div>
+                <h3 class="service-title">Миграция и обновление</h3>
+                <p class="service-description">Перенос вашего сайта на современные технологии и обновление устаревших
+                    систем</p>
+                <ul class="service-features">
+                    <li>Анализ текущей системы</li>
+                    <li>Планирование миграции</li>
+                    <li>Перенос данных</li>
+                    <li>Тестирование</li>
+                    <li>Оптимизация производительности</li>
+                </ul>
+                <!--                <div class="service-price">от 90 000 ₽</div>-->
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">🌐</div>
+                <h3 class="service-title">API Интеграции</h3>
+                <p class="service-description">Разработка и интеграция API для взаимодействия с внешними сервисами</p>
+                <ul class="service-features">
+                    <li>REST/GraphQL API</li>
+                    <li>Документация API</li>
+                    <li>Интеграция платежных систем</li>
+                    <li>Интеграция CRM/ERP</li>
+                    <li>Масштабируемая архитектура</li>
+                </ul>
+                <!--                <div class="service-price">от 120 000 ₽</div>-->
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">🛠️</div>
+                <h3 class="service-title">Веб-приложения</h3>
+                <p class="service-description">Разработка сложных веб-приложений под ваши бизнес-процессы</p>
+                <ul class="service-features">
+                    <li>Личный кабинет</li>
+                    <li>Интеграция API</li>
+                    <li>База данных</li>
+                    <li>Автоматизация процессов</li>
+                    <li>Масштабируемая архитектура</li>
+                </ul>
+                <!--                <div class="service-price">от 200 000 ₽</div>-->
+            </div>
+        </div>
+    </section>
+</div>
+
+
+<footer>
+    <section id="contacts">
+        <h2 class="section-title">Контакты</h2>
+        <p class="section-subtitle">Свяжитесь со мной удобным для вас способом</p>
+        <div class="social-links">
+            <a href="https://t.me/name_lucky_lucky" target="_blank">Telegram</a>
+            <a href="https://www.instagram.com/name_lucky_lucky_/" target="_blank">Instagram</a>
+            <a href="https://wa.me/phonenumber" target="_blank">WhatsApp</a>
+            <a href="mailto:vadimKh17@gmail.com">Email</a>
+        </div>
+    </section>
+</footer>
+</body>
+</html>

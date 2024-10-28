@@ -82,6 +82,11 @@ public class HomeController {
         return "profileList";
     }
 
+    @GetMapping("/about")
+    public String about() {
+        return "VadimKharovyuk";
+    }
+
 
 
 

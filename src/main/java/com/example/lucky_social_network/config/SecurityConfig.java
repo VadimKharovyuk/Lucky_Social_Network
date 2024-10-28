@@ -19,7 +19,7 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
                                 .requestMatchers("/", "/chat/send", "/register", "/admin/**",
-                                        "/login", "/css/**", "/", "/profile-list",
+                                        "/login", "/css/**", "/", "/profile-list", "/about",
                                         "/js/**")
                                 .permitAll()
 //                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
