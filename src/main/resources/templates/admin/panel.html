@@ -184,6 +184,78 @@
             background: #E8F5E9;
             color: var(--success-color);
         }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 400px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            max-width: 600px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #D3D9DE;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .search-results {
+            margin-top: 20px;
+        }
+
+        .convert-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .select-input {
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #D3D9DE;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .no-results {
+            padding: 20px;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            text-align: center;
+            color: #818C99;
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+            }
+
+            .convert-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .select-input {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -249,33 +321,54 @@
             </table>
         </div>
     </div>
-
     <div class="admin-card">
         <div class="card-header">
             <h2 class="card-title">Назначить администратора</h2>
         </div>
         <div class="card-content">
-            <form th:action="@{/admin/convert}" method="post" class="convert-form">
-                <select name="userId" class="select-input" required>
-                    <option value="">Выберите пользователя</option>
-                    <option th:each="user : ${users}"
-                            th:value="${user.id}"
-                            th:text="${user.username}">
-                    </option>
-                </select>
-                <select name="role" class="select-input" required>
-                    <option value="">Выберите роль</option>
-                    <option th:each="role : ${adminRoles}"
-                            th:value="${role}"
-                            th:text="${role}">
-                    </option>
-                </select>
-                <button type="submit" class="btn btn-success">Назначить администратором</button>
+            <!-- Форма поиска -->
+            <form th:action="@{/admin}" method="get" class="search-form">
+                <div class="search-container">
+                    <input type="text"
+                           name="searchQuery"
+                           th:value="${searchQuery}"
+                           class="search-input"
+                           placeholder="Поиск пользователя по имени...">
+                    <button type="submit" class="btn btn-primary">Найти</button>
+                </div>
             </form>
+
+            <!-- Результаты поиска и форма назначения админа -->
+            <div th:if="${not #lists.isEmpty(users)}" class="search-results">
+                <form th:action="@{/admin/convert}" method="post" class="convert-form">
+                    <select name="userId" class="select-input" required>
+                        <option value="">Выберите пользователя</option>
+                        <option th:each="user : ${users}"
+                                th:value="${user.id}"
+                                th:text="${user.username}">
+                        </option>
+                    </select>
+                    <select name="role" class="select-input" required>
+                        <option value="">Выберите роль</option>
+                        <option th:each="role : ${adminRoles}"
+                                th:value="${role}"
+                                th:text="${role}">
+                        </option>
+                    </select>
+                    <button type="submit" class="btn btn-success">Назначить администратором</button>
+                </form>
+            </div>
+
+            <!-- Сообщение, если пользователи не найдены -->
+            <div th:if="${searchQuery != null and #lists.isEmpty(users)}"
+                 class="no-results">
+                Пользователи не найдены
+            </div>
         </div>
     </div>
 </div>
 </body>
+
 </html>
 
 <!--<!DOCTYPE html>-->

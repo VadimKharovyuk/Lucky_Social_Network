@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -22,19 +23,27 @@ import java.util.List;
 public class AdminController {
     private final AdminService adminService;
     private final UserService userService;
- 
+
 
     @GetMapping
 //    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    public String adminPanel(Model model) {
+    public String adminPanel(
+            @RequestParam(required = false) String searchQuery,
+            Model model
+    ) {
         List<Admin> admins = adminService.getAllAdmins();
-        List<User> users = userService.getAllUsers();
+
+        // Если есть поисковый запрос, ищем пользователей
+        List<User> users = searchQuery != null && !searchQuery.isEmpty()
+                ? userService.searchUsers(searchQuery)
+                : Collections.emptyList();
+
         model.addAttribute("admins", admins);
         model.addAttribute("users", users);
+        model.addAttribute("searchQuery", searchQuery);
         model.addAttribute("adminRoles", Admin.AdminRole.values());
         return "admin/panel";
     }
-
     @PostMapping("/convert")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public String convertUserToAdmin(@RequestParam Long userId,
