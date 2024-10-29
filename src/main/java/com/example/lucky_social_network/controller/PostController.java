@@ -54,6 +54,7 @@ public class PostController {
         return "posts/list";
     }
 
+
     @GetMapping("/{id}")
     public String getPost(@PathVariable Long id, Model model) {
         Optional<Post> postOptional = postService.getPostById(id);

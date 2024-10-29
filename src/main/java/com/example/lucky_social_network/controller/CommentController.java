@@ -17,6 +17,23 @@ public class CommentController {
     private final UserService userService;
 
 
+    @PostMapping("/delete/{commentId}")
+    public String deleteComment(@PathVariable Long commentId) {
+        Comment comment = commentService.getCommentById(commentId);
+        Long postId = comment.getPost().getId();
+
+        // Проверяем, является ли текущий пользователь автором комментария
+        Long currentUserId = userService.getCurrentUserId();
+        if (currentUserId != null && currentUserId.equals(comment.getAuthor().getId())) {
+            commentService.deleteComment(commentId);
+        } else {
+            // Можно добавить сообщение об ошибке или перенаправление
+            return "redirect:/error";
+        }
+
+        return "redirect:/posts/" + postId;
+    }
+
 
     @PostMapping("/add")
     public String addComment(@ModelAttribute("newComment") Comment newComment, @RequestParam Long postId, @RequestParam Long userId) {
@@ -37,22 +54,7 @@ public class CommentController {
         return "redirect:/posts/" + updatedComment.getPost().getId();
     }
 
-    @PostMapping("/delete/{commentId}")
-    public String deleteComment(@PathVariable Long commentId) {
-        Comment comment = commentService.getCommentById(commentId);
-        Long postId = comment.getPost().getId();
 
-        // Проверяем, является ли текущий пользователь автором комментария
-        Long currentUserId = userService.getCurrentUserId();
-        if (currentUserId != null && currentUserId.equals(comment.getAuthor().getId())) {
-            commentService.deleteComment(commentId);
-        } else {
-            // Можно добавить сообщение об ошибке или перенаправление
-            return "redirect:/error";
-        }
-
-        return "redirect:/posts/" + postId;
-    }
 
 
 }

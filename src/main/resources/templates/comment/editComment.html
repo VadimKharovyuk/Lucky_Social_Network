@@ -1,13 +1,72 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Edit Comment</title>
+    <title>Редактировать комментарий</title>
+    <style>
+        .edit-form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .edit-form textarea {
+            width: 100%;
+            min-height: 100px;
+            margin: 10px 0;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-buttons {
+            margin-top: 10px;
+        }
+
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            text-decoration: none;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-btn:hover {
+            background-color: #da190b;
+        }
+    </style>
 </head>
 <body>
-<h1>Edit Comment</h1>
-<form th:action="@{/comments/edit/{id}(id=${comment.id})}" method="post">
-    <textarea name="content" th:text="${comment.content}" required></textarea>
-    <button type="submit">Update Comment</button>
-</form>
+<div class="edit-form">
+    <h2>Редактировать комментарий</h2>
+    <form th:action="@{/comments/edit/{commentId}(commentId=${comment.id})}"
+          method="post">
+            <textarea name="content"
+                      th:text="${comment.content}"
+                      required></textarea>
+        <div class="form-buttons">
+            <button type="submit" class="submit-btn">Сохранить</button>
+            <a th:href="@{/posts/{postId}(postId=${comment.post.id})}"
+               class="cancel-btn">Отмена</a>
+        </div>
+    </form>
+</div>
 </body>
 </html>

@@ -34,7 +34,7 @@ public class BlogDTO {
     private Long viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private boolean published = false; // По умолчанию false
+    private boolean published = false;
 
     @Data
     @Builder

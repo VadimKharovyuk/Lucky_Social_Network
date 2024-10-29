@@ -391,6 +391,59 @@
       }
     }
 
+    .comment-actions {
+      margin-top: 5px;
+    }
+
+    .delete-comment-btn {
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .delete-comment-btn:hover {
+      background-color: #cc0000;
+    }
+
+    .comment-actions {
+      margin-top: 5px;
+    }
+
+    .edit-comment-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      text-decoration: none;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .delete-comment-btn {
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .edit-comment-btn:hover {
+      background-color: #45a049;
+    }
+
+    .delete-comment-btn:hover {
+      background-color: #cc0000;
+    }
+
   </style>
 </head>
 <body>
@@ -480,7 +533,6 @@
       <!--        <i class="fas fa-share"></i> Поделиться-->
       <!--      </button>-->
     </div>
-
     <div class="comments-section">
       <div th:each="comment : ${comments}" class="comment">
         <div class="comment-header">
@@ -488,18 +540,48 @@
                class="comment-avatar"
                alt="Comment Avatar">
           <div class="comment-meta">
-                        <span class="comment-author"
-                              th:with="commentFullName=${(comment.author.firstName != null and !comment.author.firstName.isEmpty() and
-                                                        comment.author.lastName != null and !comment.author.lastName.isEmpty()) ?
-                                                        comment.author.firstName + ' ' + comment.author.lastName : null}"
-                              th:text="${commentFullName != null ? commentFullName : comment.author.username}">
-                        </span>
+        <span class="comment-author"
+              th:with="commentFullName=${(comment.author.firstName != null and !comment.author.firstName.isEmpty() and
+                                        comment.author.lastName != null and !comment.author.lastName.isEmpty()) ?
+                                        comment.author.firstName + ' ' + comment.author.lastName : null}"
+              th:text="${commentFullName != null ? commentFullName : comment.author.username}">
+        </span>
             <div class="comment-content" th:text="${comment.content}">
               Текст комментария
+            </div>
+            <!-- Кнопки действий (редактирование и удаление) -->
+            <div th:if="${#authentication.principal.id == comment.author.id}" class="comment-actions">
+              <a th:href="@{/comments/edit/{commentId}(commentId=${comment.id})}"
+                 class="edit-comment-btn">Редактировать</a>
+              <form th:action="@{/comments/delete/{commentId}(commentId=${comment.id})}"
+                    method="post"
+                    style="display: inline;">
+                <button type="submit" class="delete-comment-btn">Удалить</button>
+              </form>
             </div>
           </div>
         </div>
       </div>
+    </div>
+    <!--    <div class="comments-section">-->
+    <!--      <div th:each="comment : ${comments}" class="comment">-->
+    <!--        <div class="comment-header">-->
+    <!--          <img th:src="${comment.author.avatarUrl}"-->
+    <!--               class="comment-avatar"-->
+    <!--               alt="Comment Avatar">-->
+    <!--          <div class="comment-meta">-->
+    <!--                        <span class="comment-author"-->
+    <!--                              th:with="commentFullName=${(comment.author.firstName != null and !comment.author.firstName.isEmpty() and-->
+    <!--                                                        comment.author.lastName != null and !comment.author.lastName.isEmpty()) ?-->
+    <!--                                                        comment.author.firstName + ' ' + comment.author.lastName : null}"-->
+    <!--                              th:text="${commentFullName != null ? commentFullName : comment.author.username}">-->
+    <!--                        </span>-->
+    <!--            <div class="comment-content" th:text="${comment.content}">-->
+    <!--              Текст комментария-->
+    <!--            </div>-->
+    <!--          </div>-->
+    <!--        </div>-->
+    <!--      </div>-->
 
       <form th:action="@{/comments/add}" method="post" class="comment-form" th:object="${newComment}" id="comment-form">
         <input type="hidden" name="postId" th:value="${post.id}"/>

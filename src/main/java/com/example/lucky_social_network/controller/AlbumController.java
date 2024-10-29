@@ -71,9 +71,6 @@ public class AlbumController {
             // Создание альбома
             Album album = albumService.createAlbum(title, description, isPrivate, currentUser);
 
-            // Логирование успешного создания
-            log.info("Album created: {}, user: {}", album.getId(), currentUser.getId());
-
             return "redirect:/albums/" + album.getId();
         } catch (Exception e) {
             // Логирование ошибки

@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.util.List;
 @Controller
-@RequestMapping("/admin/blog")  // Базовый путь для админского контроллера
+@RequestMapping("/admin/blog")
 @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
 @RequiredArgsConstructor
 public class AdminBlogController {

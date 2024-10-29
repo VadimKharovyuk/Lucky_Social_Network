@@ -203,9 +203,25 @@ public class UserService {
         throw new IllegalStateException("User not authenticated or CustomUserDetails not found");
     }
 
+    //    public User getCurrentUser() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            throw new IllegalStateException("No authenticated user found");
+//        }
+//
+//        Object principal = authentication.getPrincipal();
+//        if (principal instanceof UserDetails) {
+//            String username = ((UserDetails) principal).getUsername();
+//            return userRepository.findByUsername(username)
+//                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+//        }
+//
+//        throw new IllegalStateException("Unexpected principal type: " + principal.getClass());
+//    }
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
+            log.error("Attempt to access getCurrentUser() with no authenticated user");
             throw new IllegalStateException("No authenticated user found");
         }
 
@@ -216,6 +232,7 @@ public class UserService {
                     .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         }
 
+        log.error("Unexpected principal type: " + principal.getClass());
         throw new IllegalStateException("Unexpected principal type: " + principal.getClass());
     }
 

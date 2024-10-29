@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <title>Панель администратора | Lucky Social Network</title>
     <style>
         :root {
@@ -363,6 +365,107 @@
             <div th:if="${searchQuery != null and #lists.isEmpty(users)}"
                  class="no-results">
                 Пользователи не найдены
+            </div>
+        </div>
+        <div class="admin-card">
+            <div class="card-header">
+                <h2 class="card-title">Управление пользователями</h2>
+            </div>
+            <div class="card-content">
+                <!-- Форма поиска пользователей -->
+                <form th:action="@{/admin/search-users}" method="get" class="search-form">
+                    <div class="search-container">
+                        <input type="text"
+                               name="userSearchQuery"
+                               th:value="${userSearchQuery}"
+                               class="search-input"
+                               placeholder="Поиск пользователей...">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Найти
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Таблица найденных пользователей -->
+                <div th:if="${not #lists.isEmpty(searchedUsers)}" class="user-table-container">
+                    <table class="user-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя пользователя</th>
+                            <th>Email</th>
+                            <th>Роли</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${searchedUsers}">
+                            <td th:text="${user.id}"></td>
+                            <td th:text="${user.username}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td>
+                        <span th:each="role : ${user.roles}"
+                              th:text="${role}"
+                              class="badge bg-secondary me-1">
+                        </span>
+                            </td>
+                            <td>
+                        <span th:if="${user.emailVerified}"
+                              class="badge bg-success">Активен</span>
+                                <span th:unless="${user.emailVerified}"
+                                      class="badge bg-warning">Не подтвержден</span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger"
+                                            data-bs-toggle="modal"
+                                            th:data-bs-target="'#deleteModal' + ${user.id}">
+                                        <i class="bi bi-trash"></i> Удалить
+                                    </button>
+                                </div>
+
+                                <!-- Модальное окно подтверждения удаления -->
+                                <div class="modal fade" th:id="'deleteModal' + ${user.id}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Подтверждение удаления</h5>
+                                                <button type="button" class="btn-close"
+                                                        data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Вы уверены, что хотите удалить пользователя
+                                                    <strong th:text="${user.username}"></strong>?</p>
+                                                <p class="text-danger">Это действие нельзя отменить!</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Отмена
+                                                </button>
+                                                <form th:action="@{/admin/delete-user}" method="post"
+                                                      style="display: inline;">
+                                                    <input type="hidden" name="userId" th:value="${user.id}">
+                                                    <button type="submit" class="btn btn-danger">
+                                                        Удалить
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Сообщение, если пользователи не найдены -->
+                <div th:if="${userSearchQuery != null and #lists.isEmpty(searchedUsers)}"
+                     class="alert alert-info mt-3">
+                    Пользователи не найдены
+                </div>
             </div>
         </div>
     </div>
