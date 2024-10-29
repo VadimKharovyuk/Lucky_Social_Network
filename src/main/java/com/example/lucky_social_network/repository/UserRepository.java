@@ -30,4 +30,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u.roles FROM User u WHERE u.id = :userId")
     Set<Role> findRolesById(@Param("userId") Long userId);
 
+
+    Optional<User> findByEmail(String email);
 }

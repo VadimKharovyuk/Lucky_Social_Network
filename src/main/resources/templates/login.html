@@ -8,24 +8,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            /* Светлая тема */
+            --bg-gradient-light: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --container-bg-light: rgba(255, 255, 255, 0.1);
+            --text-color-light: #ffffff;
+            --link-color-light: rgba(255, 255, 255, 0.8);
+            --input-bg-light: rgba(255, 255, 255, 0.1);
+            --icon-color-light: #ffd700;
+
+            /* Темная тема */
+            --bg-gradient-dark: linear-gradient(135deg, #1f1f1f 0%, #000000 100%);
+            --container-bg-dark: rgba(255, 255, 255, 0.05);
+            --text-color-dark: #e0e0e0;
+            --link-color-dark: rgba(255, 255, 255, 0.6);
+            --input-bg-dark: rgba(0, 0, 0, 0.3);
+            --icon-color-dark: #ffd700;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
+            background: var(--bg-gradient-light);
+            color: var(--text-color-light);
             min-height: 100vh;
             display: flex;
             align-items: center;
             padding: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: var(--bg-gradient-dark);
+            color: var(--text-color-dark);
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--container-bg-light);
             backdrop-filter: blur(10px);
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 2rem;
             max-width: 100%;
             width: 100%;
             margin: 0 auto;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .container {
+            background: var(--container-bg-dark);
+            border-color: rgba(255, 255, 255, 0.05);
         }
 
         .login-logo {
@@ -35,8 +66,13 @@
 
         .login-logo i {
             font-size: 3rem;
-            color: #ffd700;
+            color: var(--icon-color-light);
             margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .login-logo i {
+            color: var(--icon-color-dark);
         }
 
         .password-container {
@@ -49,64 +85,174 @@
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--link-color-light);
             transition: color 0.3s ease;
         }
 
+        .dark-mode .toggle-password {
+            color: var(--link-color-dark);
+        }
+
         .toggle-password:hover {
-            color: #fff;
+            color: var(--text-color-light);
         }
 
-        .social-login {
-            margin-top: 2rem;
-            text-align: center;
-        }
-
-        .social-login-title {
-            position: relative;
-            margin-bottom: 1rem;
-        }
-
-        .social-login-title::before,
-        .social-login-title::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            width: 45%;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .social-login-title::before {
-            left: 0;
-        }
-
-        .social-login-title::after {
-            right: 0;
-        }
-
-        .social-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .social-button {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+        .form-control {
+            background: var(--input-bg-light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-color-light);
             transition: all 0.3s ease;
         }
 
-        .social-button:hover {
-            background: #fff;
+        .dark-mode .form-control {
+            background: var(--input-bg-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color-dark);
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+            color: var(--text-color-light);
+        }
+
+        .dark-mode .form-control:focus {
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-color-dark);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .dark-mode .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            border: none;
+            padding: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .forgot-password-link {
+            color: var(--link-color-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .forgot-password-link {
+            color: var(--link-color-dark);
+        }
+
+        .forgot-password-link:hover {
+            color: var(--text-color-light);
+            text-decoration: underline;
+        }
+
+        .auth-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .alert {
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .dark-mode .alert-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-color: rgba(220, 53, 69, 0.2);
+        }
+
+        .dark-mode .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-color: rgba(40, 167, 69, 0.2);
+        }
+
+        .theme-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 1.2rem;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .theme-switch:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .dark-mode .theme-switch {
+            background: rgba(0, 0, 0, 0.3);
+            color: #ffd700;
+        }
+
+        .btn-primary {
+            background: #ffd700; /* Желтый цвет */
+            border: none;
+            padding: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #764ba2; /* Фиолетовый цвет текста */
+        }
+
+        .btn-primary:hover {
+            background: #ffed4a; /* Светло-желтый при наведении */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             color: #764ba2;
-            transform: translateY(-3px);
+        }
+
+        .btn-primary:focus, .btn-primary:active {
+            background: #ffd700 !important;
+            color: #764ba2 !important;
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25) !important;
+        }
+
+        /* Стили для темной темы */
+        .dark-mode .btn-primary {
+            background: #ffd700;
+            color: #1f1f1f; /* Темный цвет текста для темной темы */
+        }
+
+        .dark-mode .btn-primary:hover {
+            background: #ffed4a;
+            color: #1f1f1f;
+        }
+
+        .dark-mode .btn-primary:focus,
+        .dark-mode .btn-primary:active {
+            background: #ffd700 !important;
+            color: #1f1f1f !important;
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25) !important;
         }
 
         /* Адаптивные стили */
@@ -119,22 +265,15 @@
                 padding: 1.5rem;
             }
 
+            .theme-switch {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+            }
+
             h2 {
                 font-size: 1.5rem;
-                text-align: center;
-            }
-
-            .form-control {
-                font-size: 16px; /* Предотвращает масштабирование на iOS */
-                padding: 0.8rem;
-            }
-
-            .btn-primary {
-                padding: 0.8rem;
-            }
-
-            .social-buttons {
-                flex-wrap: wrap;
             }
         }
 
@@ -147,25 +286,8 @@
                 font-size: 2.5rem;
             }
 
-            .social-button {
-                width: 35px;
-                height: 35px;
-            }
-
             .form-label {
                 font-size: 0.9rem;
-            }
-
-            .alert {
-                padding: 0.75rem;
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Поддержка темной темы устройства */
-        @media (prefers-color-scheme: dark) {
-            .form-control::placeholder {
-                color: rgba(255, 255, 255, 0.3);
             }
         }
 
@@ -177,9 +299,28 @@
             }
         }
 
+        /* Анимации */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-container {
+            animation: fadeIn 0.5s ease-out;
+        }
     </style>
 </head>
 <body>
+<button class="theme-switch" onclick="toggleTheme()" aria-label="Переключить тему">
+    <i class="fas fa-moon"></i>
+</button>
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -190,55 +331,78 @@
             <h2 class="mb-4 text-center">Вход в Lucky Social Network</h2>
 
             <div th:if="${error}" class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
                 <div th:text="${error}"></div>
             </div>
 
             <div th:if="${message}" class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
                 <div th:text="${message}"></div>
             </div>
 
             <form th:action="@{/login}" method="post" id="loginForm">
                 <div class="mb-3">
                     <label for="username" class="form-label">
-                        <i class="fas fa-user"></i> Имя пользователя:
+                        <i class="fas fa-user me-2"></i>Имя пользователя:
                     </label>
-                    <input type="text" class="form-control" id="username" name="username"
-                           required autofocus placeholder="Введите имя пользователя">
+                    <input type="text"
+                           class="form-control"
+                           id="username"
+                           name="username"
+                           required
+                           autofocus
+                           placeholder="Введите имя пользователя">
                 </div>
                 <div class="mb-3 password-container">
                     <label for="password" class="form-label">
-                        <i class="fas fa-lock"></i> Пароль:
+                        <i class="fas fa-lock me-2"></i>Пароль:
                     </label>
-                    <input type="password" class="form-control" id="password" name="password"
-                           required placeholder="Введите пароль">
+                    <input type="password"
+                           class="form-control"
+                           id="password"
+                           name="password"
+                           required
+                           placeholder="Введите пароль">
                     <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>
                 </div>
+
+                <div class="auth-links">
+                    <a th:href="@{/auth/forgot-password}" class="forgot-password-link">
+                        <i class="fas fa-key me-2"></i>Забыли пароль?
+                    </a>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-sign-in-alt"></i> Войти
+                    <i class="fas fa-sign-in-alt me-2"></i>Войти
                 </button>
             </form>
 
             <div class="mt-3 text-center">
-                <p>Еще нет аккаунта? <a th:href="@{/register}">Зарегистрируйтесь</a></p>
+                <p>Еще нет аккаунта? <a th:href="@{/register}" class="text-warning">Зарегистрируйтесь</a></p>
             </div>
-
-            <!--            <div class="social-login">-->
-            <!--                <div class="social-login-title">или войдите через</div>-->
-            <!--                <div class="social-buttons">-->
-            <!--                    <a href="#" class="social-button"><i class="fab fa-google"></i></a>-->
-            <!--                    <a href="#" class="social-button"><i class="fab fa-facebook-f"></i></a>-->
-            <!--                    <a href="#" class="social-button"><i class="fab fa-twitter"></i></a>-->
-            <!--                </div>-->
-            <!--            </div>-->
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Ваши существующие скрипты
+    function toggleTheme() {
+        const body = document.body;
+        const themeIcon = document.querySelector('.theme-switch i');
 
-    // Добавляем функцию переключения видимости пароля
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        } else {
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+
+        localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+    }
+
     function togglePassword() {
         const passwordInput = document.getElementById('password');
         const toggleIcon = document.querySelector('.toggle-password');
@@ -254,6 +418,29 @@
         }
     }
 
+    function setInitialTheme() {
+        const savedDarkMode = localStorage.getItem('darkMode');
+        const themeIcon = document.querySelector('.theme-switch i');
+
+        if (savedDarkMode !== null) {
+            document.body.classList.toggle('dark-mode', savedDarkMode === 'true');
+            if (savedDarkMode === 'true') {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        } else {
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            if (prefersDarkScheme.matches) {
+                document.body.classList.add('dark-mode');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        }
+    }
+
+    // Инициализация темы при загрузке страницы
+    document.addEventListener('DOMContentLoaded', setInitialTheme);
+
     // Предотвращаем отправку формы при нажатии Enter на поле пароля
     document.getElementById('password').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
@@ -265,6 +452,7 @@
 </body>
 </html>
 
+
 <!--<!DOCTYPE html>-->
 <!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
 <!--<head>-->
@@ -273,6 +461,7 @@
 <!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
 <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
 <!--    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">-->
 <!--    <style>-->
 <!--        body {-->
 <!--            font-family: 'Poppins', sans-serif;-->
@@ -281,195 +470,490 @@
 <!--            min-height: 100vh;-->
 <!--            display: flex;-->
 <!--            align-items: center;-->
-
+<!--            padding: 20px 0;-->
 <!--        }-->
-
 
 <!--        .container {-->
 <!--            background: rgba(255, 255, 255, 0.1);-->
 <!--            backdrop-filter: blur(10px);-->
 <!--            border-radius: 10px;-->
 <!--            padding: 2rem;-->
+<!--            max-width: 100%;-->
+<!--            width: 100%;-->
+<!--            margin: 0 auto;-->
 <!--        }-->
 
-<!--        h2 {-->
+<!--        .login-logo {-->
+<!--            text-align: center;-->
+<!--            margin-bottom: 2rem;-->
+<!--        }-->
+
+<!--        .login-logo i {-->
+<!--            font-size: 3rem;-->
 <!--            color: #ffd700;-->
-<!--            font-weight: 600;-->
-
+<!--            margin-bottom: 1rem;-->
 <!--        }-->
 
+<!--        .password-container {-->
+<!--            position: relative;-->
+<!--        }-->
 
-<!--        .form-label {-->
+<!--        .toggle-password {-->
+<!--            position: absolute;-->
+<!--            right: 10px;-->
+<!--            top: 50%;-->
+<!--            transform: translateY(-50%);-->
+<!--            cursor: pointer;-->
+<!--            color: rgba(255, 255, 255, 0.5);-->
+<!--            transition: color 0.3s ease;-->
+<!--        }-->
+
+<!--        .toggle-password:hover {-->
 <!--            color: #fff;-->
 <!--        }-->
 
-<!--        .form-control {-->
+<!--        .social-login {-->
+<!--            margin-top: 2rem;-->
+<!--            text-align: center;-->
+<!--        }-->
+
+<!--        .social-login-title {-->
+<!--            position: relative;-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+
+<!--        .social-login-title::before,-->
+<!--        .social-login-title::after {-->
+<!--            content: "";-->
+<!--            position: absolute;-->
+<!--            top: 50%;-->
+<!--            width: 45%;-->
+<!--            height: 1px;-->
 <!--            background: rgba(255, 255, 255, 0.2);-->
-<!--            border: none;-->
+<!--        }-->
+
+<!--        .social-login-title::before {-->
+<!--            left: 0;-->
+<!--        }-->
+
+<!--        .social-login-title::after {-->
+<!--            right: 0;-->
+<!--        }-->
+
+<!--        .social-buttons {-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            gap: 1rem;-->
+<!--        }-->
+
+<!--        .social-button {-->
+<!--            width: 40px;-->
+<!--            height: 40px;-->
+<!--            border-radius: 50%;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            background: rgba(255, 255, 255, 0.1);-->
 <!--            color: #fff;-->
-
-<!--        }-->
-
-
-<!--        .form-control:focus {-->
-<!--            background: rgba(255, 255, 255, 0.3);-->
-<!--            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);-->
-<!--            color: #fff;-->
-
-<!--        }-->
-
-
-<!--        .btn-primary:hover {-->
-<!--            background-color: #fff;-->
-<!--            border-color: #fff;-->
-<!--            color: #764ba2;-->
-<!--            transform: translateY(-3px);-->
-<!--            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);-->
-
-<!--        }-->
-
-<!--      -->
-<!--        .form-check-input:checked {-->
-<!--            background-color: #ffd700;-->
-<!--            border-color: #ffd700-->
-<!--        }-->
-
-<!--        a {-->
-<!--            color: #ffd700;-->
-<!--            text-decoration: none;-->
 <!--            transition: all 0.3s ease;-->
 <!--        }-->
 
-<!--        a:hover {-->
+<!--        .social-button:hover {-->
+<!--            background: #fff;-->
+<!--            color: #764ba2;-->
+<!--            transform: translateY(-3px);-->
+<!--        }-->
+
+<!--        /* Добавляем стили для ссылки восстановления пароля */-->
+<!--        .forgot-password-link {-->
+<!--            color: rgba(255, 255, 255, 0.8);-->
+<!--            text-decoration: none;-->
+<!--            font-size: 0.9rem;-->
+<!--            transition: color 0.3s ease;-->
+<!--            display: inline-block;-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+
+<!--        .forgot-password-link:hover {-->
 <!--            color: #fff;-->
-<!--        &ndash;&gt; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);-->
-<!--        &ndash;&gt;-->
+<!--            text-decoration: underline;-->
 <!--        }-->
 
-<!--        .alert {-->
-<!--            background: rgba(255, 255, 255, 0.1);-->
-<!--            backdrop-filter: blur(10px);-->
-<!--            border: none;-->
-<!--            color: #fff;-->
-<!--            padding: 1rem;-->
-<!--            margin-bottom: 1.5rem;-->
-<!--            animation: slideDown 0.3s ease-out;-->
+<!--        .auth-links {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: center;-->
+<!--            margin-top: 1rem;-->
+<!--            margin-bottom: 1rem;-->
 <!--        }-->
 
-<!--        .alert-danger {-->
-<!--            background: rgba(220, 53, 69, 0.2);-->
-<!--            border-left: 4px solid #dc3545;-->
-<!--        }-->
-
-<!--        .alert-success {-->
-<!--            background: rgba(40, 167, 69, 0.2);-->
-<!--            border-left: 4px solid #28a745;-->
-<!--        }-->
-
-<!--        @keyframes slideDown {-->
-<!--            from {-->
-<!--                transform: translateY(-20px);-->
-<!--                opacity: 0;-->
+<!--        /* Адаптивные стили */-->
+<!--        @media (max-width: 768px) {-->
+<!--            body {-->
+<!--                padding: 10px;-->
 <!--            }-->
-<!--            to {-->
-<!--                transform: translateY(0);-->
-<!--                opacity: 1;-->
-<!--            }-->
-<!--        }-->
 
-<!--        .form-control::placeholder {-->
-<!--            color: rgba(255, 255, 255, 0.5);-->
-<!--        }-->
+<!--            .container {-->
+<!--                padding: 1.5rem;-->
+<!--            }-->
 
-<!--        .shake {-->
-<!--            animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;-->
-<!--            transform: translate3d(0, 0, 0);-->
-<!--        }-->
+<!--            h2 {-->
+<!--                font-size: 1.5rem;-->
+<!--                text-align: center;-->
+<!--            }-->
 
-<!--        @keyframes shake {-->
-<!--            10%, 90% {-->
-<!--                transform: translate3d(-1px, 0, 0);-->
+<!--            .form-control {-->
+<!--                font-size: 16px; /* Предотвращает масштабирование на iOS */-->
+<!--                padding: 0.8rem;-->
 <!--            }-->
-<!--            20%, 80% {-->
-<!--                transform: translate3d(2px, 0, 0);-->
+
+<!--            .btn-primary {-->
+<!--                padding: 0.8rem;-->
 <!--            }-->
-<!--            30%, 50%, 70% {-->
-<!--                transform: translate3d(-4px, 0, 0);-->
-<!--            }-->
-<!--            40%, 60% {-->
-<!--                transform: translate3d(4px, 0, 0);-->
+
+<!--            .social-buttons {-->
+<!--                flex-wrap: wrap;-->
 <!--            }-->
 <!--        }-->
+
+<!--        @media (max-width: 480px) {-->
+<!--            .container {-->
+<!--                padding: 1rem;-->
+<!--            }-->
+
+<!--            .login-logo i {-->
+<!--                font-size: 2.5rem;-->
+<!--            }-->
+
+<!--            .social-button {-->
+<!--                width: 35px;-->
+<!--                height: 35px;-->
+<!--            }-->
+
+<!--            .form-label {-->
+<!--                font-size: 0.9rem;-->
+<!--            }-->
+
+<!--            .alert {-->
+<!--                padding: 0.75rem;-->
+<!--                font-size: 0.9rem;-->
+<!--            }-->
+<!--        }-->
+
+<!--        /* Поддержка темной темы устройства */-->
+<!--        @media (prefers-color-scheme: dark) {-->
+<!--            .form-control::placeholder {-->
+<!--                color: rgba(255, 255, 255, 0.3);-->
+<!--            }-->
+<!--        }-->
+
+<!--        /* Улучшения для устройств с notch */-->
+<!--        @supports (padding: max(0px)) {-->
+<!--            body {-->
+<!--                padding-left: max(20px, env(safe-area-inset-left));-->
+<!--                padding-right: max(20px, env(safe-area-inset-right));-->
+<!--            }-->
+<!--        }-->
+
 <!--    </style>-->
 <!--</head>-->
 <!--<body>-->
-<!--<div class="container mt-5">-->
+<!--<div class="container">-->
 <!--    <div class="row justify-content-center">-->
 <!--        <div class="col-md-6">-->
-<!--            <h2 class="mb-4">Вход в Lucky Social Network</h2>-->
+<!--            <div class="login-logo">-->
+<!--                <i class="fas fa-user-circle"></i>-->
+<!--            </div>-->
 
-<!--            &lt;!&ndash; Сообщения об ошибках &ndash;&gt;-->
+<!--            <h2 class="mb-4 text-center">Вход в Lucky Social Network</h2>-->
+
 <!--            <div th:if="${error}" class="alert alert-danger" role="alert">-->
 <!--                <div th:text="${error}"></div>-->
 <!--            </div>-->
 
-<!--            &lt;!&ndash; Сообщение об успешном выходе &ndash;&gt;-->
 <!--            <div th:if="${message}" class="alert alert-success" role="alert">-->
 <!--                <div th:text="${message}"></div>-->
 <!--            </div>-->
 
 <!--            <form th:action="@{/login}" method="post" id="loginForm">-->
 <!--                <div class="mb-3">-->
-<!--                    <label for="username" class="form-label">Имя пользователя:</label>-->
+<!--                    <label for="username" class="form-label">-->
+<!--                        <i class="fas fa-user"></i> Имя пользователя:-->
+<!--                    </label>-->
 <!--                    <input type="text" class="form-control" id="username" name="username"-->
 <!--                           required autofocus placeholder="Введите имя пользователя">-->
 <!--                </div>-->
-<!--                <div class="mb-3">-->
-<!--                    <label for="password" class="form-label">Пароль:</label>-->
+<!--                <div class="mb-3 password-container">-->
+<!--                    <label for="password" class="form-label">-->
+<!--                        <i class="fas fa-lock"></i> Пароль:-->
+<!--                    </label>-->
 <!--                    <input type="password" class="form-control" id="password" name="password"-->
 <!--                           required placeholder="Введите пароль">-->
+<!--                    <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>-->
 <!--                </div>-->
-<!--                &lt;!&ndash;                <div class="mb-3 form-check">&ndash;&gt;-->
-<!--                &lt;!&ndash;                    <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">&ndash;&gt;-->
-<!--                &lt;!&ndash;                    <label class="form-check-label" for="remember-me">Запомнить меня</label>&ndash;&gt;-->
-<!--                &lt;!&ndash;                </div>&ndash;&gt;-->
-<!--                <button type="submit" class="btn btn-primary w-100">Войти</button>-->
+<!--                &lt;!&ndash; Добавляем блок с ссылками &ndash;&gt;-->
+<!--                <div class="auth-links">-->
+<!--                    <a th:href="@{/auth/forgot-password}" class="forgot-password-link">-->
+<!--                        <i class="fas fa-key"></i> Забыли пароль?-->
+<!--                    </a>-->
+<!--                </div>-->
+<!--                <button type="submit" class="btn btn-primary w-100">-->
+<!--                    <i class="fas fa-sign-in-alt"></i> Войти-->
+<!--                </button>-->
 <!--            </form>-->
 
 <!--            <div class="mt-3 text-center">-->
 <!--                <p>Еще нет аккаунта? <a th:href="@{/register}">Зарегистрируйтесь</a></p>-->
 <!--            </div>-->
+
+<!--            &lt;!&ndash;            <div class="social-login">&ndash;&gt;-->
+<!--            &lt;!&ndash;                <div class="social-login-title">или войдите через</div>&ndash;&gt;-->
+<!--            &lt;!&ndash;                <div class="social-buttons">&ndash;&gt;-->
+<!--            &lt;!&ndash;                    <a href="#" class="social-button"><i class="fab fa-google"></i></a>&ndash;&gt;-->
+<!--            &lt;!&ndash;                    <a href="#" class="social-button"><i class="fab fa-facebook-f"></i></a>&ndash;&gt;-->
+<!--            &lt;!&ndash;                    <a href="#" class="social-button"><i class="fab fa-twitter"></i></a>&ndash;&gt;-->
+<!--            &lt;!&ndash;                </div>&ndash;&gt;-->
+<!--            &lt;!&ndash;            </div>&ndash;&gt;-->
 <!--        </div>-->
 <!--    </div>-->
 <!--</div>-->
 
 <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>-->
 <!--<script>-->
-<!--    // Добавляем анимацию тряски при ошибке-->
-<!--    document.addEventListener('DOMContentLoaded', function () {-->
-<!--        const errorAlert = document.querySelector('.alert-danger');-->
-<!--        const form = document.querySelector('#loginForm');-->
+<!--    // Ваши существующие скрипты-->
 
-<!--        if (errorAlert) {-->
-<!--            form.classList.add('shake');-->
-<!--            // Удаляем класс после окончания анимации-->
-<!--            form.addEventListener('animationend', function () {-->
-<!--                form.classList.remove('shake');-->
-<!--            });-->
+<!--    // Добавляем функцию переключения видимости пароля-->
+<!--    function togglePassword() {-->
+<!--        const passwordInput = document.getElementById('password');-->
+<!--        const toggleIcon = document.querySelector('.toggle-password');-->
+
+<!--        if (passwordInput.type === 'password') {-->
+<!--            passwordInput.type = 'text';-->
+<!--            toggleIcon.classList.remove('fa-eye');-->
+<!--            toggleIcon.classList.add('fa-eye-slash');-->
+<!--        } else {-->
+<!--            passwordInput.type = 'password';-->
+<!--            toggleIcon.classList.remove('fa-eye-slash');-->
+<!--            toggleIcon.classList.add('fa-eye');-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Предотвращаем отправку формы при нажатии Enter на поле пароля-->
+<!--    document.getElementById('password').addEventListener('keypress', function (e) {-->
+<!--        if (e.key === 'Enter') {-->
+<!--            e.preventDefault();-->
+<!--            document.querySelector('button[type="submit"]').click();-->
 <!--        }-->
 <!--    });-->
-
-<!--    // Автоматически скрываем сообщения через 5 секунд-->
-<!--    setTimeout(function () {-->
-<!--        const alerts = document.querySelectorAll('.alert');-->
-<!--        alerts.forEach(function (alert) {-->
-<!--            alert.style.opacity = '0';-->
-<!--            alert.style.transition = 'opacity 0.5s ease-out';-->
-<!--            setTimeout(function () {-->
-<!--                alert.style.display = 'none';-->
-<!--            }, 500);-->
-<!--        });-->
-<!--    }, 5000);-->
 <!--</script>-->
 <!--</body>-->
 <!--</html>-->
+
+<!--&lt;!&ndash;<!DOCTYPE html>&ndash;&gt;-->
+<!--&lt;!&ndash;<html xmlns:th="http://www.thymeleaf.org" lang="ru">&ndash;&gt;-->
+<!--&lt;!&ndash;<head>&ndash;&gt;-->
+<!--&lt;!&ndash;    <title>Вход - Lucky Social Network</title>&ndash;&gt;-->
+<!--&lt;!&ndash;    <meta charset="UTF-8">&ndash;&gt;-->
+<!--&lt;!&ndash;    <meta name="viewport" content="width=device-width, initial-scale=1.0">&ndash;&gt;-->
+<!--&lt;!&ndash;    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">&ndash;&gt;-->
+<!--&lt;!&ndash;    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">&ndash;&gt;-->
+<!--&lt;!&ndash;    <style>&ndash;&gt;-->
+<!--&lt;!&ndash;        body {&ndash;&gt;-->
+<!--&lt;!&ndash;            font-family: 'Poppins', sans-serif;&ndash;&gt;-->
+<!--&lt;!&ndash;            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);&ndash;&gt;-->
+<!--&lt;!&ndash;            color: #fff;&ndash;&gt;-->
+<!--&lt;!&ndash;            min-height: 100vh;&ndash;&gt;-->
+<!--&lt;!&ndash;            display: flex;&ndash;&gt;-->
+<!--&lt;!&ndash;            align-items: center;&ndash;&gt;-->
+
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+
+<!--&lt;!&ndash;        .container {&ndash;&gt;-->
+<!--&lt;!&ndash;            background: rgba(255, 255, 255, 0.1);&ndash;&gt;-->
+<!--&lt;!&ndash;            backdrop-filter: blur(10px);&ndash;&gt;-->
+<!--&lt;!&ndash;            border-radius: 10px;&ndash;&gt;-->
+<!--&lt;!&ndash;            padding: 2rem;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        h2 {&ndash;&gt;-->
+<!--&lt;!&ndash;            color: #ffd700;&ndash;&gt;-->
+<!--&lt;!&ndash;            font-weight: 600;&ndash;&gt;-->
+
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+
+<!--&lt;!&ndash;        .form-label {&ndash;&gt;-->
+<!--&lt;!&ndash;            color: #fff;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        .form-control {&ndash;&gt;-->
+<!--&lt;!&ndash;            background: rgba(255, 255, 255, 0.2);&ndash;&gt;-->
+<!--&lt;!&ndash;            border: none;&ndash;&gt;-->
+<!--&lt;!&ndash;            color: #fff;&ndash;&gt;-->
+
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+
+<!--&lt;!&ndash;        .form-control:focus {&ndash;&gt;-->
+<!--&lt;!&ndash;            background: rgba(255, 255, 255, 0.3);&ndash;&gt;-->
+<!--&lt;!&ndash;            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);&ndash;&gt;-->
+<!--&lt;!&ndash;            color: #fff;&ndash;&gt;-->
+
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+
+<!--&lt;!&ndash;        .btn-primary:hover {&ndash;&gt;-->
+<!--&lt;!&ndash;            background-color: #fff;&ndash;&gt;-->
+<!--&lt;!&ndash;            border-color: #fff;&ndash;&gt;-->
+<!--&lt;!&ndash;            color: #764ba2;&ndash;&gt;-->
+<!--&lt;!&ndash;            transform: translateY(-3px);&ndash;&gt;-->
+<!--&lt;!&ndash;            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);&ndash;&gt;-->
+
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;      &ndash;&gt;-->
+<!--&lt;!&ndash;        .form-check-input:checked {&ndash;&gt;-->
+<!--&lt;!&ndash;            background-color: #ffd700;&ndash;&gt;-->
+<!--&lt;!&ndash;            border-color: #ffd700&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        a {&ndash;&gt;-->
+<!--&lt;!&ndash;            color: #ffd700;&ndash;&gt;-->
+<!--&lt;!&ndash;            text-decoration: none;&ndash;&gt;-->
+<!--&lt;!&ndash;            transition: all 0.3s ease;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        a:hover {&ndash;&gt;-->
+<!--&lt;!&ndash;            color: #fff;&ndash;&gt;-->
+<!--&lt;!&ndash;        &ndash;&gt; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);&ndash;&gt;-->
+<!--&lt;!&ndash;        &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        .alert {&ndash;&gt;-->
+<!--&lt;!&ndash;            background: rgba(255, 255, 255, 0.1);&ndash;&gt;-->
+<!--&lt;!&ndash;            backdrop-filter: blur(10px);&ndash;&gt;-->
+<!--&lt;!&ndash;            border: none;&ndash;&gt;-->
+<!--&lt;!&ndash;            color: #fff;&ndash;&gt;-->
+<!--&lt;!&ndash;            padding: 1rem;&ndash;&gt;-->
+<!--&lt;!&ndash;            margin-bottom: 1.5rem;&ndash;&gt;-->
+<!--&lt;!&ndash;            animation: slideDown 0.3s ease-out;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        .alert-danger {&ndash;&gt;-->
+<!--&lt;!&ndash;            background: rgba(220, 53, 69, 0.2);&ndash;&gt;-->
+<!--&lt;!&ndash;            border-left: 4px solid #dc3545;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        .alert-success {&ndash;&gt;-->
+<!--&lt;!&ndash;            background: rgba(40, 167, 69, 0.2);&ndash;&gt;-->
+<!--&lt;!&ndash;            border-left: 4px solid #28a745;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        @keyframes slideDown {&ndash;&gt;-->
+<!--&lt;!&ndash;            from {&ndash;&gt;-->
+<!--&lt;!&ndash;                transform: translateY(-20px);&ndash;&gt;-->
+<!--&lt;!&ndash;                opacity: 0;&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;            to {&ndash;&gt;-->
+<!--&lt;!&ndash;                transform: translateY(0);&ndash;&gt;-->
+<!--&lt;!&ndash;                opacity: 1;&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        .form-control::placeholder {&ndash;&gt;-->
+<!--&lt;!&ndash;            color: rgba(255, 255, 255, 0.5);&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        .shake {&ndash;&gt;-->
+<!--&lt;!&ndash;            animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;&ndash;&gt;-->
+<!--&lt;!&ndash;            transform: translate3d(0, 0, 0);&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        @keyframes shake {&ndash;&gt;-->
+<!--&lt;!&ndash;            10%, 90% {&ndash;&gt;-->
+<!--&lt;!&ndash;                transform: translate3d(-1px, 0, 0);&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;            20%, 80% {&ndash;&gt;-->
+<!--&lt;!&ndash;                transform: translate3d(2px, 0, 0);&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;            30%, 50%, 70% {&ndash;&gt;-->
+<!--&lt;!&ndash;                transform: translate3d(-4px, 0, 0);&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;            40%, 60% {&ndash;&gt;-->
+<!--&lt;!&ndash;                transform: translate3d(4px, 0, 0);&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;    </style>&ndash;&gt;-->
+<!--&lt;!&ndash;</head>&ndash;&gt;-->
+<!--&lt;!&ndash;<body>&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="container mt-5">&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="row justify-content-center">&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="col-md-6">&ndash;&gt;-->
+<!--&lt;!&ndash;            <h2 class="mb-4">Вход в Lucky Social Network</h2>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            &lt;!&ndash; Сообщения об ошибках &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <div th:if="${error}" class="alert alert-danger" role="alert">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div th:text="${error}"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            &lt;!&ndash; Сообщение об успешном выходе &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <div th:if="${message}" class="alert alert-success" role="alert">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div th:text="${message}"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            <form th:action="@{/login}" method="post" id="loginForm">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <label for="username" class="form-label">Имя пользователя:</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <input type="text" class="form-control" id="username" name="username"&ndash;&gt;-->
+<!--&lt;!&ndash;                           required autofocus placeholder="Введите имя пользователя">&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <label for="password" class="form-label">Пароль:</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <input type="password" class="form-control" id="password" name="password"&ndash;&gt;-->
+<!--&lt;!&ndash;                           required placeholder="Введите пароль">&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                &lt;!&ndash;                <div class="mb-3 form-check">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                &lt;!&ndash;                    <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                &lt;!&ndash;                    <label class="form-check-label" for="remember-me">Запомнить меня</label>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                &lt;!&ndash;                </div>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                <button type="submit" class="btn btn-primary w-100">Войти</button>&ndash;&gt;-->
+<!--&lt;!&ndash;            </form>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            <div class="mt-3 text-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                <p>Еще нет аккаунта? <a th:href="@{/register}">Зарегистрируйтесь</a></p>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>&ndash;&gt;-->
+<!--&lt;!&ndash;<script>&ndash;&gt;-->
+<!--&lt;!&ndash;    // Добавляем анимацию тряски при ошибке&ndash;&gt;-->
+<!--&lt;!&ndash;    document.addEventListener('DOMContentLoaded', function () {&ndash;&gt;-->
+<!--&lt;!&ndash;        const errorAlert = document.querySelector('.alert-danger');&ndash;&gt;-->
+<!--&lt;!&ndash;        const form = document.querySelector('#loginForm');&ndash;&gt;-->
+
+<!--&lt;!&ndash;        if (errorAlert) {&ndash;&gt;-->
+<!--&lt;!&ndash;            form.classList.add('shake');&ndash;&gt;-->
+<!--&lt;!&ndash;            // Удаляем класс после окончания анимации&ndash;&gt;-->
+<!--&lt;!&ndash;            form.addEventListener('animationend', function () {&ndash;&gt;-->
+<!--&lt;!&ndash;                form.classList.remove('shake');&ndash;&gt;-->
+<!--&lt;!&ndash;            });&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;    });&ndash;&gt;-->
+
+<!--&lt;!&ndash;    // Автоматически скрываем сообщения через 5 секунд&ndash;&gt;-->
+<!--&lt;!&ndash;    setTimeout(function () {&ndash;&gt;-->
+<!--&lt;!&ndash;        const alerts = document.querySelectorAll('.alert');&ndash;&gt;-->
+<!--&lt;!&ndash;        alerts.forEach(function (alert) {&ndash;&gt;-->
+<!--&lt;!&ndash;            alert.style.opacity = '0';&ndash;&gt;-->
+<!--&lt;!&ndash;            alert.style.transition = 'opacity 0.5s ease-out';&ndash;&gt;-->
+<!--&lt;!&ndash;            setTimeout(function () {&ndash;&gt;-->
+<!--&lt;!&ndash;                alert.style.display = 'none';&ndash;&gt;-->
+<!--&lt;!&ndash;            }, 500);&ndash;&gt;-->
+<!--&lt;!&ndash;        });&ndash;&gt;-->
+<!--&lt;!&ndash;    }, 5000);&ndash;&gt;-->
+<!--&lt;!&ndash;</script>&ndash;&gt;-->
+<!--&lt;!&ndash;</body>&ndash;&gt;-->
+<!--&lt;!&ndash;</html>&ndash;&gt;-->

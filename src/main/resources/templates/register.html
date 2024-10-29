@@ -9,6 +9,125 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
+
+
+    :root {
+      /* Светлая тема */
+      --bg-gradient-light: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --container-bg-light: rgba(255, 255, 255, 0.1);
+      --text-color-light: #fff;
+      --input-bg-light: rgba(255, 255, 255, 0.2);
+      --header-bg-light: rgba(255, 255, 255, 0.1);
+      --border-color-light: rgba(255, 255, 255, 0.2);
+
+      /* Темная тема */
+      --bg-gradient-dark: linear-gradient(135deg, #1f1f1f 0%, #000000 100%);
+      --container-bg-dark: rgba(255, 255, 255, 0.05);
+      --text-color-dark: #e0e0e0;
+      --input-bg-dark: rgba(0, 0, 0, 0.3);
+      --header-bg-dark: rgba(0, 0, 0, 0.3);
+      --border-color-dark: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Добавьте стили для переключателя темы */
+    .theme-switch {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+      font-size: 1.2rem;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1001;
+    }
+
+    .theme-switch:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    /* Стили для темной темы */
+    body.dark-mode {
+      background: var(--bg-gradient-dark);
+      color: var(--text-color-dark);
+    }
+
+    .dark-mode .form-container {
+      background: var(--container-bg-dark);
+      border-color: var(--border-color-dark);
+    }
+
+    .dark-mode header {
+      background: var(--header-bg-dark);
+    }
+
+    .dark-mode .form-control,
+    .dark-mode .form-select {
+      background: var(--input-bg-dark);
+      border-color: var(--border-color-dark);
+      color: var(--text-color-dark);
+    }
+
+    .dark-mode .form-control:focus,
+    .dark-mode .form-select:focus {
+      background: rgba(0, 0, 0, 0.4);
+      border-color: var(--border-color-dark);
+    }
+
+    .dark-mode .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .dark-mode .mobile-menu {
+      background: var(--header-bg-dark);
+    }
+
+    .dark-mode .alert-danger {
+      background-color: rgba(220, 53, 69, 0.1);
+      border-color: rgba(220, 53, 69, 0.2);
+    }
+
+    .dark-mode .alert-success {
+      background-color: rgba(40, 167, 69, 0.1);
+      border-color: rgba(40, 167, 69, 0.2);
+    }
+
+    .dark-mode .theme-switch {
+      background: rgba(0, 0, 0, 0.3);
+      color: #ffd700;
+    }
+
+    .dark-mode .logo {
+      color: #ffd700;
+    }
+
+    .dark-mode .desktop-nav ul li a:hover {
+      color: #ffd700;
+    }
+
+    /* Медиа-запросы для темной темы */
+    @media (max-width: 768px) {
+      .dark-mode .mobile-menu {
+        background: var(--header-bg-dark);
+      }
+
+      .theme-switch {
+        top: 10px;
+        right: 60px;
+        width: 40px;
+        height: 40px;
+      }
+    }
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -290,6 +409,9 @@
     }
   </style>
 <body>
+<button class="theme-switch" onclick="toggleTheme()" aria-label="Переключить тему">
+  <i class="fas fa-moon"></i>
+</button>
 <header>
   <div class="container">
     <a href="/" class="logo">Lucky Social Network</a>
@@ -384,6 +506,50 @@
     </div>
   </div>
 </div>
+<script>
+  function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.querySelector('.theme-switch i');
+
+    body.classList.toggle('dark-mode');
+
+    if (body.classList.contains('dark-mode')) {
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+    } else {
+      themeIcon.classList.remove('fa-sun');
+      themeIcon.classList.add('fa-moon');
+    }
+
+    // Сохраняем выбор пользователя
+    localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+  }
+
+  function setInitialTheme() {
+    const savedDarkMode = localStorage.getItem('darkMode');
+    const themeIcon = document.querySelector('.theme-switch i');
+
+    if (savedDarkMode !== null) {
+      // Если есть сохраненные настройки, используем их
+      document.body.classList.toggle('dark-mode', savedDarkMode === 'true');
+      if (savedDarkMode === 'true') {
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      }
+    } else {
+      // Если нет сохраненных настроек, проверяем системные предпочтения
+      const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+      if (prefersDarkScheme.matches) {
+        document.body.classList.add('dark-mode');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      }
+    }
+  }
+
+  // Устанавливаем начальную тему при загрузке страницы
+  document.addEventListener('DOMContentLoaded', setInitialTheme);
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
