@@ -1,10 +1,12 @@
 package com.example.lucky_social_network.controller;
 
+import com.example.lucky_social_network.dto.PasswordChangeDTO;
 import com.example.lucky_social_network.model.SupportTicket;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.SupportTicketService;
 import com.example.lucky_social_network.service.UserService;
 import com.example.lucky_social_network.service.picService.ImgurService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,13 +34,49 @@ public class SettingsController {
         String avatarUrl = userService.getUserAvatarUrl(user);
 
 
-        // Добавляем URL аватара в модель
         model.addAttribute("avatarUrl", avatarUrl);
         model.addAttribute("ticket", new SupportTicket());
         model.addAttribute("user", user);
+        model.addAttribute("passwordChangeDTO", new PasswordChangeDTO());
 
         return "settings/Template";
     }
+
+    @PostMapping("/change-password")
+    public String changePassword(@Valid @ModelAttribute PasswordChangeDTO passwordChangeDTO,
+                                 BindingResult bindingResult,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            // Проверяем совпадение паролей
+            if (!passwordChangeDTO.getNewPassword().equals(passwordChangeDTO.getConfirmPassword())) {
+                bindingResult.rejectValue("confirmPassword", "error.passwordChangeDTO",
+                        "Пароли не совпадают");
+            }
+
+            if (bindingResult.hasErrors()) {
+                return "settings/Template";
+            }
+
+            User currentUser = userService.getCurrentUser();
+            userService.changePassword(
+                    currentUser.getId(),
+                    passwordChangeDTO.getCurrentPassword(),
+                    passwordChangeDTO.getNewPassword()
+            );
+
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Пароль успешно изменен");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Произошла ошибка при смене пароля");
+        }
+
+        return "redirect:/settings";
+    }
+
 
     @PostMapping
     public String submitTicket(@AuthenticationPrincipal UserDetails userDetails,

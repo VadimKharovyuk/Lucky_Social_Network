@@ -260,5 +260,20 @@ public class UserService {
                 birthDate.getDayOfMonth() == today.getDayOfMonth();
     }
 
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = getUserById(userId);
+
+        // Проверяем текущий пароль
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Текущий пароль неверен");
+        }
+
+        // Обновляем пароль
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        log.info("Password changed successfully for user: {}", userId);
+    }
+
 
 }
