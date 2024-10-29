@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -206,6 +207,7 @@
             border-color: #dc3545;
             border-left: none;
         }
+
     </style>
 </head>
 <body>
@@ -230,9 +232,17 @@
                                  class="profile-avatar">
                         </div>
 
-                        <h5 th:text="${user.firstName}" class="mb-2">Username</h5>
+                        <h5 class="mb-2">
+    <span th:if="${user != null}">
+        <span th:if="${user.firstName != null and user.lastName != null}"
+              th:text="${user.firstName + ' ' + user.lastName}"></span>
+        <span th:unless="${user.firstName != null and user.lastName != null}"
+              th:text="${user.username}"></span>
+    </span>
+                            <span th:unless="${user != null}">Username</span>
+                        </h5>
                     </div>
-                    
+
                 </div>
                 <div class="nav flex-column nav-pills" role="tablist">
 
@@ -318,41 +328,86 @@
                             <h3 class="settings-title">Безопасность</h3>
                         </div>
 
-                        <!-- Сообщения об ошибках и успехе -->
-                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
-                            <span th:text="${errorMessage}"></span>
-                        </div>
-                        <div th:if="${successMessage}" class="alert alert-success" role="alert">
-                            <span th:text="${successMessage}"></span>
-                        </div>
+                        <!-- Форма смены пароля -->
+                        <form th:action="@{/settings/change-password}"
+                              th:object="${passwordChangeDTO}"
+                              method="post">
 
-                        <form th:action="@{/settings/change-password}" th:object="${passwordChangeDTO}" method="post">
-                            <div class="mb-3">
-                                <label class="form-label">Текущий пароль</label>
-                                <input type="password" class="form-control" th:field="*{currentPassword}" required>
+                            <!-- Общие ошибки -->
+                            <div th:if="${errorMessage}" class="alert alert-danger">
+                                <span th:text="${errorMessage}"></span>
                             </div>
 
+                            <!-- Текущий пароль -->
                             <div class="mb-3">
-                                <label class="form-label">Новый пароль</label>
-                                <input type="password" class="form-control" th:field="*{newPassword}" required>
-                                <div class="form-text">Пароль должен содержать минимум 8 символов, включая буквы и
-                                    цифры.
+                                <label class="form-label">Текущий пароль</label>
+                                <div class="input-group">
+                                    <input type="password"
+                                           class="form-control"
+                                           id="currentPassword"
+                                           th:field="*{currentPassword}"
+                                           th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid'">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            onclick="togglePasswordVisibility('currentPassword')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <div class="invalid-feedback"
+                                         th:if="${#fields.hasErrors('currentPassword')}"
+                                         th:errors="*{currentPassword}">
+                                    </div>
                                 </div>
                             </div>
 
+                            <!-- Новый пароль -->
                             <div class="mb-3">
-                                <label class="form-label">Подтвердите новый пароль</label>
-                                <input type="password" class="form-control" th:field="*{confirmPassword}" required>
-                                <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>
+                                <label class="form-label">Новый пароль</label>
+                                <div class="input-group">
+                                    <input type="password"
+                                           class="form-control"
+                                           id="newPassword"
+                                           th:field="*{newPassword}"
+                                           th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid'">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            onclick="togglePasswordVisibility('newPassword')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <div class="invalid-feedback"
+                                         th:if="${#fields.hasErrors('newPassword')}"
+                                         th:errors="*{newPassword}">
+                                    </div>
+                                </div>
+                                <div class="form-text">
+                                    Пароль должен содержать минимум 8 символов, включая буквы и цифры.
+                                </div>
                             </div>
 
+                            <!-- Подтверждение пароля -->
+                            <div class="mb-3">
+                                <label class="form-label">Подтвердите новый пароль</label>
+                                <div class="input-group">
+                                    <input type="password"
+                                           class="form-control"
+                                           id="confirmPassword"
+                                           th:field="*{confirmPassword}"
+                                           th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid'">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            onclick="togglePasswordVisibility('confirmPassword')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <div class="invalid-feedback"
+                                         th:if="${#fields.hasErrors('confirmPassword')}"
+                                         th:errors="*{confirmPassword}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Кнопка отправки -->
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-key"></i> Изменить пароль
                             </button>
                         </form>
                     </div>
                 </div>
-
 
                 <!-- Приватность -->
                 <div class="tab-pane fade" id="privacy">
@@ -577,25 +632,681 @@
         </div>
     </div>
 </div>
-
 <script>
-    function togglePassword() {
-        const passwordFields = document.querySelectorAll('input[type="password"]');
-        passwordFields.forEach(field => {
-            if (field.type === "password") {
-                field.type = "text";
-            } else {
-                field.type = "password";
-            }
-        });
-        const toggleIcons = document.querySelectorAll('.toggle-password');
-        toggleIcons.forEach(icon => {
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
-        });
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = input.nextElementSibling.querySelector('i');
+
+        // Показываем пароль
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+
+        // Автоматически скрываем пароль через 5 секунд
+        setTimeout(() => {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }, 5000);
+
+        // Показываем подсказку
+        showPasswordTooltip();
     }
+
+    function showPasswordTooltip() {
+        // Удаляем предыдущий тултип, если он есть
+        const oldTooltip = document.querySelector('.generated-password-tooltip');
+        if (oldTooltip) {
+            oldTooltip.remove();
+        }
+
+        // Создаем новый тултип
+        const tooltip = document.createElement('div');
+        tooltip.className = 'generated-password-tooltip';
+        tooltip.textContent = 'Пароль будет скрыт через 5 секунд';
+
+        // Позиционируем тултип
+        const input = document.querySelector('input[type="text"]');
+        if (input) {
+            input.parentElement.appendChild(tooltip);
+        }
+
+        // Показываем тултип
+        tooltip.style.display = 'block';
+
+        // Скрываем тултип через 5 секунд
+        setTimeout(() => {
+            tooltip.style.display = 'none';
+        }, 5000);
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Показываем активную вкладку при наличии ошибок
+        if (document.querySelector('#security .alert-danger')) {
+            const securityTab = document.querySelector('[data-bs-target="#security"]');
+            const tabInstance = new bootstrap.Tab(securityTab);
+            tabInstance.show();
+        }
+    });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--    <title>Настройки аккаунта - Lucky Social Network</title>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">-->
+<!--    -->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: 'Poppins', sans-serif;-->
+<!--            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);-->
+<!--            color: #fff;-->
+<!--            min-height: 100vh;-->
+<!--        }-->
+
+<!--        .dashboard-container {-->
+<!--            max-width: 1200px;-->
+<!--            margin: 2rem auto;-->
+<!--            padding: 0 1rem;-->
+<!--        }-->
+
+<!--        .settings-card {-->
+<!--            background: rgba(255, 255, 255, 0.1);-->
+<!--            backdrop-filter: blur(10px);-->
+<!--            border-radius: 15px;-->
+<!--            padding: 2rem;-->
+<!--            margin-bottom: 2rem;-->
+<!--            transition: transform 0.3s ease, box-shadow 0.3s ease;-->
+<!--        }-->
+
+<!--        .settings-card:hover {-->
+<!--            transform: translateY(-5px);-->
+<!--            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);-->
+<!--        }-->
+
+<!--        .settings-header {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            margin-bottom: 1.5rem;-->
+<!--        }-->
+
+<!--        .settings-header i {-->
+<!--            font-size: 1.5rem;-->
+<!--            margin-right: 1rem;-->
+<!--            color: #ffd700;-->
+<!--        }-->
+
+<!--        .settings-title {-->
+<!--            color: #ffd700;-->
+<!--            margin: 0;-->
+<!--            font-weight: 600;-->
+<!--        }-->
+
+<!--        .form-control, .form-select {-->
+<!--            background: rgba(255, 255, 255, 0.2);-->
+<!--            border: none;-->
+<!--            color: #fff;-->
+<!--            padding: 0.8rem;-->
+<!--        }-->
+
+<!--        .form-control:focus, .form-select:focus {-->
+<!--            background: rgba(255, 255, 255, 0.3);-->
+<!--            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);-->
+<!--            color: #fff;-->
+<!--        }-->
+
+<!--        .form-label {-->
+<!--            color: #fff;-->
+<!--            font-weight: 500;-->
+<!--        }-->
+
+<!--        .btn-primary {-->
+<!--            background-color: #ffd700;-->
+<!--            border-color: #ffd700;-->
+<!--            color: #764ba2;-->
+<!--            font-weight: 600;-->
+<!--            padding: 0.8rem 1.5rem;-->
+<!--            transition: all 0.3s ease;-->
+<!--        }-->
+
+<!--        .btn-primary:hover {-->
+<!--            background-color: #fff;-->
+<!--            border-color: #fff;-->
+<!--            color: #764ba2;-->
+<!--            transform: translateY(-2px);-->
+<!--            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);-->
+<!--        }-->
+
+<!--        .form-switch {-->
+<!--            padding-left: 3em;-->
+<!--        }-->
+
+<!--        .form-switch .form-check-input {-->
+<!--            width: 3em;-->
+<!--            height: 1.5em;-->
+<!--            background-color: rgba(255, 255, 255, 0.2);-->
+<!--            border-color: rgba(255, 255, 255, 0.3);-->
+<!--        }-->
+
+<!--        .form-switch .form-check-input:checked {-->
+<!--            background-color: #ffd700;-->
+<!--            border-color: #ffd700;-->
+<!--        }-->
+
+<!--        .avatar-preview {-->
+<!--            width: 150px;-->
+<!--            height: 150px;-->
+<!--            border-radius: 50%;-->
+<!--            overflow: hidden;-->
+<!--            margin-bottom: 1rem;-->
+<!--            border: 3px solid #ffd700;-->
+<!--        }-->
+
+<!--        .avatar-preview img {-->
+<!--            width: 100%;-->
+<!--            height: 100%;-->
+<!--            object-fit: cover;-->
+<!--        }-->
+
+<!--        .nav-pills .nav-link {-->
+<!--            color: #fff;-->
+<!--            margin-bottom: 0.5rem;-->
+<!--            border-radius: 8px;-->
+<!--            transition: all 0.3s ease;-->
+<!--        }-->
+
+<!--        .nav-pills .nav-link:hover {-->
+<!--            background: rgba(255, 255, 255, 0.2);-->
+<!--        }-->
+
+<!--        .nav-pills .nav-link.active {-->
+<!--            background-color: #ffd700;-->
+<!--            color: #764ba2;-->
+<!--        }-->
+
+<!--        .alert {-->
+<!--            background: rgba(255, 255, 255, 0.1);-->
+<!--            border: none;-->
+<!--            color: #fff;-->
+<!--            backdrop-filter: blur(10px);-->
+<!--        }-->
+
+<!--        .support-badge {-->
+<!--            background-color: #ffd700;-->
+<!--            color: #764ba2;-->
+<!--            padding: 0.25rem 0.5rem;-->
+<!--            border-radius: 1rem;-->
+<!--            font-size: 0.8rem;-->
+<!--            font-weight: 600;-->
+<!--        }-->
+
+<!--        .avatar-preview {-->
+<!--            width: 150px;-->
+<!--            height: 150px;-->
+<!--            border-radius: 50%;-->
+<!--            overflow: hidden;-->
+<!--            border: 3px solid #ffffff;-->
+<!--            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        .profile-avatar {-->
+<!--            width: 100%;-->
+<!--            height: 100%;-->
+<!--            object-fit: cover;-->
+<!--            transition: transform 0.3s ease;-->
+<!--        }-->
+
+<!--        .avatar-preview:hover .profile-avatar {-->
+<!--            transform: scale(1.1);-->
+<!--        }-->
+
+<!--        /* Стили для кнопок показа/скрытия пароля */-->
+<!--        .input-group .btn-outline-secondary {-->
+<!--            border-color: #ced4da;-->
+<!--            color: #6c757d;-->
+<!--        }-->
+
+<!--        .input-group .btn-outline-secondary:hover {-->
+<!--            background-color: #f8f9fa;-->
+<!--            border-color: #ced4da;-->
+<!--            color: #6c757d;-->
+<!--        }-->
+
+<!--        .input-group .btn-outline-secondary:focus {-->
+<!--            box-shadow: none;-->
+<!--        }-->
+
+<!--        .input-group .form-control:focus {-->
+<!--            z-index: 1;-->
+<!--        }-->
+
+<!--        .input-group .btn-outline-secondary i {-->
+<!--            font-size: 1rem;-->
+<!--        }-->
+
+<!--        /* Стили для состояния ошибки */-->
+<!--        .input-group .form-control.is-invalid {-->
+<!--            border-right: none;-->
+<!--        }-->
+
+<!--        .input-group .form-control.is-invalid + .btn-outline-secondary {-->
+<!--            border-color: #dc3545;-->
+<!--            border-left: none;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="dashboard-container">-->
+<!--    <div class="row">-->
+<!--        &lt;!&ndash; Боковое меню &ndash;&gt;-->
+<!--        <div class="col-md-3 mb-4">-->
+<!--            <div class="settings-card">-->
+<!--                <div class="settings-card">-->
+<!--                    <div class="text-center mb-4">-->
+<!--                        <div class="avatar-preview mx-auto">-->
+<!--                            &lt;!&ndash; Условное отображение аватара &ndash;&gt;-->
+<!--                            <img th:if="${avatarUrl != null}"-->
+<!--                                 th:src="${avatarUrl}"-->
+<!--                                 alt="Profile Picture"-->
+<!--                                 class="profile-avatar">-->
+
+<!--                            &lt;!&ndash; Заглушка, если аватар отсутствует &ndash;&gt;-->
+<!--                            <img th:unless="${avatarUrl != null}"-->
+<!--                                 src="/api/placeholder/150/150"-->
+<!--                                 alt="Default Profile Picture"-->
+<!--                                 class="profile-avatar">-->
+<!--                        </div>-->
+
+<!--                        <h5 th:text="${user.firstName}" class="mb-2">Username</h5>-->
+<!--                    </div>-->
+<!--                    -->
+<!--                </div>-->
+<!--                <div class="nav flex-column nav-pills" role="tablist">-->
+
+<!--                    <a th:href="@{/profile/{id}(id=${user.id})}" class="btn btn-primary">Профиль</a>-->
+
+<!--                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#security">-->
+<!--                        <i class="bi bi-shield-lock-fill me-2"></i>Безопасность-->
+<!--                    </button>-->
+<!--                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#privacy">-->
+<!--                        <i class="bi bi-eye-slash-fill me-2"></i>Приватность-->
+<!--                    </button>-->
+<!--                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#notifications">-->
+<!--                        <i class="bi bi-bell-fill me-2"></i>Уведомления-->
+<!--                    </button>-->
+<!--                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#support">-->
+<!--                        <i class="bi bi-headset me-2"></i>Поддержка-->
+<!--                        <span class="support-badge ms-2">2</span>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Основной контент &ndash;&gt;-->
+<!--        <div class="col-md-9">-->
+<!--            <div class="tab-content">-->
+<!--                &lt;!&ndash; Профиль &ndash;&gt;-->
+<!--                <div class="tab-pane fade show active" id="profile">-->
+<!--                    <div class="settings-card">-->
+<!--                        <div class="settings-header">-->
+<!--                            <i class="bi bi-person-fill"></i>-->
+<!--                            <h3 class="settings-title">Настройки профиля</h3>-->
+<!--                        </div>-->
+<!--                        <form>-->
+<!--                            <div class="row">-->
+<!--                                <div class="col-md-6 mb-3">-->
+<!--                                    <label class="form-label">Имя</label>-->
+<!--                                    <input type="text" class="form-control" th:value="${user.firstName}">-->
+<!--                                </div>-->
+<!--                                <div class="col-md-6 mb-3">-->
+<!--                                    <label class="form-label">Фамилия</label>-->
+<!--                                    <input type="text" class="form-control" th:value="${user.lastName}">-->
+<!--                                </div>-->
+
+<!--                                <div class="col-md-6 mb-3">-->
+<!--                                    <label class="form-label">День Рождения</label>-->
+<!--                                    <input type="text" class="form-control" th:value="${user.getDateOfBirth()}">-->
+<!--                                </div>-->
+
+<!--                                <div class="col-md-6 mb-3">-->
+<!--                                    <label class="form-label">Почта</label>-->
+<!--                                    <input type="text" class="form-control" th:value="${user.getEmail()}">-->
+<!--                                </div>-->
+
+<!--                                <div class="col-md-6 mb-3">-->
+<!--                                    <label class="form-label">Место проживание</label>-->
+<!--                                    <input type="text" class="form-control" th:value="${user.getLocation()}">-->
+<!--                                </div>-->
+
+<!--                                <div class="col-md-6 mb-3">-->
+<!--                                    <label class="form-label">Номер мобильного</label>-->
+<!--                                    <input type="text" class="form-control" th:value="${user.getPhone()}">-->
+<!--                                </div>-->
+
+
+<!--                            </div>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">О себе</label>-->
+<!--                                <textarea class="form-control" rows="3" th:text="${user.bio}"></textarea>-->
+<!--                            </div>-->
+
+<!--                            <a href="/profile" class="btn btn-primary">Изменить профиль</a>-->
+
+<!--                        </form>-->
+
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Безопасность &ndash;&gt;-->
+<!--                <div class="tab-pane fade" id="security">-->
+<!--                    <div class="settings-card">-->
+<!--                        <div class="settings-header">-->
+<!--                            <i class="bi bi-shield-lock-fill"></i>-->
+<!--                            <h3 class="settings-title">Безопасность</h3>-->
+<!--                        </div>-->
+
+<!--                        &lt;!&ndash; Сообщения об ошибках и успехе &ndash;&gt;-->
+<!--                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">-->
+<!--                            <span th:text="${errorMessage}"></span>-->
+<!--                        </div>-->
+<!--                        <div th:if="${successMessage}" class="alert alert-success" role="alert">-->
+<!--                            <span th:text="${successMessage}"></span>-->
+<!--                        </div>-->
+
+<!--                        <form th:action="@{/settings/change-password}"-->
+<!--                              th:object="${passwordChangeDTO}"-->
+<!--                              method="post">-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Текущий пароль</label>-->
+<!--                                <input type="password"-->
+<!--                                       class="form-control"-->
+<!--                                       th:field="*{currentPassword}"-->
+<!--                                       th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid'">-->
+<!--                                <div class="invalid-feedback"-->
+<!--                                     th:if="${#fields.hasErrors('currentPassword')}"-->
+<!--                                     th:errors="*{currentPassword}"></div>-->
+<!--                            </div>-->
+
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Новый пароль</label>-->
+<!--                                <input type="password"-->
+<!--                                       class="form-control"-->
+<!--                                       th:field="*{newPassword}"-->
+<!--                                       th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid'">-->
+<!--                                <div class="invalid-feedback"-->
+<!--                                     th:if="${#fields.hasErrors('newPassword')}"-->
+<!--                                     th:errors="*{newPassword}"></div>-->
+<!--                            </div>-->
+
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Подтвердите новый пароль</label>-->
+<!--                                <input type="password"-->
+<!--                                       class="form-control"-->
+<!--                                       th:field="*{confirmPassword}"-->
+<!--                                       th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid'">-->
+<!--                                <div class="invalid-feedback"-->
+<!--                                     th:if="${#fields.hasErrors('confirmPassword')}"-->
+<!--                                     th:errors="*{confirmPassword}"></div>-->
+<!--                            </div>-->
+
+<!--                            <button type="submit" class="btn btn-primary">-->
+<!--                                <i class="bi bi-key"></i> Изменить пароль-->
+<!--                            </button>-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Приватность &ndash;&gt;-->
+<!--                <div class="tab-pane fade" id="privacy">-->
+<!--                    <div class="settings-card">-->
+<!--                        <div class="settings-header">-->
+<!--                            <i class="bi bi-eye-slash-fill"></i>-->
+<!--                            <h3 class="settings-title">Настройки приватности</h3>-->
+<!--                        </div>-->
+<!--                        <form>-->
+<!--                            <div class="mb-3 form-check form-switch">-->
+<!--                                <input type="checkbox" class="form-check-input" id="privateAccount">-->
+<!--                                <label class="form-check-label" for="privateAccount">Закрытый аккаунт</label>-->
+<!--                            </div>-->
+<!--                            <div class="mb-3 form-check form-switch">-->
+<!--                                <input type="checkbox" class="form-check-input" id="showOnline">-->
+<!--                                <label class="form-check-label" for="showOnline">Показывать статус онлайн</label>-->
+<!--                            </div>-->
+<!--                            <div class="mb-3 form-check form-switch">-->
+<!--                                <input type="checkbox" class="form-check-input" id="showLastSeen">-->
+<!--                                <label class="form-check-label" for="showLastSeen">Показывать последнее-->
+<!--                                    посещение</label>-->
+<!--                            </div>-->
+<!--                            <button type="submit" class="btn btn-primary">Сохранить настройки</button>-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Уведомления &ndash;&gt;-->
+<!--                <div class="tab-pane fade" id="notifications">-->
+<!--                    <div class="settings-card">-->
+<!--                        <div class="settings-header">-->
+<!--                            <i class="bi bi-bell-fill"></i>-->
+<!--                            <h3 class="settings-title">Настройки уведомлений</h3>-->
+<!--                        </div>-->
+<!--                        <form>-->
+<!--                            <div class="mb-3 form-check form-switch">-->
+<!--                                <input type="checkbox" class="form-check-input" id="emailNotif">-->
+<!--                                <label class="form-check-label" for="emailNotif">Email уведомления</label>-->
+<!--                            </div>-->
+<!--                            <div class="mb-3 form-check form-switch">-->
+<!--                                <input type="checkbox" class="form-check-input" id="messageNotif">-->
+<!--                                <label class="form-check-label" for="messageNotif">Уведомления о сообщениях</label>-->
+<!--                            </div>-->
+<!--                            <div class="mb-3 form-check form-switch">-->
+<!--                                <input type="checkbox" class="form-check-input" id="supportNotif">-->
+<!--                                <label class="form-check-label" for="supportNotif">Уведомления поддержки</label>-->
+<!--                            </div>-->
+<!--                            <button type="submit" class="btn btn-primary">Сохранить настройки</button>-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Поддержка &ndash;&gt;-->
+<!--                <div class="tab-pane fade" id="support">-->
+<!--                    <div class="settings-card">-->
+<!--                        <div class="settings-header">-->
+<!--                            <i class="bi bi-headset"></i>-->
+<!--                            <h3 class="settings-title">Поддержка</h3>-->
+<!--                        </div>-->
+<!--                        <div class="mb-4">-->
+<!--                            <h5>Создать новый тикет</h5>-->
+<!--                            <form th:action="@{/settings}" th:object="${ticket}" method="post">-->
+<!--                                &lt;!&ndash; Общие ошибки &ndash;&gt;-->
+<!--                                <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>-->
+
+<!--                                <div class="mb-3">-->
+<!--                                    <label for="subject" class="form-label">Тема</label>-->
+<!--                                    <input type="text"-->
+<!--                                           class="form-control"-->
+<!--                                           id="subject"-->
+<!--                                           th:field="*{subject}"-->
+<!--                                           th:classappend="${#fields.hasErrors('subject')} ? 'is-invalid'"-->
+<!--                                           required>-->
+<!--                                    <div class="invalid-feedback"-->
+<!--                                         th:if="${#fields.hasErrors('subject')}"-->
+<!--                                         th:errors="*{subject}">-->
+<!--                                    </div>-->
+<!--                                </div>-->
+
+<!--                                <div class="mb-3">-->
+<!--                                    <label for="message" class="form-label">Описание проблемы</label>-->
+<!--                                    <textarea class="form-control"-->
+<!--                                              id="message"-->
+<!--                                              rows="4"-->
+<!--                                              th:field="*{message}"-->
+<!--                                              th:classappend="${#fields.hasErrors('message')} ? 'is-invalid'"-->
+<!--                                              required>-->
+<!--        </textarea>-->
+<!--                                    <div class="invalid-feedback"-->
+<!--                                         th:if="${#fields.hasErrors('message')}"-->
+<!--                                         th:errors="*{message}">-->
+<!--                                    </div>-->
+<!--                                </div>-->
+
+<!--                                <button type="submit" class="btn btn-primary">Отправить</button>-->
+<!--                            </form>-->
+<!--                        </div>-->
+<!--                        <div class="mt-4">-->
+<!--                            <div class="card bg-transparent border-light">-->
+<!--                                <div class="card-body">-->
+<!--                                    <p class="text-white">Просмотрите историю ваших обращений в службу поддержки</p>-->
+<!--                                    <a href="/user/tickets" class="btn btn-primary">-->
+<!--                                        Перейти к списку тикетов-->
+<!--                                    </a>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash; Удаленная работа &ndash;&gt;-->
+<!--                    <div class="settings-card mt-4">-->
+<!--                        <div class="settings-header">-->
+<!--                            <i class="bi bi-geo-alt-fill"></i>-->
+<!--                            <h3 class="settings-title">Настройки местоположения</h3>-->
+<!--                        </div>-->
+<!--                        <form>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Страна</label>-->
+<!--                                <select class="form-select">-->
+<!--                                    <option value="">Выберите страну</option>-->
+<!--                                    <option value="RU">Россия</option>-->
+<!--                                    <option value="BY">Беларусь</option>-->
+<!--                                    <option value="KZ">Казахстан</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Город</label>-->
+<!--                                <input type="text" class="form-control">-->
+<!--                            </div>-->
+<!--                            <div class="mb-3 form-check form-switch">-->
+<!--                                <input type="checkbox" class="form-check-input" id="showLocation">-->
+<!--                                <label class="form-check-label" for="showLocation">Показывать местоположение в-->
+<!--                                    профиле</label>-->
+<!--                            </div>-->
+<!--                            <button type="submit" class="btn btn-primary">Сохранить</button>-->
+<!--                        </form>-->
+<!--                    </div>-->
+
+<!--                    &lt;!&ndash; Языковые настройки &ndash;&gt;-->
+<!--                    <div class="settings-card mt-4">-->
+<!--                        <div class="settings-header">-->
+<!--                            <i class="bi bi-translate"></i>-->
+<!--                            <h3 class="settings-title">Языковые настройки</h3>-->
+<!--                        </div>-->
+<!--                        <form>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Язык интерфейса</label>-->
+<!--                                <select class="form-select">-->
+<!--                                    <option value="ru">Русский</option>-->
+<!--                                    <option value="en">English</option>-->
+<!--                                    <option value="es">Español</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+<!--                            <div class="mb-3 form-check form-switch">-->
+<!--                                <input type="checkbox" class="form-check-input" id="autoTranslate">-->
+<!--                                <label class="form-check-label" for="autoTranslate">Автоматический перевод-->
+<!--                                    постов</label>-->
+<!--                            </div>-->
+<!--                            <button type="submit" class="btn btn-primary">Сохранить</button>-->
+<!--                        </form>-->
+<!--                    </div>-->
+
+<!--                    &lt;!&ndash; Настройки темы &ndash;&gt;-->
+<!--                    <div class="settings-card mt-4">-->
+<!--                        <div class="settings-header">-->
+<!--                            <i class="bi bi-palette-fill"></i>-->
+<!--                            <h3 class="settings-title">Настройки темы</h3>-->
+<!--                        </div>-->
+<!--                        <form>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Тема оформления</label>-->
+<!--                                <select class="form-select">-->
+<!--                                    <option value="light">Светлая</option>-->
+<!--                                    <option value="dark">Тёмная</option>-->
+<!--                                    <option value="system">Системная</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Цветовая схема</label>-->
+<!--                                <div class="d-flex gap-2">-->
+<!--                                    <button type="button" class="btn btn-primary rounded-circle"-->
+<!--                                            style="width: 40px; height: 40px; background-color: #1877f2;"></button>-->
+<!--                                    <button type="button" class="btn btn-primary rounded-circle"-->
+<!--                                            style="width: 40px; height: 40px; background-color: #764ba2;"></button>-->
+<!--                                    <button type="button" class="btn btn-primary rounded-circle"-->
+<!--                                            style="width: 40px; height: 40px; background-color: #2ecc71;"></button>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <button type="submit" class="btn btn-primary">Сохранить</button>-->
+<!--                        </form>-->
+<!--                    </div>-->
+
+<!--                    &lt;!&ndash; Настройки социальных сетей &ndash;&gt;-->
+<!--                    <div class="settings-card mt-4">-->
+<!--                        <div class="settings-header">-->
+<!--                            <i class="bi bi-share-fill"></i>-->
+<!--                            <h3 class="settings-title">Социальные сети</h3>-->
+<!--                        </div>-->
+<!--                        <form>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Instagram</label>-->
+<!--                                <input type="text" class="form-control" placeholder="@username">-->
+<!--                            </div>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Twitter</label>-->
+<!--                                <input type="text" class="form-control" placeholder="@username">-->
+<!--                            </div>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Facebook</label>-->
+<!--                                <input type="text" class="form-control" placeholder="Ссылка на профиль">-->
+<!--                            </div>-->
+<!--                            <div class="mb-3 form-check form-switch">-->
+<!--                                <input type="checkbox" class="form-check-input" id="showSocial">-->
+<!--                                <label class="form-check-label" for="showSocial">Показывать социальные сети в-->
+<!--                                    профиле</label>-->
+<!--                            </div>-->
+<!--                            <button type="submit" class="btn btn-primary">Сохранить</button>-->
+<!--                        </form>-->
+<!--                    </div>-->
+
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<script>-->
+<!--    function togglePasswordVisibility(inputId) {-->
+<!--        const input = document.getElementById(inputId);-->
+<!--        const icon = input.nextElementSibling;-->
+
+<!--        if (input.type === 'password') {-->
+<!--            input.type = 'text';-->
+<!--            icon.classList.remove('bi-eye');-->
+<!--            icon.classList.add('bi-eye-slash');-->
+<!--        } else {-->
+<!--            input.type = 'password';-->
+<!--            icon.classList.remove('bi-eye-slash');-->
+<!--            icon.classList.add('bi-eye');-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

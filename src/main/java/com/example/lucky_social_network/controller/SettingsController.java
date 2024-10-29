@@ -1,6 +1,7 @@
 package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.dto.PasswordChangeDTO;
+import com.example.lucky_social_network.dto.UserDisplayDTO;
 import com.example.lucky_social_network.model.SupportTicket;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.SupportTicketService;
@@ -8,6 +9,7 @@ import com.example.lucky_social_network.service.UserService;
 import com.example.lucky_social_network.service.picService.ImgurService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+@Slf4j
 
 @Controller
 @RequiredArgsConstructor
@@ -30,22 +33,33 @@ public class SettingsController {
 
     @GetMapping
     public String settings(Model model) {
-        User user = userService.getCurrentUser();
-        String avatarUrl = userService.getUserAvatarUrl(user);
+        try {
+            User user = userService.getCurrentUser();
+            String avatarUrl = userService.getUserAvatarUrl(user);
 
+            // Создаем DTO для отображения
+            UserDisplayDTO userDisplay = UserDisplayDTO.fromUser(user);
 
-        model.addAttribute("avatarUrl", avatarUrl);
-        model.addAttribute("ticket", new SupportTicket());
-        model.addAttribute("user", user);
-        model.addAttribute("passwordChangeDTO", new PasswordChangeDTO());
+            // Добавляем все необходимые атрибуты в модель
+            model.addAttribute("avatarUrl", avatarUrl);
+            model.addAttribute("ticket", new SupportTicket());
+            model.addAttribute("user", user);
+            model.addAttribute("userDisplay", userDisplay); // Добавляем DTO
+            model.addAttribute("passwordChangeDTO", new PasswordChangeDTO());
 
-        return "settings/Template";
+            return "settings/Template";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Ошибка при загрузке настроек: " + e.getMessage());
+            return "redirect:/login";
+        }
     }
+
 
     @PostMapping("/change-password")
     public String changePassword(@Valid @ModelAttribute PasswordChangeDTO passwordChangeDTO,
                                  BindingResult bindingResult,
-                                 RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes,
+                                 Model model) {
         try {
             // Проверяем совпадение паролей
             if (!passwordChangeDTO.getNewPassword().equals(passwordChangeDTO.getConfirmPassword())) {
@@ -54,6 +68,14 @@ public class SettingsController {
             }
 
             if (bindingResult.hasErrors()) {
+                // Добавляем все необходимые атрибуты в модель при ошибке
+                User currentUser = userService.getCurrentUser();
+                model.addAttribute("user", currentUser);
+                model.addAttribute("avatarUrl", userService.getUserAvatarUrl(currentUser));
+                model.addAttribute("ticket", new SupportTicket());
+                model.addAttribute("userDisplay", UserDisplayDTO.fromUser(currentUser));
+                model.addAttribute("errorMessage", "Проверьте правильность введенных данных");
+
                 return "settings/Template";
             }
 
@@ -66,10 +88,13 @@ public class SettingsController {
 
             redirectAttributes.addFlashAttribute("successMessage",
                     "Пароль успешно изменен");
+            return "redirect:/settings";
+
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     e.getMessage());
         } catch (Exception e) {
+            log.error("Error changing password", e);
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Произошла ошибка при смене пароля");
         }
