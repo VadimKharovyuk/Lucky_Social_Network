@@ -124,7 +124,7 @@ public class ProfileController {
             log.info("Получен пользователь: {}", fullUser.getUsername());
             log.info("Время последнего входа: {}", fullUser.getLastLogin());
             log.info("Статус онлайн: {}", onlineStatus);
-            
+
 
             // Добавляем атрибуты в модель
             model.addAttribute("currentUser", currentUser);

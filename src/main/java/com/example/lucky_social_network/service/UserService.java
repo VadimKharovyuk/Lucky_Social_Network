@@ -36,6 +36,7 @@ public class UserService {
     private final SubscriptionService subscriptionService;
     private final ActivityPublisher activityPublisher;
 
+
     @EventListener
     @Transactional
     public void onUserActivity(UserActivityEvent event) {
@@ -292,41 +293,38 @@ public class UserService {
     }
 
 
+//    @Transactional
+//    public void updateLastLogin(Long userId) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new RuntimeException("Пользователь не найден: " + userId));
+//
+//        LocalDateTime now = LocalDateTime.now();
+//        user.setLastLogin(now);
+//        userRepository.save(user);
+//
+//        log.debug("Обновлено время последней активности для пользователя {}: {}",
+//                userId, now);
+//    }
+
+
     @Transactional(readOnly = true)
     public String getUserOnlineStatus(Long userId) {
         log.debug("Получение статуса пользователя: {}", userId);
+
+        // Проверяем существование пользователя
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден с ID: " + userId));
+
+        // Проверяем время последнего входа
+        if (user.getLastLogin() == null) {
+            log.debug("Пользователь {} еще не входил в систему", userId);
+            return "не в сети";
+        }
+
         if (wasOnlineWithinLastMinutes(userId, 5)) {
             return "онлайн";
         }
         return getLastLoginFormatted(userId);
-    }
-
-    @Transactional
-    public void updateLastLogin(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден: " + userId));
-
-        LocalDateTime now = LocalDateTime.now();
-        user.setLastLogin(now);
-        userRepository.save(user);
-
-        log.debug("Обновлено время последней активности для пользователя {}: {}",
-                userId, now);
-    }
-
-
-    @Transactional(readOnly = true)
-    public String getLastLoginFormatted(Long userId) {
-        log.debug("Получение форматированного времени последнего входа для пользователя {}", userId);
-
-        LocalDateTime lastLogin = userRepository.findLastLoginById(userId)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден с ID: " + userId));
-
-        if (lastLogin == null) {
-            return "никогда";
-        }
-
-        return TimeUtils.getTimeAgo(lastLogin);
     }
 
 
@@ -335,15 +333,60 @@ public class UserService {
         log.debug("Проверка онлайн статуса для пользователя {} в течение {} минут", userId, minutes);
 
         LocalDateTime lastLogin = userRepository.findLastLoginById(userId)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден с ID: " + userId));
+                .orElse(null);
 
+        // Если lastLogin null, значит пользователь еще ни разу не входил
         if (lastLogin == null) {
+            log.debug("Пользователь {} еще не входил в систему", userId);
             return false;
         }
 
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(minutes);
         return lastLogin.isAfter(threshold);
     }
+
+    @Transactional(readOnly = true)
+    public String getLastLoginFormatted(Long userId) {
+        log.debug("Получение форматированного времени последнего входа для пользователя {}", userId);
+
+        LocalDateTime lastLogin = userRepository.findLastLoginById(userId)
+                .orElse(null);
+
+        if (lastLogin == null) {
+            return "никогда не был в сети";
+        }
+
+        return TimeUtils.getTimeAgo(lastLogin);
+    }
+
+
+    @Transactional
+    public void updateLastLogin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден: " + userId));
+
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+
+        log.debug("Обновлено время последней активности для пользователя {}: {}",
+                userId, user.getLastLogin());
+    }
+//    @Transactional
+//    public void updateFirstLogin(Long userId) {
+//        log.debug("Обновление первого входа для пользователя {}", userId);
+//
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new RuntimeException("Пользователь не найден с ID: " + userId));
+//
+//        if (user.getLastLogin() == null) {
+//            user.setLastLogin(LocalDateTime.now());
+//            userRepository.save(user);
+//            log.info("Установлено время первого входа для пользователя {}", userId);
+//
+//            // Публикуем событие первого входа
+//            eventPublisher.publishEvent(new UserFirstLoginEvent(this, user));
+//        }
+//    }
 
 
 }

@@ -2,11 +2,13 @@ package com.example.lucky_social_network.config;
 
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.UserRepository;
+import com.example.lucky_social_network.service.UserFirstLoginEvent;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,9 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
 
     @Override
     @Transactional
@@ -34,21 +39,45 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("Пользователь не найден: " + username));
 
-            log.info("Старое время входа для {}: {}", username, user.getLastLogin());
-
-            user.setLastLogin(LocalDateTime.now());
-            userRepository.save(user);
-
-            log.info("Обновлено время входа для {}: {}", username, user.getLastLogin());
-
-            // Проверяем сохранение
-            User updatedUser = userRepository.findByUsername(username).orElseThrow();
-            log.info("Проверка времени входа после сохранения: {}", updatedUser.getLastLogin());
+            updateLoginTime(user);
 
             response.sendRedirect("/posts");
         } catch (Exception e) {
             log.error("Ошибка при обновлении времени входа: {}", e.getMessage(), e);
             response.sendRedirect("/login?error");
+        }
+    }
+
+    private void updateLoginTime(User user) {
+        log.info("Старое время входа для {}: {}", user.getUsername(), user.getLastLogin());
+
+        boolean isFirstLogin = user.getLastLogin() == null;
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+
+        log.info("Обновлено время входа для {}: {}", user.getUsername(), user.getLastLogin());
+
+        // Проверяем сохранение
+        User updatedUser = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден после обновления"));
+        log.info("Проверка времени входа после сохранения: {}", updatedUser.getLastLogin());
+
+        if (isFirstLogin) {
+            log.info("Зафиксирован первый вход пользователя: {}", user.getUsername());
+            // Здесь можно опубликовать событие первого входа, если нужно
+            publishFirstLoginEvent(updatedUser);
+
+        }
+    }
+
+
+    private void publishFirstLoginEvent(User user) {
+        try {
+            eventPublisher.publishEvent(new UserFirstLoginEvent(this, user));
+            log.debug("Опубликовано событие первого входа для пользователя: {}",
+                    user.getUsername());
+        } catch (Exception e) {
+            log.error("Ошибка при публикации события первого входа: {}", e.getMessage());
         }
     }
 }

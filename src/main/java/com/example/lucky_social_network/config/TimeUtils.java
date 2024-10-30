@@ -15,8 +15,8 @@ public class TimeUtils {
         log.info("Получение форматированного времени для: {}", dateTime);
 
         if (dateTime == null) {
-            log.warn("Получено null значение времени");
-            return "никогда";
+            log.debug("Получено null значение времени");
+            return "никогда не был в сети";
         }
 
         LocalDateTime now = LocalDateTime.now();
