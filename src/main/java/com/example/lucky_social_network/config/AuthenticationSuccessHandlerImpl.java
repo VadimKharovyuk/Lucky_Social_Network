@@ -64,7 +64,7 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
 
         if (isFirstLogin) {
             log.info("Зафиксирован первый вход пользователя: {}", user.getUsername());
-            // Здесь можно опубликовать событие первого входа, если нужно
+
             publishFirstLoginEvent(updatedUser);
 
         }

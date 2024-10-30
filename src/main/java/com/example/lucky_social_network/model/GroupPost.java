@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,8 +14,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "group_posts")
 public class GroupPost {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,35 +29,50 @@ public class GroupPost {
     @Column(nullable = false, length = 1000)
     private String content;
 
-    @Column
+    @Column(name = "imgur_image_url")
     private String imgurImageUrl;
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    @Column(nullable = false)
+    @Column(name = "likes_count", nullable = false)
     private Long likesCount = 0L;
 
-    @Column(nullable = false)
+    @Column(name = "comments_count", nullable = false)
     private Long commentsCount = 0L;
 
+    @Column(name = "reposts_count")
     private Long repostsCount = 0L;
 
-    // Изменили тип с boolean на Boolean
     @Column(name = "important")
     private Boolean important = false;
 
-    // Для репостов
+    @Column(name = "pinned")
+    private Boolean pinned = false;
+
+    @Column(name = "pinned_at")
+    private LocalDateTime pinnedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "original_group_post_id")
     private GroupPost originalGroupPost;
 
-    // Добавили геттер для безопасного получения группы
+    @PrePersist
+    protected void onCreate() {
+        timestamp = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        if (pinned && pinnedAt == null) {
+            pinnedAt = LocalDateTime.now();
+        }
+    }
+
     public Group getGroupSafely() {
         return originalGroupPost != null ? originalGroupPost.getGroup() : group;
     }
 
-    // Безопасные геттеры для счетчиков
     public Long getRepostsCount() {
         return repostsCount != null ? repostsCount : 0L;
     }
@@ -74,10 +86,13 @@ public class GroupPost {
     }
 
     public Boolean isImportant() {
-        return important != null ? important : false;
+        return important != null && important;
     }
 
-    // Методы для инкрементации счетчиков
+    public Boolean isPinned() {
+        return pinned != null && pinned;
+    }
+
     public void incrementRepostsCount() {
         this.repostsCount = getRepostsCount() + 1;
     }
@@ -89,6 +104,11 @@ public class GroupPost {
     public void incrementCommentsCount() {
         this.commentsCount = getCommentsCount() + 1;
     }
+
+    public boolean isRepost() {
+        return originalGroupPost != null;
+    }
+}
 
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -145,4 +165,3 @@ public class GroupPost {
 //        this.repostsCount = (this.repostsCount != null ? this.repostsCount : 0L) + 1;
 //    }
 
-}
