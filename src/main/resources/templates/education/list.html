@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Образование</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div class="container">
+    <h2>Образование</h2>
+
+    <div th:if="${isOwner}" class="mb-3">
+        <a th:href="@{/users/{userId}/education/add(userId=${user.id})}"
+           class="btn btn-primary">Добавить образование</a>
+    </div>
+
+    <div th:if="${educationList.empty}" class="alert alert-info">
+        Информация об образовании отсутствует
+    </div>
+
+    <div th:each="education : ${educationList}" class="education-card mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${education.institutionName}"></h5>
+                <h6 class="card-subtitle mb-2 text-muted"
+                    th:text="${education.educationType.displayName}"></h6>
+
+                <div class="education-details">
+                    <p th:if="${education.faculty}"
+                       th:text="'Факультет: ' + ${education.faculty}"></p>
+                    <p th:if="${education.specialization}"
+                       th:text="'Специализация: ' + ${education.specialization}"></p>
+                    <p th:if="${education.degree}"
+                       th:text="'Степень: ' + ${education.degree}"></p>
+
+                    <p class="education-period">
+                        <span th:text="${#temporals.format(education.startDate, 'MM.yyyy')}"></span>
+                        -
+                        <span th:if="${education.current}">по настоящее время</span>
+                        <span th:unless="${education.current}"
+                              th:text="${#temporals.format(education.endDate, 'MM.yyyy')}">
+                            </span>
+                    </p>
+                </div>
+
+                <div th:if="${isOwner}" class="education-actions">
+                    <a th:href="@{/users/{userId}/education/{id}/edit(userId=${user.id},id=${education.id})}"
+                       class="btn btn-sm btn-primary">Редактировать</a>
+                    <form th:action="@{/users/{userId}/education/{id}/delete(userId=${user.id},id=${education.id})}"
+                          method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Вы уверены?')">Удалить
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

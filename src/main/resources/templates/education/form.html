@@ -1,0 +1,96 @@
+<!-- education/form.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${educationDTO.id == null ? 'Добавить образование' : 'Редактировать образование'}"></title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div class="container">
+    <h2 th:text="${educationDTO.id == null ? 'Добавить образование' : 'Редактировать образование'}"></h2>
+
+    <!-- education/form.html -->
+    <form th:action="@{/users/{userId}/education/add(userId=${user.id})}"
+          th:object="${educationDTO}"
+          method="post">
+
+        <div class="form-group">
+            <label>Учебное заведение</label>
+            <input type="text" class="form-control" th:field="*{institutionName}" required>
+            <div class="alert alert-danger"
+                 th:if="${#fields.hasErrors('institutionName')}"
+                 th:errors="*{institutionName}"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Тип образования</label>
+            <select class="form-control" th:field="*{educationType}" required>
+                <option th:each="type : ${educationTypes}"
+                        th:value="${type}"
+                        th:text="${type.displayName}"></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Факультет</label>
+            <input type="text" class="form-control" th:field="*{faculty}">
+        </div>
+
+        <div class="form-group">
+            <label>Специализация</label>
+            <input type="text" class="form-control" th:field="*{specialization}">
+        </div>
+
+        <div class="form-group">
+            <label>Степень</label>
+            <input type="text" class="form-control" th:field="*{degree}">
+        </div>
+
+        <div class="form-group">
+            <label>Дата начала</label>
+            <input type="date" class="form-control" th:field="*{startDate}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Дата окончания</label>
+            <input type="date" class="form-control" th:field="*{endDate}"
+                   th:disabled="${educationDTO.current}">
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" th:field="*{current}">
+            <label class="form-check-label">Обучаюсь в настоящее время</label>
+        </div>
+
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea class="form-control" th:field="*{description}" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Достижения</label>
+            <textarea class="form-control" th:field="*{achievements}" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Местоположение</label>
+            <input type="text" class="form-control" th:field="*{location}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a th:href="@{/users/{userId}/education(userId=${user.id})}"
+           class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+
+<script>
+    document.querySelector('input[name="current"]').addEventListener('change', function () {
+        const endDateInput = document.querySelector('input[name="endDate"]');
+        endDateInput.disabled = this.checked;
+        if (this.checked) {
+            endDateInput.value = '';
+        }
+    });
+</script>
+</body>
+</html>

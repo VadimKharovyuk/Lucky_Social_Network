@@ -126,7 +126,6 @@ public class ProfileController {
             log.info("Статус онлайн: {}", onlineStatus);
 
 
-            // Добавляем атрибуты в модель
             model.addAttribute("currentUser", currentUser);
             model.addAttribute("areFriends", areFriends);
             model.addAttribute("user", userProfile);

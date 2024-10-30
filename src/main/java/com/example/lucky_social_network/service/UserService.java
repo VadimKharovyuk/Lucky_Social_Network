@@ -293,19 +293,6 @@ public class UserService {
     }
 
 
-//    @Transactional
-//    public void updateLastLogin(Long userId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new RuntimeException("Пользователь не найден: " + userId));
-//
-//        LocalDateTime now = LocalDateTime.now();
-//        user.setLastLogin(now);
-//        userRepository.save(user);
-//
-//        log.debug("Обновлено время последней активности для пользователя {}: {}",
-//                userId, now);
-//    }
-
 
     @Transactional(readOnly = true)
     public String getUserOnlineStatus(Long userId) {
@@ -371,22 +358,23 @@ public class UserService {
         log.debug("Обновлено время последней активности для пользователя {}: {}",
                 userId, user.getLastLogin());
     }
-//    @Transactional
-//    public void updateFirstLogin(Long userId) {
-//        log.debug("Обновление первого входа для пользователя {}", userId);
-//
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new RuntimeException("Пользователь не найден с ID: " + userId));
-//
-//        if (user.getLastLogin() == null) {
-//            user.setLastLogin(LocalDateTime.now());
-//            userRepository.save(user);
-//            log.info("Установлено время первого входа для пользователя {}", userId);
-//
-//            // Публикуем событие первого входа
-//            eventPublisher.publishEvent(new UserFirstLoginEvent(this, user));
-//        }
-//    }
+
+    public boolean canAccessProfile(Long currentUserId, Long targetUserId) {
+        // Свой профиль всегда доступен
+        if (currentUserId.equals(targetUserId)) {
+            return true;
+        }
+
+        User targetUser = getUserById(targetUserId);
+
+        // Проверяем, является ли профиль приватным
+        if (targetUser.getIsPrivate()) {
+            // Проверяем, являются ли пользователи друзьями
+            return areFriends(currentUserId, targetUserId);
+        }
+
+        return true;
+    }
 
 
 }

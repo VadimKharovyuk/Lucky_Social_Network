@@ -178,6 +178,7 @@ public class User implements Serializable {
     @OrderBy("startDate DESC")
     private List<Education> educationHistory = new ArrayList<>();
 
+    
     @Column(name = "interests", length = 1000)
     private String interests;
 
