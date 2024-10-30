@@ -118,6 +118,14 @@ public class ProfileController {
 
             boolean isFriend = userService.areFriends(currentUserId, userId);
 
+            String onlineStatus = userService.getUserOnlineStatus(userId);
+            model.addAttribute("onlineStatus", onlineStatus);
+
+            log.info("Получен пользователь: {}", fullUser.getUsername());
+            log.info("Время последнего входа: {}", fullUser.getLastLogin());
+            log.info("Статус онлайн: {}", onlineStatus);
+            
+
             // Добавляем атрибуты в модель
             model.addAttribute("currentUser", currentUser);
             model.addAttribute("areFriends", areFriends);
@@ -134,6 +142,9 @@ public class ProfileController {
             model.addAttribute("totalPages", userAlbums.getTotalPages());
             model.addAttribute("currentPage", userAlbums.getNumber());
             model.addAttribute("isFriend", isFriend);
+            model.addAttribute("user", userProfile);
+            model.addAttribute("onlineStatus", onlineStatus);
+
 
             return "user-profile";
         } catch (Exception e) {

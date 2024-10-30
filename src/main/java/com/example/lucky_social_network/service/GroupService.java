@@ -4,6 +4,7 @@ import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.Group;
 import com.example.lucky_social_network.model.GroupPost;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.model.UserActivityEvent;
 import com.example.lucky_social_network.repository.GroupContentRepository;
 import com.example.lucky_social_network.repository.GroupRepository;
 import com.example.lucky_social_network.service.picService.ImgurService;
@@ -32,6 +33,7 @@ public class GroupService {
     private final UserService userService;
     private final ImgurService imgurService;
     private final GroupContentRepository groupContentRepository;
+    private final ActivityPublisher activityPublisher;
 
 
     public void deletePostInGroup(Long postId) {
@@ -135,6 +137,7 @@ public class GroupService {
                 group.getMembers().add(user);
                 group.setMembersCount(group.getMembersCount() + 1);
                 groupRepository.save(group);
+                activityPublisher.publishActivity(user.getId(), UserActivityEvent.ActivityType.LIKE_ADDED);
                 log.info("User {} successfully subscribed to group {}", user.getUsername(), group.getName());
             } else {
                 log.info("User {} is already subscribed to group {}", user.getUsername(), group.getName());
@@ -190,6 +193,7 @@ public class GroupService {
         }
 
         GroupPost savedPost = groupContentRepository.save(post);
+        activityPublisher.publishActivity(author.getId(), UserActivityEvent.ActivityType.LIKE_ADDED);
 
         group.getPosts().add(savedPost);
         group.setPostsCount(group.getPostsCount() + 1);

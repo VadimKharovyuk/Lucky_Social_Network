@@ -42,7 +42,7 @@ public class User implements Serializable {
 
 
     private String email;
-    
+
     private String phone;
     @Column(length = 500)
     private String bio;
@@ -52,7 +52,6 @@ public class User implements Serializable {
     private String avatarUrl;
 
 
-
     private LocalDate createdAt;
 
     private LocalDate dateOfBirth;
@@ -60,8 +59,25 @@ public class User implements Serializable {
 
 
     private Boolean isPrivate;
+
+    @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
+
+//    public LocalDateTime getLastLogin() {
+//        return lastLogin;
+//    }
+//
+//    public void setLastLogin(LocalDateTime lastLogin) {
+//        this.lastLogin = lastLogin;
+//    }
+
+//    @PrePersist
+//    public void prePersist() {
+//        if (this.createdAt == null) {
+//            this.createdAt = LocalDate.now();
+//        }
+//    }
 
     private String location;
 
@@ -131,7 +147,7 @@ public class User implements Serializable {
     public void addRole(Role role) {
         this.roles.add(role);
     }
-    
+
     public enum Role {
         USER,
         ADMIN,
@@ -145,4 +161,5 @@ public class User implements Serializable {
     @JsonIgnore
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Photo> photos = new HashSet<>();
+
 }

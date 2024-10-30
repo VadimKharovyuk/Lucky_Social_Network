@@ -5,6 +5,7 @@ import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.Album;
 import com.example.lucky_social_network.model.Photo;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.model.UserActivityEvent;
 import com.example.lucky_social_network.repository.AlbumRepository;
 import com.example.lucky_social_network.repository.PhotoRepository;
 import com.example.lucky_social_network.service.picService.ImgurService;
@@ -26,6 +27,7 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final AlbumRepository albumRepository;
     private final ImgurService imgurService;
+    private final ActivityPublisher activityPublisher;
 
 
     public Photo addPhotoToAlbum(byte[] imageData, String description, Long albumId, User user) throws AccessDeniedException {
@@ -139,6 +141,7 @@ public class PhotoService {
         if (photo.getIsPrivate() && !photo.getAuthor().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You don't have permission to view this photo");
         }
+        activityPublisher.publishActivity(currentUser.getId(), UserActivityEvent.ActivityType.PROFILE_UPDATED);
 
         return photo;
     }

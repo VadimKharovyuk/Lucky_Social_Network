@@ -3,6 +3,7 @@
 <head>
     <title>Профиль пользователя - Lucky Social Network</title>
     <meta charset="UTF-8">
+    <meta name="user-id" th:content="${user.id}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -948,6 +949,46 @@
             }
         }
 
+
+        .online-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+        }
+
+        .online .status-indicator {
+            animation: pulse 2s infinite;
+        }
+
+        .online-status {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .status-indicator {
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(76, 175, 80, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1074,7 +1115,23 @@
                         class="profile-name" th:text="${'@' + user.username}">username</h2>
                 </div>
 
-                <div class="profile-status">Online</div>
+
+                <div class="user-profile">
+                    <!-- Статус онлайн -->
+                    <div class="online-status-wrapper" th:data-user-id="${user.id}">
+                        <div class="online-status" th:classappend="${onlineStatus == 'онлайн' ? 'online' : ''}"
+                             th:data-initial-status="${onlineStatus}">
+                            <span class="status-indicator" th:if="${onlineStatus == 'онлайн'}"></span>
+                            <span class="status-text" th:text="${onlineStatus}"></span>
+                        </div>
+                    </div>
+
+
+                    <!-- Сообщение если пользователь не найден -->
+                    <div th:if="${user == null}" class="error-message">
+                        Пользователь не найден
+                    </div>
+                </div>
 
 
                 <div class="profile-details">

@@ -27,6 +27,7 @@ public class ChatService {
     private final RabbitMQService rabbitMQService;
     private final MeterRegistry meterRegistry;
     private final Timer messageSendTimer;
+  
 
     /**
      * Удаление сообщений для пользователя 1
@@ -208,7 +209,6 @@ public class ChatService {
 
     public List<Message> getChatHistory(Long senderId, Long recipientId) {
         List<Message> messages = messageRepository.findAvailableChatHistory(senderId, recipientId);
-
         return messages.stream()
                 .filter(message -> {
                     boolean isSender = message.getSender().getId().equals(senderId);
@@ -218,9 +218,6 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
-//    public List<Message> getChatHistory(Long senderId, Long recipientId) {
-//        return messageRepository.findAvailableChatHistory(senderId, recipientId);
-//    }
 
     public List<User> getUserChats(Long userId) {
         User currentUser = getUserById(userId);

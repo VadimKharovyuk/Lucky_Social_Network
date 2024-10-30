@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.management.relation.Role;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,4 +33,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     Optional<User> findByEmail(String email);
+
+    @Query("SELECT u.lastLogin FROM User u WHERE u.id = :userId")
+    Optional<LocalDateTime> findLastLoginById(@Param("userId") Long userId);
+
 }

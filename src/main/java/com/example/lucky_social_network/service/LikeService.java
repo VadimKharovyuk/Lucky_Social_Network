@@ -3,11 +3,10 @@ package com.example.lucky_social_network.service;
 import com.example.lucky_social_network.model.Like;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.model.UserActivityEvent;
 import com.example.lucky_social_network.repository.LikeRepository;
-import com.example.lucky_social_network.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +22,7 @@ import java.util.stream.Collectors;
 public class LikeService {
     private final LikeRepository likeRepository;
     private final  PostService postService;
+    private final ActivityPublisher activityPublisher;
 
 
     @Transactional
@@ -38,6 +38,7 @@ public class LikeService {
             newLike.setTimestamp(LocalDateTime.now());
             likeRepository.save(newLike);
             postService.incrementLikeCount(post);
+            activityPublisher.publishActivity(user.getId(), UserActivityEvent.ActivityType.LIKE_ADDED);
         }
     }
 

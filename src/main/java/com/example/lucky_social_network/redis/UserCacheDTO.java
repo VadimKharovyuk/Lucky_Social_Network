@@ -33,10 +33,11 @@ public class UserCacheDTO implements Serializable {
     private String location;
 
 
+
     // Базовые настройки профиля
     private Boolean isPrivate;
     private Boolean emailVerified;
-    private String gender;  // Оставляем, так как это может быть важно для UI
+    private String gender;
 
     // Счетчики активности
     private Integer friendsCount;
@@ -53,7 +54,6 @@ public class UserCacheDTO implements Serializable {
         dto.setLastName(user.getLastName());
         dto.setAvatarUrl(user.getAvatarUrl());
         dto.setBio(user.getBio());
-        
         dto.setDateOfBirth(user.getDateOfBirth());
         dto.setLocation(user.getLocation());
 
@@ -69,7 +69,6 @@ public class UserCacheDTO implements Serializable {
         // Счетчики
         dto.setFriendsCount(user.getFriendsCount());
         dto.setFollowersCount(user.getFollowersCount());
-
 
         return dto;
     }

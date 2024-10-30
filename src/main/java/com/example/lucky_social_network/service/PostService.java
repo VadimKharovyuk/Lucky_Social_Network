@@ -3,6 +3,7 @@ package com.example.lucky_social_network.service;
 import com.example.lucky_social_network.dto.PostCreationDto;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.model.UserActivityEvent;
 import com.example.lucky_social_network.repository.PostRepository;
 import com.example.lucky_social_network.service.picService.ImgurService;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,6 +23,8 @@ import java.util.Optional;
 public class PostService {
     private final PostRepository postRepository;
     private final ImgurService imgurService;
+
+    private final ActivityPublisher activityPublisher;
 
 
     @Transactional
@@ -45,6 +48,7 @@ public class PostService {
 
             }
         }
+        activityPublisher.publishActivity(author.getId(), UserActivityEvent.ActivityType.POST_CREATED);
 
         return postRepository.save(post);
     }

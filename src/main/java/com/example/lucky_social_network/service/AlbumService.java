@@ -3,6 +3,7 @@ package com.example.lucky_social_network.service;
 import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.Album;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.model.UserActivityEvent;
 import com.example.lucky_social_network.repository.AlbumRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import java.util.List;
 @Transactional
 public class AlbumService {
     private final AlbumRepository albumRepository;
+    public final ActivityPublisher activityPublisher;
 
 
     // Создание нового альбома
@@ -30,6 +32,7 @@ public class AlbumService {
         album.setCreatedAt(LocalDateTime.now());
         album.setOwner(owner);
         album.setPhotoCount(0);
+        activityPublisher.publishActivity(owner.getId(), UserActivityEvent.ActivityType.PHOTO_UPLOADED);
 
         return albumRepository.save(album);
     }
@@ -43,6 +46,7 @@ public class AlbumService {
         if (album.getIsPrivate() && !album.getOwner().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You don't have access to this album");
         }
+        activityPublisher.publishActivity(currentUser.getId(), UserActivityEvent.ActivityType.PHOTO_UPLOADED);
 
         return album;
     }

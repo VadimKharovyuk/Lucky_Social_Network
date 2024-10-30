@@ -3,6 +3,7 @@ package com.example.lucky_social_network.service;
 import com.example.lucky_social_network.model.Comment;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.model.UserActivityEvent;
 import com.example.lucky_social_network.repository.CommentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class CommentService {
     private final PostService postService;
     private final UserService userService;
     private final NotificationService notificationService;
+    private final ActivityPublisher activityPublisher;
 
     public Comment addComment(Long postId, Long userId, String content) {
         Post post = postService.getPostById(postId).orElseThrow(EntityNotFoundException::new);
@@ -32,6 +34,7 @@ public class CommentService {
         comment = commentRepository.save(comment);
 
         notificationService.createCommentNotification(post, comment);
+        activityPublisher.publishActivity(userId, UserActivityEvent.ActivityType.COMMENT_ADDED);
 
         return comment;
     }

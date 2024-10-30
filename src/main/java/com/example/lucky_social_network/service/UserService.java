@@ -1,8 +1,9 @@
 package com.example.lucky_social_network.service;
 
+import com.example.lucky_social_network.config.TimeUtils;
 import com.example.lucky_social_network.exception.FriendshipNotFoundException;
-import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.model.UserActivityEvent;
 import com.example.lucky_social_network.redis.UserCacheDTO;
 import com.example.lucky_social_network.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,6 +34,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SubscriptionService subscriptionService;
+    private final ActivityPublisher activityPublisher;
+
+    @EventListener
+    @Transactional
+    public void onUserActivity(UserActivityEvent event) {
+        log.info("Обработка события активности пользователя: ID={}, тип={}",
+                event.getUserId(), event.getActivityType());
+
+        updateLastLogin(event.getUserId());
+    }
 
 
     @Cacheable(value = "user_profiles", key = "#userId", unless = "#result == null")
@@ -49,16 +61,23 @@ public class UserService {
         return dto;
     }
 
+    @CachePut(value = "user_profiles", key = "#user.id")
+    public UserCacheDTO updateUserProfile(User user) {
+        log.info("Updating user profile in cache for user ID: {}", user.getId());
+        log.info("Last login time before saving: {}", user.getLastLogin());
+
+        User savedUser = userRepository.save(user);
+        UserCacheDTO dto = UserCacheDTO.fromUser(savedUser);
+
+
+        return dto;
+    }
+
     public User getUserFullProfile(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
     }
 
-    @CachePut(value = "user_profiles", key = "#user.id")
-    public UserCacheDTO updateUserProfile(User user) {
-        User savedUser = userRepository.save(user);
-        return UserCacheDTO.fromUser(savedUser);
-    }
 
     @CacheEvict(value = "user_profiles", key = "#userId")
     public void deleteUser(Long userId) {
@@ -88,13 +107,6 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
-    public void updateLastLogin(User user) {
-        User existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-        existingUser.setLastLogin(LocalDateTime.now());
-        userRepository.save(existingUser);
-    }
-
 
     public User registerNewUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -108,12 +120,14 @@ public class UserService {
 
     @Transactional
     public User findByUsername(String username) {
+
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
 
     public User getUserById(Long senderId) {
+        activityPublisher.publishActivity(senderId, UserActivityEvent.ActivityType.PROFILE_UPDATED);
         return userRepository.findById(senderId).orElseThrow(() -> new UsernameNotFoundException("User not found: " + senderId));
     }
 
@@ -179,19 +193,18 @@ public class UserService {
     }
 
 
-
     public String getUserAvatarUrl(User user) {
         if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
             return user.getAvatarUrl();
         }
-        return getDefaultAvatarUrl(); // Метод, возвращающий URL аватара по умолчанию
+        activityPublisher.publishActivity(user.getId(), UserActivityEvent.ActivityType.PROFILE_UPDATED);
+        return getDefaultAvatarUrl();
     }
 
     private String getDefaultAvatarUrl() {
         // Возвращает URL аватара по умолчанию
         return "https://example.com/default-avatar.png";
     }
-
 
 
     public Long getCurrentUserId() {
@@ -203,21 +216,6 @@ public class UserService {
         throw new IllegalStateException("User not authenticated or CustomUserDetails not found");
     }
 
-    //    public User getCurrentUser() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            throw new IllegalStateException("No authenticated user found");
-//        }
-//
-//        Object principal = authentication.getPrincipal();
-//        if (principal instanceof UserDetails) {
-//            String username = ((UserDetails) principal).getUsername();
-//            return userRepository.findByUsername(username)
-//                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-//        }
-//
-//        throw new IllegalStateException("Unexpected principal type: " + principal.getClass());
-//    }
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -249,6 +247,7 @@ public class UserService {
     }
 
     public Optional<User> findById(Long userId) {
+        activityPublisher.publishActivity(userId, UserActivityEvent.ActivityType.PROFILE_UPDATED);
         return userRepository.findById(userId);
     }
 
@@ -290,6 +289,60 @@ public class UserService {
         userRepository.save(user);
 
         log.info("Password changed successfully for user: {}", userId);
+    }
+
+
+    @Transactional(readOnly = true)
+    public String getUserOnlineStatus(Long userId) {
+        log.debug("Получение статуса пользователя: {}", userId);
+        if (wasOnlineWithinLastMinutes(userId, 5)) {
+            return "онлайн";
+        }
+        return getLastLoginFormatted(userId);
+    }
+
+    @Transactional
+    public void updateLastLogin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден: " + userId));
+
+        LocalDateTime now = LocalDateTime.now();
+        user.setLastLogin(now);
+        userRepository.save(user);
+
+        log.debug("Обновлено время последней активности для пользователя {}: {}",
+                userId, now);
+    }
+
+
+    @Transactional(readOnly = true)
+    public String getLastLoginFormatted(Long userId) {
+        log.debug("Получение форматированного времени последнего входа для пользователя {}", userId);
+
+        LocalDateTime lastLogin = userRepository.findLastLoginById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден с ID: " + userId));
+
+        if (lastLogin == null) {
+            return "никогда";
+        }
+
+        return TimeUtils.getTimeAgo(lastLogin);
+    }
+
+
+    @Transactional(readOnly = true)
+    public boolean wasOnlineWithinLastMinutes(Long userId, int minutes) {
+        log.debug("Проверка онлайн статуса для пользователя {} в течение {} минут", userId, minutes);
+
+        LocalDateTime lastLogin = userRepository.findLastLoginById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден с ID: " + userId));
+
+        if (lastLogin == null) {
+            return false;
+        }
+
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(minutes);
+        return lastLogin.isAfter(threshold);
     }
 
 

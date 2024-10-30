@@ -3,7 +3,9 @@ package com.example.lucky_social_network.controller;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class LoginController {
@@ -48,21 +51,14 @@ public class LoginController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = userService.findByUsername(username);
-            userService.updateLastLogin(user);
 
-            // После успешной аутентификации перенаправляем на главную страницу
+            // Обновляем время входа
+            userService.updateLastLogin(user.getId());
+
+
             return "redirect:/posts";
-
-        } catch (BadCredentialsException e) {
-            redirectAttributes.addFlashAttribute("error", "Неверный пароль");
-            return "redirect:/login";
-        } catch (DisabledException e) {
-            redirectAttributes.addFlashAttribute("error", "Аккаунт отключен");
-            return "redirect:/login";
-        } catch (LockedException e) {
-            redirectAttributes.addFlashAttribute("error", "Аккаунт заблокирован");
-            return "redirect:/login";
         } catch (Exception e) {
+            log.error("Login error for user {}: {}", username, e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Ошибка входа в систему");
             return "redirect:/login";
         }
