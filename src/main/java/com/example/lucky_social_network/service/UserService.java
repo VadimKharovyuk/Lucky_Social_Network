@@ -39,6 +39,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final SubscriptionService subscriptionService;
     private final ActivityPublisher activityPublisher;
+    private final UserActivityService userActivityService;
 
 
     @EventListener
@@ -46,6 +47,7 @@ public class UserService {
     public void onUserActivity(UserActivityEvent event) {
         log.info("Обработка события активности пользователя: ID={}, тип={}",
                 event.getUserId(), event.getActivityType());
+
 
         updateLastLogin(event.getUserId());
     }
@@ -95,23 +97,35 @@ public class UserService {
     }
 
 
+    @Transactional
     public User updateUser(User user) {
-        User existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        try {
+            User existingUser = userRepository.findById(user.getId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Обновляем основные поля
-        existingUser.setEmail(user.getEmail());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setBio(user.getBio());
-        existingUser.setDateOfBirth(user.getDateOfBirth());
-        existingUser.setLocation(user.getLocation());
+            // Обновляем основные поля
+            existingUser.setEmail(user.getEmail());
+            existingUser.setPhone(user.getPhone());
+            existingUser.setBio(user.getBio());
+            existingUser.setDateOfBirth(user.getDateOfBirth());
+            existingUser.setLocation(user.getLocation());
+            existingUser.setFirstName(user.getFirstName());
+            existingUser.setLastName(user.getLastName());
 
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
+            // Сохраняем изменения
+            User savedUser = userRepository.save(existingUser);
 
-        return userRepository.save(existingUser);
+            // Отслеживаем действие
+            userActivityService.trackUserAction(savedUser);
+
+            log.info("Updated user profile and tracked activity for user ID: {}", user.getId());
+
+            return savedUser;
+        } catch (Exception e) {
+            log.error("Error updating user profile for ID {}: {}", user.getId(), e.getMessage());
+            throw e;
+        }
     }
-
 
     public User registerNewUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -244,12 +258,24 @@ public class UserService {
         return userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(searchTerm, searchTerm);
     }
 
-
+    // Можно также добавить отслеживание при обновлении аватара
+    @Transactional
     public void updateAvatarUrl(Long userId, String imageUrl) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        user.setAvatarUrl(imageUrl);
-        userRepository.save(user);
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+            user.setAvatarUrl(imageUrl);
+            User savedUser = userRepository.save(user);
+
+            // Отслеживаем действие
+            userActivityService.trackUserAction(savedUser);
+
+            log.info("Updated avatar and tracked activity for user ID: {}", userId);
+        } catch (Exception e) {
+            log.error("Error updating avatar for user ID {}: {}", userId, e.getMessage());
+            throw e;
+        }
     }
 
     public Optional<User> findById(Long userId) {
@@ -382,25 +408,25 @@ public class UserService {
     }
 
 
-    @Transactional
-    public void updateUserDetails(@Valid User user) {
-        User existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + user.getId()));
-
-        validateUserDetails(user, existingUser);
-
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-
-        existingUser.setEmail(user.getEmail());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setBio(user.getBio());
-       
-
-        userRepository.save(existingUser);
-
-        log.info("Updated user details for user ID: {}", user.getId());
-    }
+//    @Transactional
+//    public void updateUserDetails(@Valid User user) {
+//        User existingUser = userRepository.findById(user.getId())
+//                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + user.getId()));
+//
+//        validateUserDetails(user, existingUser);
+//
+//        existingUser.setFirstName(user.getFirstName());
+//        existingUser.setLastName(user.getLastName());
+//
+//        existingUser.setEmail(user.getEmail());
+//        existingUser.setPhone(user.getPhone());
+//        existingUser.setBio(user.getBio());
+//
+//
+//        userRepository.save(existingUser);
+//
+//        log.info("Updated user details for user ID: {}", user.getId());
+//    }
 
     private void validateUserDetails(User user, User existingUser) {
         if (user.getFirstName() != null && user.getFirstName().length() > 50) {
@@ -417,6 +443,37 @@ public class UserService {
             if (userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
                 throw new EmailAlreadyExistsException("Email " + user.getEmail() + " already in use");
             }
+        }
+    }
+
+    @Transactional
+    public void updateUserDetails(@Valid User user) {
+        try {
+            User existingUser = userRepository.findById(user.getId())
+                    .orElseThrow(() -> new UserNotFoundException("User not found with id: " + user.getId()));
+
+            validateUserDetails(user, existingUser);
+
+            // Обновляем данные пользователя
+            existingUser.setFirstName(user.getFirstName());
+            existingUser.setLastName(user.getLastName());
+            existingUser.setEmail(user.getEmail());
+            existingUser.setPhone(user.getPhone());
+            existingUser.setBio(user.getBio());
+
+            // Сохраняем обновления
+            User savedUser = userRepository.save(existingUser);
+
+            // Отслеживаем действие пользователя
+            userActivityService.trackUserAction(savedUser);
+
+            // Публикуем событие обновления профиля
+            activityPublisher.publishActivity(user.getId(), UserActivityEvent.ActivityType.PROFILE_UPDATED);
+
+            log.info("Updated user details and tracked activity for user ID: {}", user.getId());
+        } catch (Exception e) {
+            log.error("Error updating user details for ID {}: {}", user.getId(), e.getMessage());
+            throw e;
         }
     }
 }

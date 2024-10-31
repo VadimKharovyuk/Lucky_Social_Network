@@ -37,6 +37,7 @@ public class SessionEventListener implements HttpSessionListener {
         }
     }
 
+
     @Override
     public void sessionCreated(HttpSessionEvent se) {
         // Можно добавить логику при создании сессии, если нужно
