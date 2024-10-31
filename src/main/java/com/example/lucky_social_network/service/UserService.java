@@ -1,11 +1,15 @@
 package com.example.lucky_social_network.service;
 
 import com.example.lucky_social_network.config.TimeUtils;
+import com.example.lucky_social_network.exception.EmailAlreadyExistsException;
 import com.example.lucky_social_network.exception.FriendshipNotFoundException;
+import com.example.lucky_social_network.exception.UserNotFoundException;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.model.UserActivityEvent;
 import com.example.lucky_social_network.redis.UserCacheDTO;
 import com.example.lucky_social_network.repository.UserRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -128,7 +132,7 @@ public class UserService {
 
 
     public User getUserById(Long senderId) {
-        activityPublisher.publishActivity(senderId, UserActivityEvent.ActivityType.PROFILE_UPDATED);
+//        activityPublisher.publishActivity(senderId, UserActivityEvent.ActivityType.PROFILE_UPDATED);
         return userRepository.findById(senderId).orElseThrow(() -> new UsernameNotFoundException("User not found: " + senderId));
     }
 
@@ -230,6 +234,7 @@ public class UserService {
             return userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         }
+
 
         log.error("Unexpected principal type: " + principal.getClass());
         throw new IllegalStateException("Unexpected principal type: " + principal.getClass());
@@ -377,4 +382,41 @@ public class UserService {
     }
 
 
+    @Transactional
+    public void updateUserDetails(@Valid User user) {
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + user.getId()));
+
+        validateUserDetails(user, existingUser);
+
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
+
+        existingUser.setEmail(user.getEmail());
+        existingUser.setPhone(user.getPhone());
+        existingUser.setBio(user.getBio());
+       
+
+        userRepository.save(existingUser);
+
+        log.info("Updated user details for user ID: {}", user.getId());
+    }
+
+    private void validateUserDetails(User user, User existingUser) {
+        if (user.getFirstName() != null && user.getFirstName().length() > 50) {
+            throw new ValidationException("First name too long");
+        }
+        if (user.getLastName() != null && user.getLastName().length() > 50) {
+            throw new ValidationException("Last name too long");
+        }
+        if (user.getBio() != null && user.getBio().length() > 500) {
+            throw new ValidationException("Bio too long");
+        }
+
+        if (user.getEmail() != null && !user.getEmail().equals(existingUser.getEmail())) {
+            if (userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
+                throw new EmailAlreadyExistsException("Email " + user.getEmail() + " already in use");
+            }
+        }
+    }
 }

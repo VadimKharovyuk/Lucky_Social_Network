@@ -170,17 +170,20 @@ public class User implements Serializable {
     private List<WorkExperience> workExperience = new ArrayList<>();
 
 
-    @Column(length = 100)
-    private String profession;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserInterests userInterests;
+
+    public void setUserInterests(UserInterests userInterests) {
+        if (userInterests != null) {
+            userInterests.setUser(this); // Устанавливаем ссылку на User в UserInterests
+        }
+        this.userInterests = userInterests; // Устанавливаем UserInterests в User
+    }
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("startDate DESC")
     private List<Education> educationHistory = new ArrayList<>();
-
-    
-    @Column(name = "interests", length = 1000)
-    private String interests;
 
 
     // Настройки приватности

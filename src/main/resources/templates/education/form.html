@@ -4,7 +4,200 @@
 <head>
     <title th:text="${educationDTO.id == null ? 'Добавить образование' : 'Редактировать образование'}"></title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        /* Основные стили контейнера */
+        .container {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 24px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Заголовок */
+        h2 {
+            color: #1c1e21;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #dadde1;
+        }
+
+        /* Стили для групп форм */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #1c1e21;
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        /* Стили для инпутов */
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            background: #f5f6f7;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+            background: #fff;
+            outline: none;
+        }
+
+        /* Стили для select */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+        }
+
+        /* Стили для textarea */
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Стили для чекбокса */
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            color: #1c1e21;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        /* Стили для кнопок */
+        .btn {
+            padding: 8px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #1877f2;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #166fe5;
+        }
+
+        .btn-secondary {
+            background: #e4e6eb;
+            color: #050505;
+            margin-left: 8px;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #dadde1;
+        }
+
+        /* Стили для сообщений об ошибках */
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .alert-danger {
+            background: #ffebe9;
+            color: #e41e3f;
+            border: 1px solid #ffa199;
+        }
+
+        /* Стили для отключенных полей */
+        .form-control:disabled {
+            background: #f0f2f5;
+            cursor: not-allowed;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 16px;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .btn-secondary {
+                margin-left: 0;
+            }
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Специальные стили для date input */
+        input[type="date"] {
+            position: relative;
+            padding-right: 40px;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        /* Стили для фокуса на чекбоксе */
+        .form-check-input:focus {
+            outline: 2px solid rgba(24, 119, 242, 0.2);
+            outline-offset: 2px;
+        }
+    </style>
 </head>
+
 <body>
 <div class="container">
     <h2 th:text="${educationDTO.id == null ? 'Добавить образование' : 'Редактировать образование'}"></h2>

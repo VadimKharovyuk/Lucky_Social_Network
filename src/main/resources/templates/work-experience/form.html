@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${workExperienceDTO.id == null ? 'Добавить место работы' : 'Редактировать место работы'}"></title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        /* Основные стили контейнера */
+        .container {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 24px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Заголовок */
+        h2 {
+            color: #1c1e21;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #dadde1;
+        }
+
+        /* Стили для групп форм */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #1c1e21;
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        /* Стили для инпутов */
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            background: #f5f6f7;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+            background: #fff;
+            outline: none;
+        }
+
+        /* Стили для textarea */
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Стили для чекбокса */
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            color: #1c1e21;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        /* Стили для кнопок */
+        .btn {
+            padding: 8px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #1877f2;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #166fe5;
+        }
+
+        .btn-secondary {
+            background: #e4e6eb;
+            color: #050505;
+            margin-left: 8px;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #dadde1;
+        }
+
+        /* Стили для сообщений об ошибках */
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .alert-danger {
+            background: #ffebe9;
+            color: #e41e3f;
+            border: 1px solid #ffa199;
+        }
+
+        /* Стили для date input */
+        input[type="date"] {
+            position: relative;
+            padding-right: 40px;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        /* Стили для отключенных полей */
+        .form-control:disabled {
+            background: #f0f2f5;
+            cursor: not-allowed;
+        }
+
+        /* Стили для обязательных полей */
+        label:after {
+            content: " *";
+            color: #e41e3f;
+        }
+
+        label:not([for="currentWork"]):not([for="endDateGroup"]):not([for="location"]):not([for="industry"]):not([for="description"]):not([for="responsibilities"]):after {
+            content: " *";
+            color: #e41e3f;
+        }
+
+        /* Стили для группы кнопок действий */
+        .form-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 16px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .btn-secondary {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2 th:text="${workExperienceDTO.id == null ? 'Добавить место работы' : 'Редактировать место работы'}"></h2>
+
+    <form th:action="@{${isEdit ?
+                         '/users/' + user.id + '/work/' + workExperienceDTO.id + '/edit' :
+                         '/users/' + user.id + '/work/add'}}"
+          th:object="${workExperienceDTO}"
+          method="post"
+          class="work-form">
+
+        <div class="form-group">
+            <label>Компания</label>
+            <input type="text"
+                   th:field="*{companyName}"
+                   class="form-control"
+                   required>
+            <div class="alert alert-danger"
+                 th:if="${#fields.hasErrors('companyName')}"
+                 th:errors="*{companyName}"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Должность</label>
+            <input type="text"
+                   th:field="*{position}"
+                   class="form-control"
+                   required>
+            <div class="alert alert-danger"
+                 th:if="${#fields.hasErrors('position')}"
+                 th:errors="*{position}"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Дата начала</label>
+            <input type="date"
+                   th:field="*{startDate}"
+                   class="form-control"
+                   required>
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox"
+                   th:field="*{current}"
+                   class="form-check-input"
+                   id="currentWork">
+            <label class="form-check-label" for="currentWork">
+                Текущее место работы
+            </label>
+        </div>
+
+        <div class="form-group" id="endDateGroup">
+            <label>Дата окончания</label>
+            <input type="date"
+                   th:field="*{endDate}"
+                   class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Местоположение</label>
+            <input type="text"
+                   th:field="*{location}"
+                   class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Отрасль</label>
+            <input type="text"
+                   th:field="*{industry}"
+                   class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea th:field="*{description}"
+                      class="form-control"
+                      rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Обязанности</label>
+            <textarea th:field="*{responsibilities}"
+                      class="form-control"
+                      rows="5"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a th:href="@{/users/{userId}/work(userId=${user.id})}"
+               class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('currentWork').addEventListener('change', function () {
+        const endDateGroup = document.getElementById('endDateGroup');
+        const endDateInput = endDateGroup.querySelector('input');
+        endDateInput.disabled = this.checked;
+        if (this.checked) {
+            endDateInput.value = '';
+        }
+    });
+</script>
+</body>
+</html>

@@ -14,6 +14,8 @@ public class LuckySocialNetworkApplication {
         SpringApplication.run(LuckySocialNetworkApplication.class, args);
     }
 
+    //добавить activityPublisher для онлайн
+
 
 
     //docker buildx build --platform linux/amd64 -t lucky1911/lucky_social_network:latest . --push

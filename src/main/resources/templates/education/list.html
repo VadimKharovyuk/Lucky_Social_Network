@@ -3,14 +3,263 @@
 <head>
     <title>Образование</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Базовые стили и поддержка русского языка */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            color: #1c1e21;
+            line-height: 1.5;
+        }
+
+        /* Контейнер */
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Заголовок и кнопка добавления */
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1c1e21;
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Кнопки */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #1877f2;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #166fe5;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        /* Карточка образования */
+        .education-card {
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1c1e21;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 15px;
+            color: #65676b;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        /* Детали образования */
+        .education-details {
+            font-size: 14px;
+            color: #1c1e21;
+        }
+
+        .education-details p {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .education-period {
+            color: #65676b;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        /* Действия с карточкой */
+        .education-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Уведомление об отсутствии данных */
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background: #e8f4fd;
+            color: #0a58ca;
+            border: 1px solid #cfe2ff;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Отступы */
+        .mb-2 {
+            margin-bottom: 8px;
+        }
+
+        .mb-3 {
+            margin-bottom: 16px;
+        }
+
+        /* Улучшенная поддержка шрифтов для русского языка */
+        @font-face {
+            font-family: 'Segoe UI';
+            font-display: swap;
+            src: local('Segoe UI');
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        }
+
+        /* Оптимизация отображения русского текста */
+        h2, h3, p, span, a, button {
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h2 {
+                font-size: 20px;
+                padding: 12px 16px;
+                text-align: center;
+            }
+
+            .mb-3:first-of-type {
+                text-align: center;
+            }
+
+            .card-body {
+                padding: 16px;
+            }
+
+            .card-title {
+                font-size: 16px;
+            }
+
+            .card-subtitle {
+                font-size: 14px;
+            }
+
+            .education-details {
+                font-size: 13px;
+            }
+
+            .education-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Стили для текущего образования */
+        .education-period span:last-child {
+            color: #1877f2;
+            font-weight: 500;
+        }
+
+        /* Улучшенные стили для форм */
+        form {
+            margin: 0;
+        }
+
+        /* Стили для кнопок действий */
+        .education-actions form {
+            flex: 1;
+        }
+
+        .education-actions .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+    </style>
 </head>
+
 <body>
 <div class="container">
     <h2>Образование</h2>
 
     <div th:if="${isOwner}" class="mb-3">
         <a th:href="@{/users/{userId}/education/add(userId=${user.id})}"
-           class="btn btn-primary">Добавить образование</a>
+           class="btn btn-primary">
+            <i class="fas fa-plus"></i> Добавить образование
+        </a>
     </div>
 
     <div th:if="${educationList.empty}" class="alert alert-info">
@@ -38,17 +287,20 @@
                         <span th:if="${education.current}">по настоящее время</span>
                         <span th:unless="${education.current}"
                               th:text="${#temporals.format(education.endDate, 'MM.yyyy')}">
-                            </span>
+                        </span>
                     </p>
                 </div>
 
                 <div th:if="${isOwner}" class="education-actions">
                     <a th:href="@{/users/{userId}/education/{id}/edit(userId=${user.id},id=${education.id})}"
-                       class="btn btn-sm btn-primary">Редактировать</a>
+                       class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </a>
                     <form th:action="@{/users/{userId}/education/{id}/delete(userId=${user.id},id=${education.id})}"
                           method="post" style="display: inline;">
                         <button type="submit" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Вы уверены?')">Удалить
+                                onclick="return confirm('Вы уверены?')">
+                            <i class="fas fa-trash"></i> Удалить
                         </button>
                     </form>
                 </div>

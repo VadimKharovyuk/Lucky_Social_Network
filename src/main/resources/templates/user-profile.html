@@ -989,6 +989,185 @@
             }
         }
 
+        .profile-header {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 168px;
+            height: 168px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+
+        .profile-info {
+            position: relative;
+        }
+
+        .profile-name {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1c1e21;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .details-link {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            color: #1877f2;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .details-link:hover {
+            background: #f0f2f5;
+        }
+
+        .details-link i {
+            font-size: 16px;
+        }
+
+        .birthday-message {
+            background: #e8f4fd;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            color: #0a58ca;
+        }
+
+        .verified-icon {
+            color: #1877f2;
+            font-size: 18px;
+            margin-left: 4px;
+        }
+
+        .online-status-wrapper {
+            margin: 12px 0;
+        }
+
+        .online-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #f0f2f5;
+            font-size: 14px;
+        }
+
+        .online-status.online {
+            color: #31a24c;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #31a24c;
+        }
+
+        .profile-details {
+            margin-top: 16px;
+            color: #65676b;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .profile-details div {
+            margin-bottom: 8px;
+        }
+
+        .profile-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #1877f2;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #166fe5;
+        }
+
+        .btn-secondary {
+            background: #e4e6eb;
+            color: #050505;
+        }
+
+        .btn-secondary:hover {
+            background: #dadde1;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .mb-2 {
+            margin-bottom: 8px;
+        }
+
+        .error-message {
+            padding: 16px;
+            background: #ffebe9;
+            color: #e41e3f;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                padding: 16px;
+            }
+
+            .profile-avatar {
+                width: 120px;
+                height: 120px;
+            }
+
+            .profile-name {
+                font-size: 22px;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1081,7 +1260,7 @@
 
     <div class="profile-container">
         <div class="profile-header">
-            <div class="profile-header">
+            <div>
                 <img th:if="${avatarUrl != null}"
                      th:src="${avatarUrl}"
                      alt="User Avatar" class="profile-avatar">
@@ -1090,49 +1269,48 @@
                      alt="Default Avatar" class="profile-avatar">
             </div>
 
-
             <div class="profile-info">
+                <!-- Ссылка на детали с иконкой -->
+                <a th:href="@{/users/{userId}/details(userId=${user.id})}"
+                   class="details-link">
+                    <i class="fas fa-info-circle"></i>
+                    Подробная информация
+                </a>
+
                 <div th:if="${isBirthday}" class="birthday-message">
                     <h2>Happy Birthday, <span th:text="${user.username}"></span>!</h2>
                     <p>We hope you have a fantastic day!</p>
                 </div>
+
                 <h5>
                     <span th:if="${isEmailVerified}" class="verified-icon" title="Email подтвержден">&#9733;</span>
                 </h5>
-                <div class="profile-header">
 
-                    <!-- Проверяем, заполнены ли имя и фамилия -->
-                    <div th:if="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}">
-                        <h2 class="profile-name">
-                            <span th:text="${user.firstName}">Имя</span>
-                            <span th:text="${user.lastName}">Фамилия</span>
-                        </h2>
-                        <!--                        <p class="profile-username" th:text="${'@' + user.username}">@username</p>-->
-                    </div>
-
-                    <!-- Если имя или фамилия не заполнены, показываем только username -->
-                    <h2 th:unless="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"
-                        class="profile-name" th:text="${'@' + user.username}">username</h2>
+                <!-- Имя пользователя -->
+                <div th:if="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}">
+                    <h2 class="profile-name">
+                        <span th:text="${user.firstName}">Имя</span>
+                        <span th:text="${user.lastName}">Фамилия</span>
+                    </h2>
                 </div>
 
+                <h2 th:unless="${not #strings.isEmpty(user.firstName) and not #strings.isEmpty(user.lastName)}"
+                    class="profile-name" th:text="${'@' + user.username}">username</h2>
 
                 <div class="user-profile">
-                    <!-- Статус онлайн -->
                     <div class="online-status-wrapper" th:data-user-id="${user.id}">
-                        <div class="online-status" th:classappend="${onlineStatus == 'онлайн' ? 'online' : ''}"
+                        <div class="online-status"
+                             th:classappend="${onlineStatus == 'онлайн' ? 'online' : ''}"
                              th:data-initial-status="${onlineStatus}">
                             <span class="status-indicator" th:if="${onlineStatus == 'онлайн'}"></span>
                             <span class="status-text" th:text="${onlineStatus}"></span>
                         </div>
                     </div>
 
-
-                    <!-- Сообщение если пользователь не найден -->
                     <div th:if="${user == null}" class="error-message">
                         Пользователь не найден
                     </div>
                 </div>
-
 
                 <div class="profile-details">
                     <div>День рождения: <span th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}"></span>
@@ -1140,25 +1318,30 @@
                     <div>Город: <span th:text="${user.location}"></span></div>
                     <br>
                     <br>
-                    <div>О себе : <span th:text="${user.getBio()}"></span></div>
+                    <div>О себе: <span th:text="${user.getBio()}"></span></div>
                 </div>
-
 
                 <div class="profile-actions">
                     <form th:if="${currentUser != null && user != null && currentUser.id != user.id && !isFriend}"
                           th:action="@{/users/addFriend}" method="post">
                         <input type="hidden" name="userId" th:value="${currentUser.id}">
                         <input type="hidden" name="friendId" th:value="${user.id}">
-                        <button type="submit" class="btn btn-primary btn-block mb-2">Добавить в друзья</button>
+                        <button type="submit" class="btn btn-primary btn-block mb-2">
+                            <i class="fas fa-user-plus"></i>
+                            Добавить в друзья
+                        </button>
                     </form>
 
-                    <!-- Кнопка "Отправить сообщение" -->
                     <a th:if="${currentUser != null && user != null && currentUser.id != user.id}"
                        th:href="@{/chat/start/{userId}(userId=${user.id})}"
-                       class="btn btn-secondary btn-block">Отправить сообщение</a>
+                       class="btn btn-secondary btn-block">
+                        <i class="fas fa-comment"></i>
+                        Отправить сообщение
+                    </a>
                 </div>
             </div>
         </div>
+
 
         <div class="profile-stats">
             <div class="stat-item">
@@ -1173,6 +1356,13 @@
                 <div class="stat-value" th:text="${user.friendsCount + user.followersCount}">0</div>
                 <div class="stat-label">Контакты</div>
             </div>
+            <!--            <div class="stat-item">-->
+            <!--                <a th:href="@{/users/{userId}/details(userId=${user.id})}"-->
+            <!--                   class="btn btn-info">-->
+            <!--                    <i class="fas fa-info-circle"></i>-->
+            <!--                    Информация о пользователе-->
+            <!--                </a>-->
+            <!--            </div>-->
 
         </div>
         <br>

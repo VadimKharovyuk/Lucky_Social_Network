@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Редактирование интересов</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e4e6eb;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: #1c1e21;
+      margin: 0;
+    }
+
+    .interests-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .interests-section h2 {
+      color: #1c1e21;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #050505;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 12px;
+      border: 1px solid #dddfe2;
+      border-radius: 6px;
+      resize: vertical;
+      font-size: 15px;
+    }
+
+    textarea:focus {
+      border-color: #1877f2;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #65676b;
+      margin-top: 4px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: #1877f2;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #166fe5;
+    }
+
+    .btn-secondary {
+      background: #e4e6eb;
+      color: #050505;
+    }
+
+    .btn-secondary:hover {
+      background: #d8dadf;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      .interests-section {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+
+    <h1>Редактирование интересов</h1>
+    <a th:href="@{/users/{id}/details(id=${user.id})}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Назад
+    </a>
+  </div>
+
+  <form th:action="@{${isNew} ? '/users/' + ${interestsDTO.userId} + '/interests/add' : '/users/' + ${interestsDTO.userId} + '/interests/edit'}"
+        th:object="${interestsDTO}"
+        method="post">
+    <input type="hidden" th:field="*{id}">
+    <input type="hidden" th:field="*{userId}">
+
+    <!-- Музыка -->
+    <div class="interests-section">
+      <h2>Музыкальные предпочтения</h2>
+      <div class="form-group">
+        <label for="favoriteMusic">Любимая музыка</label>
+        <textarea id="favoriteMusic"
+                  th:field="*{favoriteMusic}"
+                  placeholder="Например: Рок, Джаз, Классическая музыка"></textarea>
+        <div class="hint">Укажите ваши любимые жанры и стили музыки</div>
+      </div>
+    </div>
+
+    <!-- Кино и ТВ -->
+    <div class="interests-section">
+      <h2>Кино и ТВ</h2>
+      <div class="form-group">
+        <label for="favoriteMovies">Любимые фильмы</label>
+        <textarea id="favoriteMovies"
+                  th:field="*{favoriteMovies}"
+                  placeholder="Например: Властелин колец, Матрица"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="favoriteTvShows">Любимые сериалы</label>
+        <textarea id="favoriteTvShows"
+                  th:field="*{favoriteTvShows}"
+                  placeholder="Например: Игра престолов, Друзья"></textarea>
+      </div>
+    </div>
+
+    <!-- Книги -->
+    <div class="interests-section">
+      <h2>Литература</h2>
+      <div class="form-group">
+        <label for="favoriteAuthors">Любимые авторы</label>
+        <textarea id="favoriteAuthors"
+                  th:field="*{favoriteAuthors}"
+                  placeholder="Например: Толстой, Достоевский"></textarea>
+      </div>
+    </div>
+
+    <!-- Спорт -->
+    <div class="interests-section">
+      <h2>Спорт и активности</h2>
+      <div class="form-group">
+        <label for="sportsActivities">Спортивные увлечения</label>
+        <textarea id="sportsActivities"
+                  th:field="*{sportsActivities}"
+                  placeholder="Например: Футбол, Йога, Бег"></textarea>
+      </div>
+    </div>
+
+    <!-- Хобби -->
+    <div class="interests-section">
+      <h2>Хобби и навыки</h2>
+      <div class="form-group">
+        <label for="hobbies">Хобби</label>
+        <textarea id="hobbies"
+                  th:field="*{hobbies}"
+                  placeholder="Например: Фотография, Кулинария"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="skills">Навыки</label>
+        <textarea id="skills"
+                  th:field="*{skills}"
+                  placeholder="Например: Игра на гитаре, Программирование"></textarea>
+      </div>
+    </div>
+
+    <!-- Путешествия -->
+    <div class="interests-section">
+      <h2>Путешествия</h2>
+      <div class="form-group">
+        <label for="visitedPlaces">Посещенные места</label>
+        <textarea id="visitedPlaces"
+                  th:field="*{visitedPlaces}"
+                  placeholder="Например: Италия, Франция, Япония"></textarea>
+      </div>
+    </div>
+
+    <!-- Технологии -->
+    <div class="interests-section">
+      <h2>Технологии</h2>
+      <div class="form-group">
+        <label for="techInterests">Технологические интересы</label>
+        <textarea id="techInterests"
+                  th:field="*{techInterests}"
+                  placeholder="Например: AI/ML, Web Development"></textarea>
+      </div>
+    </div>
+
+    <!-- Искусство -->
+    <div class="interests-section">
+      <h2>Искусство и культура</h2>
+      <div class="form-group">
+        <label for="artInterests">Интересы в искусстве</label>
+        <textarea id="artInterests"
+                  th:field="*{artInterests}"
+                  placeholder="Например: Живопись, Театр, Фотография"></textarea>
+      </div>
+    </div>
+
+    <!-- Образование -->
+    <div class="interests-section">
+      <h2>Образование и развитие</h2>
+      <div class="form-group">
+        <label for="learningInterests">Что хотите изучить</label>
+        <textarea id="learningInterests"
+                  th:field="*{learningInterests}"
+                  placeholder="Например: Искусственный интеллект, Психология"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="languages">Языки</label>
+        <textarea id="languages"
+                  th:field="*{languages}"
+                  placeholder="Например: Английский (B2), Испанский (начинающий)"></textarea>
+      </div>
+    </div>
+
+    <!-- Цитаты -->
+    <div class="interests-section">
+      <h2>Любимые цитаты</h2>
+      <div class="form-group">
+        <label for="favoriteQuotes">Цитаты</label>
+        <textarea id="favoriteQuotes"
+                  th:field="*{favoriteQuotes}"
+                  placeholder="Ваши любимые цитаты..."></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a th:href="@{/users/{id}/details(id=${interestsDTO.userId})}"
+         class="btn btn-secondary">Отмена</a>
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+    </div>
+  </form>
+</div>
+</body>
+</html>

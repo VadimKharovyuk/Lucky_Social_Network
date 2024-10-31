@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование информации</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e4e6eb;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #1c1e21;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .form-section h2 {
+            color: #1c1e21;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #050505;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #1c1e21;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            border-color: #1877f2;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: #1877f2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #166fe5;
+        }
+
+        .btn-secondary {
+            background-color: #e4e6eb;
+            color: #050505;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8dadf;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Редактирование профиля</h1>
+        <a th:href="@{/users/{id}/details(id=${user.id})}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <form th:action="@{/users/{id}/details/edit(id=${user.id})}"
+          th:object="${user}"
+          method="post">
+
+        <!-- Основная информация -->
+        <div class="form-section">
+            <h2>Основная информация</h2>
+
+            <div class="form-group">
+                <label for="firstName">Имя</label>
+                <input type="text"
+                       id="firstName"
+                       th:field="*{firstName}"
+                       required>
+                <div class="error-message"
+                     th:if="${#fields.hasErrors('firstName')}"
+                     th:errors="*{firstName}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Фамилия</label>
+                <input type="text"
+                       id="lastName"
+                       th:field="*{lastName}"
+                       required>
+                <div class="error-message"
+                     th:if="${#fields.hasErrors('lastName')}"
+                     th:errors="*{lastName}">
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Контактная информация -->
+        <div class="form-section">
+            <h2>Контактная информация</h2>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email"
+                       id="email"
+                       th:field="*{email}">
+                <div class="error-message"
+                     th:if="${#fields.hasErrors('email')}"
+                     th:errors="*{email}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Телефон</label>
+                <input type="text"
+                       id="phone"
+                       th:field="*{phone}">
+            </div>
+        </div>
+
+        <!-- О себе -->
+        <div class="form-section">
+            <h2>О себе</h2>
+
+            <div class="form-group">
+                <label for="bio">Биография</label>
+                <textarea id="bio"
+                          th:field="*{bio}"
+                          rows="4">
+               </textarea>
+            </div>
+
+
+            <div class="form-actions">
+                <a th:href="@{/users/{id}/details(id=${user.id})}"
+                   class="btn btn-secondary">Отмена</a>
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </div>
+    </form>
+
+</div>
+</body>
+</html>

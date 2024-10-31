@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+
+    <!-- Добавьте эти мета-теги для лучшей поддержки русского языка -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Добавьте шрифт, который хорошо поддерживает кириллицу -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <title th:text="${user.firstName + ' ' + user.lastName + ' - Информация'}">Информация о пользователе</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Основные стили */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #1c1e21;
+        }
+
+        .main-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Стили для боковой панели */
+        .left-sidebar {
+            width: 280px;
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+
+        .side-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .side-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            text-decoration: none;
+            color: #050505;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .side-nav-link:hover {
+            background-color: #f2f2f2;
+        }
+
+        .side-nav-link i {
+            width: 24px;
+            margin-right: 10px;
+            color: #1877f2;
+        }
+
+        /* Основной контент */
+        .content {
+            flex-grow: 1;
+        }
+
+        .user-details-header {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-block {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .section-block:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-block h2 {
+            color: #1c1e21;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e4e6eb;
+        }
+
+        /* Стили для элементов опыта работы и образования */
+        .experience-item, .education-item {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .experience-item:hover, .education-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #65676b;
+            margin-right: 8px;
+        }
+
+        .period {
+            color: #65676b;
+            font-size: 13px;
+        }
+
+        /* Стили для уведомлений */
+        .notification-badge {
+            background: #e41e3f;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 50%;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .notification-list {
+            display: none;
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            padding: 8px 0;
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .notifications:hover .notification-list {
+            display: block;
+        }
+
+        .notification-item {
+            padding: 8px 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f2f2f2;
+        }
+
+        /* Кнопки */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background-color: #e4e6eb;
+            color: #050505;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8dadf;
+        }
+
+        /* Адаптивный дизайн */
+        @media (max-width: 992px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .left-sidebar {
+                width: 100%;
+                position: static;
+                height: auto;
+            }
+        }
+
+
+        .interests-container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .interest-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .interest-section:last-child {
+            border-bottom: none;
+        }
+
+        .interest-section h3 {
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .interest-section h4 {
+            color: #666;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        .interest-section p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .header-actions {
+            margin-bottom: 20px;
+        }
+
+        .actions {
+            margin-top: 10px;
+        }
+
+        .section-container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .work-experience-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 10px 0;
+        }
+
+        .experience-item {
+            flex: 1 1 300px; /* Минимальная ширина 300px, может растягиваться и сжиматься */
+            min-width: 300px; /* Гарантирует минимальную ширину */
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            background: #fff;
+        }
+
+        .experience-content {
+            flex-grow: 1;
+            padding-right: 15px;
+        }
+
+        .experience-content h4 {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .company-name {
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .period {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .period i {
+            margin-right: 5px;
+            color: #777;
+        }
+
+        .description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .experience-actions {
+            display: flex;
+            gap: 5px;
+            align-items: flex-start;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .work-experience-list {
+                gap: 15px;
+            }
+
+            .experience-item {
+                flex-basis: 100%;
+                min-width: 100%;
+            }
+        }
+
+        .section-block {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .education-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 10px 0;
+        }
+
+        .education-item {
+            flex: 1 1 300px;
+            min-width: 300px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            background: #fff;
+        }
+
+        .education-content {
+            flex-grow: 1;
+            padding-right: 15px;
+        }
+
+        .education-content h4 {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .education-type {
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .faculty, .specialization {
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .period {
+            color: #777;
+            font-size: 0.9em;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .period i {
+            color: #666;
+        }
+
+        .education-actions {
+            display: flex;
+            gap: 5px;
+            align-items: flex-start;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .btn-secondary {
+            background-color: #f8f9fa;
+            border-color: #ddd;
+        }
+
+        .btn-danger {
+            background-color: #fff;
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .education-list {
+                gap: 15px;
+            }
+
+            .education-item {
+                flex-basis: 100%;
+                min-width: 100%;
+            }
+
+            .education-content {
+                padding-right: 10px;
+            }
+
+            .education-actions {
+                flex-direction: column;
+            }
+        }
+
+        .user-details-header {
+            padding: 20px;
+            margin-bottom: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            background: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-placeholder i {
+            font-size: 40px;
+            color: #999;
+        }
+
+        .user-info {
+            flex-grow: 1;
+        }
+
+        .user-info h1 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 24px;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .user-header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-avatar {
+                width: 80px;
+                height: 80px;
+            }
+
+            .user-info .btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <!-- Боковая панель -->
+    <aside class="left-sidebar">
+        <nav class="side-nav">
+            <a th:href="@{/profile/{id}(id=${currentUser.id})}" class="side-nav-link">
+                <i class="fas fa-user"></i>
+                <span>Моя Страница</span>
+            </a>
+            <a href="/users/friends" class="side-nav-link">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+            </a>
+            <a href="/albums" class="side-nav-link">
+                <i class="fas fa-images"></i>
+                <span>Мои Фото</span>
+            </a>
+            <a href="/chat/list" class="side-nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Сообщения</span>
+            </a>
+            <a href="/posts" class="side-nav-link">
+                <i class="fas fa-newspaper"></i>
+                <span>Новости</span>
+            </a>
+            <a href="/groups/my" class="side-nav-link">
+                <i class="fas fa-users-rectangle"></i>
+                <span>Группы</span>
+            </a>
+            <div class="side-nav-link notifications">
+                <a href="/notifications" class="notification-link">
+                    <i class="fas fa-bell"></i>
+                    <span>Уведомления</span>
+                    <span th:if="${notificationCount > 0}"
+                          class="notification-badge"
+                          th:text="${notificationCount}">
+            </span>
+                </a>
+                <ul class="notification-list"
+                    th:if="${recentNotifications != null and !recentNotifications.empty}">
+                    <li th:each="notification : ${recentNotifications}" class="notification-item">
+                        <a th:href="@{/notifications/{id}(id=${notification.id})}"
+                           th:text="${notification.message}">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+    </aside>
+
+
+    <div class="content">
+
+        <div class="container">
+            <div class="user-details-header">
+                <div class="user-header-content">
+                    <!-- Аватар пользователя -->
+                    <div class="user-avatar">
+                        <img th:if="${avatar != null}" th:src="${avatar}" alt="Аватар пользователя">
+                        <!-- Заглушка, если аватара нет -->
+                        <div th:if="${avatar == null}" class="avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+
+                    <div class="user-info">
+                        <h1 th:text="${user.firstName + ' ' + user.lastName}">Имя пользователя</h1>
+                        <!-- Кнопка "Вернуться к профилю" -->
+                        <a th:href="@{/profile/{id}(id=${user.id})}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Вернуться к профилю
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-container">
+                <div class="header-actions d-flex justify-content-between align-items-center mb-4">
+                    <h2>Опыт работы</h2>
+                    <div th:if="${isOwner}" class="actions">
+                        <a th:href="@{/users/{id}/work/add(id=${user.id})}"
+                           class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Добавить опыт работы
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Если опыт работы отсутствует -->
+                <div th:if="${user.workExperience.empty}" class="alert alert-info">
+                    <p>Информация об опыте работы отсутствует</p>
+                </div>
+
+                <!-- Список опыта работы -->
+                <div th:if="${!user.workExperience.empty}" class="work-experience-list">
+                    <div th:each="work : ${user.workExperience}" class="experience-item">
+                        <div class="experience-content">
+                            <h4 th:text="${work.position}">Должность</h4>
+                            <p class="company-name" th:text="${work.companyName}">Компания</p>
+                            <p class="period">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span th:text="${#temporals.format(work.startDate, 'MM.yyyy')}"></span> -
+                                <span th:if="${work.current}">по настоящее время</span>
+                                <span th:unless="${work.current}"
+                                      th:text="${#temporals.format(work.endDate, 'MM.yyyy')}"></span>
+                            </p>
+                            <p class="description"
+                               th:if="${work.description != null and !work.description.isEmpty()}"
+                               th:text="${work.description}"></p>
+                        </div>
+
+                        <div th:if="${isOwner}" class="experience-actions">
+                            <a th:href="@{/users/{userId}/work/{id}/edit(userId=${user.id},id=${work.id})}"
+                               class="btn btn-sm btn-secondary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form th:action="@{/users/{userId}/work/{id}/delete(userId=${user.id},id=${work.id})}"
+                                  method="post"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Вы уверены, что хотите удалить этот опыт работы?');">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <div class="header-actions d-flex justify-content-between align-items-center mb-4">
+                    <h2>Образование</h2>
+                    <div th:if="${isOwner}" class="actions">
+                        <a th:href="@{/users/{id}/education/add(id=${user.id})}"
+                           class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Добавить образование
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Если образование отсутствует -->
+                <div th:if="${user.educationHistory.empty}" class="alert alert-info">
+                    <p>Информация об образовании отсутствует</p>
+                </div>
+
+                <!-- Список образования -->
+                <div th:if="${!user.educationHistory.empty}" class="education-list">
+                    <div th:each="edu : ${user.educationHistory}" class="education-item">
+                        <div class="education-content">
+                            <h4 th:text="${edu.institutionName}">Учебное заведение</h4>
+                            <p class="education-type" th:text="${edu.educationType.displayName}">Тип образования</p>
+                            <p class="faculty" th:if="${edu.faculty}" th:text="${'Факультет: ' + edu.faculty}"></p>
+                            <p class="specialization" th:if="${edu.specialization}"
+                               th:text="${'Специализация: ' + edu.specialization}"></p>
+                            <p class="period">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span th:text="${#temporals.format(edu.startDate, 'MM.yyyy')}"></span> -
+                                <span th:if="${edu.current}">по настоящее время</span>
+                                <span th:unless="${edu.current}"
+                                      th:text="${#temporals.format(edu.endDate, 'MM.yyyy')}"></span>
+                            </p>
+                        </div>
+
+                        <div th:if="${isOwner}" class="education-actions">
+                            <a th:href="@{/users/{userId}/education/{id}/edit(userId=${user.id},id=${edu.id})}"
+                               class="btn btn-sm btn-secondary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form th:action="@{/users/{userId}/education/{id}/delete(userId=${user.id},id=${edu.id})}"
+                                  method="post"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Вы уверены, что хотите удалить эту запись об образовании?');">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <a th:href="@{/users/{userId}/interests/add(userId=${user.id})}"
+                   class="btn btn-primary" th:if="${isOwner}">
+                    Добавить интересы
+                </a>
+            </div>
+
+
+            <div class="interests-container">
+                <div class="header-actions d-flex justify-content-between align-items-center">
+                    <h2>Интересы</h2>
+                    <!-- Показываем кнопку редактирования только владельцу профиля -->
+                    <div th:if="${isOwner}" class="actions">
+                        <a th:if="${user.userInterests == null}"
+                           th:href="@{/users/{id}/interests/add(id=${user.id})}"
+                           class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Добавить интересы
+                        </a>
+                        <a th:if="${user.userInterests != null}"
+                           th:href="@{/users/{id}/interests/edit(id=${user.id})}"
+                           class="btn btn-secondary">
+                            <i class="fas fa-edit"></i> Редактировать
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Если интересы отсутствуют -->
+                <div th:if="${user.userInterests == null}" class="alert alert-info">
+                    <p>Информация об интересах отсутствует</p>
+                </div>
+
+                <!-- Если интересы присутствуют -->
+                <div th:if="${user.userInterests != null}" class="interests-sections">
+                    <!-- Музыка -->
+                    <div th:if="${user.userInterests.favoriteMusic != null and !user.userInterests.favoriteMusic.isEmpty()}"
+                         class="interest-section">
+                        <h3>Музыкальные предпочтения</h3>
+                        <p th:text="${user.userInterests.favoriteMusic}"></p>
+                    </div>
+
+                    <!-- Кино и ТВ -->
+                    <div th:if="${user.userInterests.favoriteMovies != null or user.userInterests.favoriteTvShows != null}"
+                         class="interest-section">
+                        <h3>Кино и ТВ</h3>
+                        <div th:if="${user.userInterests.favoriteMovies != null and !user.userInterests.favoriteMovies.isEmpty()}">
+                            <h4>Любимые фильмы</h4>
+                            <p th:text="${user.userInterests.favoriteMovies}"></p>
+                        </div>
+                        <div th:if="${user.userInterests.favoriteTvShows != null and !user.userInterests.favoriteTvShows.isEmpty()}">
+                            <h4>Любимые сериалы</h4>
+                            <p th:text="${user.userInterests.favoriteTvShows}"></p>
+                        </div>
+                    </div>
+
+                    <!-- Литература -->
+                    <div th:if="${user.userInterests.favoriteAuthors != null and !user.userInterests.favoriteAuthors.isEmpty()}"
+                         class="interest-section">
+                        <h3>Литература</h3>
+                        <p th:text="${user.userInterests.favoriteAuthors}"></p>
+                    </div>
+
+                    <!-- Спорт -->
+                    <div th:if="${user.userInterests.sportsActivities != null and !user.userInterests.sportsActivities.isEmpty()}"
+                         class="interest-section">
+                        <h3>Спорт и активности</h3>
+                        <p th:text="${user.userInterests.sportsActivities}"></p>
+                    </div>
+
+                    <!-- Хобби -->
+                    <div th:if="${user.userInterests.hobbies != null or user.userInterests.skills != null}"
+                         class="interest-section">
+                        <h3>Хобби и навыки</h3>
+                        <div th:if="${user.userInterests.hobbies != null and !user.userInterests.hobbies.isEmpty()}">
+                            <h4>Хобби</h4>
+                            <p th:text="${user.userInterests.hobbies}"></p>
+                        </div>
+                        <div th:if="${user.userInterests.skills != null and !user.userInterests.skills.isEmpty()}">
+                            <h4>Навыки</h4>
+                            <p th:text="${user.userInterests.skills}"></p>
+                        </div>
+                    </div>
+
+                    <!-- Путешествия -->
+                    <div th:if="${user.userInterests.visitedPlaces != null and !user.userInterests.visitedPlaces.isEmpty()}"
+                         class="interest-section">
+                        <h3>Путешествия</h3>
+                        <p th:text="${user.userInterests.visitedPlaces}"></p>
+                    </div>
+
+                    <!-- Технологии -->
+                    <div th:if="${user.userInterests.techInterests != null and !user.userInterests.techInterests.isEmpty()}"
+                         class="interest-section">
+                        <h3>Технологии</h3>
+                        <p th:text="${user.userInterests.techInterests}"></p>
+                    </div>
+
+                    <!-- Искусство -->
+                    <div th:if="${user.userInterests.artInterests != null and !user.userInterests.artInterests.isEmpty()}"
+                         class="interest-section">
+                        <h3>Искусство и культура</h3>
+                        <p th:text="${user.userInterests.artInterests}"></p>
+                    </div>
+
+                    <!-- Образование -->
+                    <div th:if="${user.userInterests.learningInterests != null or user.userInterests.languages != null}"
+                         class="interest-section">
+                        <h3>Образование и развитие</h3>
+                        <div th:if="${user.userInterests.learningInterests != null and !user.userInterests.learningInterests.isEmpty()}">
+                            <h4>Интересы в обучении</h4>
+                            <p th:text="${user.userInterests.learningInterests}"></p>
+                        </div>
+                        <div th:if="${user.userInterests.languages != null and !user.userInterests.languages.isEmpty()}">
+                            <h4>Языки</h4>
+                            <p th:text="${user.userInterests.languages}"></p>
+                        </div>
+                    </div>
+
+                    <!-- Цитаты -->
+                    <div th:if="${user.userInterests.favoriteQuotes != null and !user.userInterests.favoriteQuotes.isEmpty()}"
+                         class="interest-section">
+                        <h3>Любимые цитаты</h3>
+                        <p th:text="${user.userInterests.favoriteQuotes}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

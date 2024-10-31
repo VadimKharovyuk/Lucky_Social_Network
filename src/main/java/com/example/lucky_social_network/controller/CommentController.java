@@ -16,7 +16,12 @@ public class CommentController {
     private final CommentService commentService;
     private final UserService userService;
 
-
+    @GetMapping("/edit/{commentId}")
+    public String showEditForm(@PathVariable Long commentId, Model model) {
+        Comment comment = commentService.getCommentById(commentId);
+        model.addAttribute("comment", comment);
+        return "comment/editComment";
+    }
 
     @PostMapping("/add")
     public String addComment(@ModelAttribute("newComment") Comment newComment, @RequestParam Long postId, @RequestParam Long userId) {
@@ -41,12 +46,6 @@ public class CommentController {
         return "redirect:/posts/" + postId;
     }
 
-    @GetMapping("/edit/{commentId}")
-    public String showEditForm(@PathVariable Long commentId, Model model) {
-        Comment comment = commentService.getCommentById(commentId);
-        model.addAttribute("comment", comment);
-        return "comment/editComment";
-    }
 
     @PostMapping("/edit/{commentId}")
     public String updateComment(@PathVariable Long commentId, @RequestParam String content) {

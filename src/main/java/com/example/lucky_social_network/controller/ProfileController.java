@@ -44,6 +44,7 @@ public class ProfileController {
 
         String avatarUrl = userService.getUserAvatarUrl(user);
 
+
         // Добавляем URL аватара в модель, если он существует
         if (avatarUrl != null) {
             model.addAttribute("avatarUrl", avatarUrl);
