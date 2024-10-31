@@ -79,6 +79,7 @@ public class AlbumController {
             model.addAttribute("error", "Ошибка при создании альбома: " + e.getMessage());
             return "albums/create";
         }
+        
     }
 
 

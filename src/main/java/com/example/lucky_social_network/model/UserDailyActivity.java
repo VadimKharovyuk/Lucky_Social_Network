@@ -2,38 +2,65 @@ package com.example.lucky_social_network.model;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+
+@Slf4j
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "user_daily_activity")
-@Data
-public class UserDailyActivity {
+public class UserDailyActivity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "activity_date")
-    private LocalDate activityDate;
+    @Column(nullable = false)
+    private LocalDate date;
 
-    @Column(name = "total_minutes")
-    private Long totalMinutes = 0L;
+    private int loginCount;
 
-    @Column(name = "session_count")
-    private Integer sessionCount = 0;
+    private LocalDateTime lastLoginTime;
 
-    @Column(name = "first_activity")
-    private LocalDateTime firstActivity;
+    private int actionsCount;  // Количество действий пользователя
 
-    @Column(name = "last_activity")
-    private LocalDateTime lastActivity;
+    private long timeSpentSeconds;  // Время, проведенное в системе
 
+    // Конструктор для создания новой активности
+    public UserDailyActivity(User user, LocalDate date) {
+        this.user = user;
+        this.date = date;
+        this.loginCount = 0;
+        this.actionsCount = 0;
+        this.timeSpentSeconds = 0;
+    }
 
+    // Методы для обновления статистики
+    public void incrementLoginCount() {
+        this.loginCount++;
+        this.lastLoginTime = LocalDateTime.now();
+    }
+
+    public void incrementActionsCount() {
+        this.actionsCount++;
+    }
+
+    public void updateTimeSpent(long seconds) {
+        this.timeSpentSeconds += seconds;
+    }
 }
 

@@ -2,6 +2,7 @@ package com.example.lucky_social_network.config;
 
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.UserRepository;
+import com.example.lucky_social_network.service.AuthenticationService;
 import com.example.lucky_social_network.service.UserFirstLoginEvent;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,8 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
     private UserRepository userRepository;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
-
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @Override
     @Transactional
@@ -39,11 +41,15 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("Пользователь не найден: " + username));
 
+            // Обновляем время входа
             updateLoginTime(user);
+
+            // Обрабатываем статистику входа
+            handleLoginStatistics(user);
 
             response.sendRedirect("/posts");
         } catch (Exception e) {
-            log.error("Ошибка при обновлении времени входа: {}", e.getMessage(), e);
+            log.error("Ошибка при обработке входа пользователя: {}", e.getMessage(), e);
             response.sendRedirect("/login?error");
         }
     }
@@ -64,12 +70,9 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
 
         if (isFirstLogin) {
             log.info("Зафиксирован первый вход пользователя: {}", user.getUsername());
-
             publishFirstLoginEvent(updatedUser);
-
         }
     }
-
 
     private void publishFirstLoginEvent(User user) {
         try {
@@ -78,6 +81,17 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
                     user.getUsername());
         } catch (Exception e) {
             log.error("Ошибка при публикации события первого входа: {}", e.getMessage());
+        }
+    }
+
+    private void handleLoginStatistics(User user) {
+        try {
+            // Начинаем отслеживание новой сессии
+            authenticationService.handleLogin(user);
+            log.debug("Статистика входа обработана для пользователя: {}", user.getUsername());
+        } catch (Exception e) {
+            log.error("Ошибка при обработке статистики входа: {}", e.getMessage());
+            // Не прерываем основной процесс аутентификации при ошибке статистики
         }
     }
 }

@@ -49,6 +49,9 @@ public class User implements Serializable {
     @Column(length = 500)
     private String bio;
 
+    @Column(length = 50)
+    private String status;
+
 
     @Column(name = "avatar_dropbox_path")
     private String avatarUrl;
@@ -149,16 +152,12 @@ public class User implements Serializable {
     private Set<Photo> photos = new HashSet<>();
 
 
-    // Общее время на сайте
-    @Column(name = "total_online_time_minutes")
-    private Long totalOnlineTimeMinutes = 0L;
-
-    // Время последней сессии
-    @Column(name = "session_start")
-    private LocalDateTime sessionStart;
-
-    @Column(name = "last_activity")
-    private LocalDateTime lastActivity;
+//    // Время последней сессии
+//    @Column(name = "session_start")
+//    private LocalDateTime sessionStart;
+//
+//    @Column(name = "last_activity")
+//    private LocalDateTime lastActivity;
 
     // Статистика по дням
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -175,9 +174,9 @@ public class User implements Serializable {
 
     public void setUserInterests(UserInterests userInterests) {
         if (userInterests != null) {
-            userInterests.setUser(this); // Устанавливаем ссылку на User в UserInterests
+            userInterests.setUser(this);
         }
-        this.userInterests = userInterests; // Устанавливаем UserInterests в User
+        this.userInterests = userInterests;
     }
 
 

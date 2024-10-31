@@ -21,6 +21,7 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
         this.authorities = getAuthoritiesForUser(user, admin);
     }
+   
 
     private Collection<? extends GrantedAuthority> getAuthoritiesForUser(User user, Admin admin) {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();

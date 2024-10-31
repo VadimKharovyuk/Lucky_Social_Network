@@ -1187,6 +1187,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/users/friends">Друзья</a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="/user/statistics" class="nav-link">Моя статистика</a>
+                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="/chat/list">Сообщения</a>
                     </li>
@@ -1356,13 +1361,6 @@
                 <div class="stat-value" th:text="${user.friendsCount + user.followersCount}">0</div>
                 <div class="stat-label">Контакты</div>
             </div>
-            <!--            <div class="stat-item">-->
-            <!--                <a th:href="@{/users/{userId}/details(userId=${user.id})}"-->
-            <!--                   class="btn btn-info">-->
-            <!--                    <i class="fas fa-info-circle"></i>-->
-            <!--                    Информация о пользователе-->
-            <!--                </a>-->
-            <!--            </div>-->
 
         </div>
         <br>
