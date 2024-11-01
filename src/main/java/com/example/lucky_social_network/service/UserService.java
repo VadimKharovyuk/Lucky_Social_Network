@@ -111,6 +111,7 @@ public class UserService {
             existingUser.setLocation(user.getLocation());
             existingUser.setFirstName(user.getFirstName());
             existingUser.setLastName(user.getLastName());
+            existingUser.setStatusMessage(user.getStatusMessage());
 
             // Сохраняем изменения
             User savedUser = userRepository.save(existingUser);
@@ -224,7 +225,6 @@ public class UserService {
         // Возвращает URL аватара по умолчанию
         return "https://example.com/default-avatar.png";
     }
-
 
     public Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -408,26 +408,6 @@ public class UserService {
     }
 
 
-//    @Transactional
-//    public void updateUserDetails(@Valid User user) {
-//        User existingUser = userRepository.findById(user.getId())
-//                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + user.getId()));
-//
-//        validateUserDetails(user, existingUser);
-//
-//        existingUser.setFirstName(user.getFirstName());
-//        existingUser.setLastName(user.getLastName());
-//
-//        existingUser.setEmail(user.getEmail());
-//        existingUser.setPhone(user.getPhone());
-//        existingUser.setBio(user.getBio());
-//
-//
-//        userRepository.save(existingUser);
-//
-//        log.info("Updated user details for user ID: {}", user.getId());
-//    }
-
     private void validateUserDetails(User user, User existingUser) {
         if (user.getFirstName() != null && user.getFirstName().length() > 50) {
             throw new ValidationException("First name too long");
@@ -475,5 +455,22 @@ public class UserService {
             log.error("Error updating user details for ID {}: {}", user.getId(), e.getMessage());
             throw e;
         }
+    }
+
+
+    @Transactional
+    public void updateUserStatus(Long userId, String newStatus) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        user.setStatusMessage(newStatus);
+        userRepository.save(user);
+        log.info("Status updated for user {}: {}", userId, newStatus);
+    }
+
+    public String getUserStatus(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        return user.getStatusMessage();
     }
 }

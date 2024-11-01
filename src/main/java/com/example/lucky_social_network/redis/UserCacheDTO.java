@@ -31,6 +31,7 @@ public class UserCacheDTO implements Serializable {
     private String bio;
     private LocalDate dateOfBirth;
     private String location;
+    private String statusMessage;
 
 
 
@@ -56,6 +57,7 @@ public class UserCacheDTO implements Serializable {
         dto.setBio(user.getBio());
         dto.setDateOfBirth(user.getDateOfBirth());
         dto.setLocation(user.getLocation());
+//        dto.setStatusMessage(user.getStatusMessage());
 
         // Настройки
         dto.setIsPrivate(user.getIsPrivate());

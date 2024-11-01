@@ -42,4 +42,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Можно также добавить более точный метод, исключающий текущего пользователя
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email = :email AND u.id != :userId")
     boolean existsByEmailAndIdNot(@Param("email") String email, @Param("userId") Long userId);
+
+
 }

@@ -37,6 +37,7 @@ public class ProfileController {
     private final AlbumService albumService;
 
 
+
     //профиль пользователя
     @GetMapping
     public String getProfile(Authentication authentication, Model model) {
@@ -144,6 +145,7 @@ public class ProfileController {
             model.addAttribute("isFriend", isFriend);
             model.addAttribute("user", userProfile);
             model.addAttribute("onlineStatus", onlineStatus);
+            model.addAttribute("fullUser", fullUser);
 
 
             return "user-profile";
@@ -152,9 +154,6 @@ public class ProfileController {
             throw new RuntimeException("Error processing profile request", e);
         }
     }
-
-
-
 
 
     private Long getCurrentUserId() {

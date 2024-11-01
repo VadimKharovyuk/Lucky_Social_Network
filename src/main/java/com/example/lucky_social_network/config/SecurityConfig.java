@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(
                                 "/",
+                                "/luda",
                                 "/chat/send",
                                 "/register",
                                 "/login",

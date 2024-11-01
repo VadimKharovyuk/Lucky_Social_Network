@@ -44,7 +44,7 @@ public class SettingsController {
             model.addAttribute("avatarUrl", avatarUrl);
             model.addAttribute("ticket", new SupportTicket());
             model.addAttribute("user", user);
-            model.addAttribute("userDisplay", userDisplay); // Добавляем DTO
+            model.addAttribute("userDisplay", userDisplay);
             model.addAttribute("passwordChangeDTO", new PasswordChangeDTO());
 
             return "settings/Template";

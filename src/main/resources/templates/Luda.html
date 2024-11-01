@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>С Днём Рождения!</title>
+    <style>
+        /* Базовые мобильные стили для iPhone 11/12/14 */
+        @media only screen
+        and (device-width: 390px)
+        and (device-height: 844px),
+            /* iPhone 12/13 Pro */
+        only screen
+        and (device-width: 428px)
+        and (device-height: 926px),
+            /* iPhone 14 Pro Max */
+        only screen
+        and (max-width: 428px) {
+            /* Общая структура */
+            .container {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            /* Боковые панели */
+            .left-aside,
+            .right-aside {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 15px;
+                margin-bottom: 10px;
+                overflow: visible;
+            }
+
+            .aside-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .aside-content img {
+                width: 150px;
+                height: 150px;
+                object-fit: cover;
+                margin: 10px auto;
+            }
+
+            /* Навигация */
+            .navigation {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                margin: 10px 0;
+            }
+
+            .navigation a {
+                width: calc(50% - 10px);
+                padding: 8px;
+                font-size: 14px;
+                text-align: center;
+            }
+
+            /* Основной контент */
+            main {
+                margin: 0;
+                padding: 10px;
+                width: 100%;
+            }
+
+            section {
+                min-height: auto;
+                padding: 20px;
+                margin: 10px 0;
+            }
+
+            section img {
+                width: 100%;
+                height: auto;
+                margin: 10px 0;
+            }
+
+            /* Заголовки */
+            h1 {
+                font-size: 24px;
+                margin: 10px 0;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin: 8px 0;
+            }
+
+            h3 {
+                font-size: 18px;
+                margin: 6px 0;
+            }
+
+            /* Текст */
+            p {
+                font-size: 16px;
+                line-height: 1.4;
+                margin: 8px 0;
+            }
+
+            /* Счётчик дня рождения */
+            .birthday-counter {
+                padding: 15px;
+                margin: 10px 0;
+                font-size: 14px;
+            }
+
+            #countdown div {
+                font-size: 16px !important;
+                margin: 5px 0 !important;
+            }
+
+            /* Кнопки */
+            .wish-button {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+                margin: 10px 0;
+            }
+
+            /* Поздравительное окно */
+            #wish-container {
+                width: 90vw !important;
+                max-width: none !important;
+                padding: 15px !important;
+            }
+
+            #wish-container div:first-child {
+                font-size: 2em !important;
+            }
+
+            #wish-container div:nth-child(2) {
+                font-size: 1.2em !important;
+            }
+
+            /* Конфетти */
+            .confetti {
+                width: 8px;
+                height: 8px;
+            }
+
+            /* Футер */
+            footer {
+                padding: 20px;
+                margin-top: 30px;
+            }
+
+            /* Улучшения для взаимодействия на тачскрине */
+            .navigation a {
+                transition: background-color 0.3s ease;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .navigation a:active {
+                background-color: var(--accent-color-4);
+                transform: scale(0.98);
+            }
+
+            section img:active {
+                transform: scale(0.98);
+            }
+
+            /* Исправление проблем с прокруткой */
+            body {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Оптимизация для безопасной зоны iPhone */
+            .container {
+                padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            }
+
+            /* Оптимизация для разных ориентаций */
+            @media screen and (orientation: landscape) {
+                .left-aside,
+                .right-aside {
+                    height: auto;
+                    max-height: none;
+                }
+
+                .navigation {
+                    flex-direction: row;
+                }
+
+                .navigation a {
+                    width: auto;
+                    flex: 1;
+                }
+
+                section {
+                    padding: 15px;
+                }
+            }
+
+            /* Исправление для notch */
+            @supports (padding-top: env(safe-area-inset-top)) {
+                .left-aside,
+                .right-aside {
+                    padding-top: calc(env(safe-area-inset-top) + 15px);
+                }
+            }
+
+            /* Оптимизация для тёмной темы */
+            @media (prefers-color-scheme: dark) {
+                .left-aside,
+                .right-aside {
+                    background-color: rgba(0, 0, 0, 0.8);
+                }
+
+                section {
+                    background-color: rgba(0, 0, 0, 0.8);
+                }
+            }
+        }
+
+        /* Специальные стили для iPhone 14 Pro/Pro Max с учётом "Dynamic Island" */
+        @media only screen
+        and (device-width: 430px)
+        and (device-height: 932px),
+            /* iPhone 14 Pro */
+        only screen
+        and (device-width: 393px)
+        and (device-height: 852px) {
+            .container {
+                padding-top: calc(env(safe-area-inset-top) + 20px);
+            }
+
+            .left-aside,
+            .right-aside {
+                padding-top: calc(env(safe-area-inset-top) + 20px);
+            }
+        }
+
+        /* Улучшения производительности для мобильных устройств */
+        @media (max-width: 428px) {
+            * {
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+
+            .container,
+            section,
+            .aside-content {
+                transform: translateZ(0);
+                -webkit-transform: translateZ(0);
+            }
+
+            /* Оптимизация анимаций для мобильных устройств */
+            @keyframes scaleIn {
+                from {
+                    transform: translate(-50%, -50%) scale(0.8);
+                    opacity: 0;
+                }
+                to {
+                    transform: translate(-50%, -50%) scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes scaleOut {
+                from {
+                    transform: translate(-50%, -50%) scale(1);
+                    opacity: 1;
+                }
+                to {
+                    transform: translate(-50%, -50%) scale(0.8);
+                    opacity: 0;
+                }
+            }
+        }
+
+        :root {
+            --background-color: #000000;
+            --text-color: #ffffff;
+            --accent-color-1: #741627;
+            --accent-color-2: #0a0301;
+            --accent-color-3: #e3d43d;
+            --accent-color-4: #4a0e1c;
+            --secondary-color: #070000;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'GothamPRO', Arial, sans-serif;
+            background: linear-gradient(135deg,
+            var(--background-color) 0%,
+            var(--accent-color-4) 25%,
+            var(--accent-color-1) 50%,
+            var(--accent-color-3) 75%,
+            var(--accent-color-2) 100%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .left-aside {
+            width: 300px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            height: 100vh;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .right-aside {
+            width: 300px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            position: fixed;
+            right: 0;
+            height: 100vh;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .aside-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .aside-content img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .aside-content h2 {
+            color: var(--accent-color-3);
+            margin-bottom: 20px;
+        }
+
+        .navigation {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .navigation a {
+            display: block;
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background-color: var(--accent-color-1);
+            transition: background-color 0.3s;
+        }
+
+        .navigation a:hover {
+            background-color: var(--accent-color-4);
+        }
+
+        main {
+            margin: 0 320px;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        section {
+            min-height: 80vh;
+            padding: 40px;
+            margin: 20px 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        section img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        footer {
+            background-color: var(--accent-color-2);
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+            border-radius: 15px;
+        }
+
+        h1, h2, h3 {
+            color: var(--accent-color-3);
+        }
+
+        .personal-message {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: var(--accent-color-4);
+            text-align: center;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-aside, .right-aside {
+                position: relative;
+                width: 100%;
+                height: auto;
+                margin-bottom: 20px;
+            }
+
+            main {
+                margin: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <aside class="left-aside">
+        <div class="aside-content">
+            <img src="https://scontent.ffjr1-6.fna.fbcdn.net/v/t39.30808-6/295546314_2034082843428614_9079360599545058916_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=FsqlL7olgS8Q7kNvgENl69u&_nc_zt=23&_nc_ht=scontent.ffjr1-6.fna&_nc_gid=A-wEzgFEtzJz7A9KmDCvjX7&oh=00_AYDEnQu-SRaHvVJtBzK3GhK-J7X4HfwHDE-Wr7RR63Qiaw&oe=6729C6E9"
+                 alt="Фото именинницы">
+            <h2>Людмила Рыжкова </h2>
+            <div class="navigation">
+                <a href="#section1">Поздравление 1</a>
+                <a href="#section2">Поздравление 2</a>
+                <a href="#section3">Поздравление 3</a>
+                <a href="#section4">Поздравление 4</a>
+                <a href="#section5">Поздравление 5</a>
+            </div>
+
+        </div>
+    </aside>
+
+    <main>
+        <section id="section1">
+            <h1>С Днём Рождения! ✨</h1>
+            <img src="https://scontent.ffjr1-1.fna.fbcdn.net/v/t39.30808-6/461802503_2617202605116632_4251053286397329472_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=a5f93a&_nc_ohc=HTE77lX8X9UQ7kNvgEGy8z7&_nc_zt=23&_nc_ht=scontent.ffjr1-1.fna&_nc_gid=AFJjL7CIAq3V0x_dugwxoVk&oh=00_AYBQdfum5TxxSBwoWLgOMdAdS8BFzZ89ZAJrSu4a4MdjhQ&oe=6729C7AE"
+                 alt="Фото 1">
+            <p>Пусть этот особенный день будет наполнен радостью и счастьем!</p>
+            <section class="running-text-container">
+                <div class="running-text running-text-reverse">
+                    <span>Жизнь – в кайф или тягучее, нудное болото?</span>
+                    <span>Насколько вы довольны своей жизнью?</span>
+                    <span>Как часто вам НЕСТЕРПИМО жить в том, в чем живешь?</span>
+                    <span>Вы хотите перемен или готовы жить так всегда?</span>
+                    <span>Кажется, что выхода из этого серого круга нет?</span>
+                </div>
+            </section>
+        </section>
+
+        <section id="section2">
+            <h2>Желаю тебе... 🌟</h2>
+            <img src="https://scontent.ffjr1-1.fna.fbcdn.net/v/t39.30808-6/456870849_18322610677196404_8429249369866310407_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=pi_89aSMOwUQ7kNvgHG2Orp&_nc_zt=23&_nc_ht=scontent.ffjr1-1.fna&_nc_gid=AfcN8lvpNSyCEy4N3WvkXKz&oh=00_AYD5Pz5YYFCX3v6yOyTRLEzO45eVCZTwObV1yitA2uao2Q&oe=6729D765"
+                 alt="Фото 2">
+            <p>Чтобы каждый день приносил новые возможности и достижения!</p>
+        </section>
+
+        <section id="section3">
+            <h2>Будь счастлива! 🎉</h2>
+            <img src="https://scontent.ffjr1-5.fna.fbcdn.net/v/t39.30808-6/449282869_18314879656196404_8213251665798283266_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=127cfc&_nc_ohc=ij_JlvhGthsQ7kNvgF0mOEY&_nc_zt=23&_nc_ht=scontent.ffjr1-5.fna&_nc_gid=AuKMrTyRfcuccBjuqNn2goz&oh=00_AYAT8fSwsEayTuRN3jAHrXBzmuKVehdHEpDrFe50bYBzJg&oe=6729B212"
+                 alt="Фото 3">
+            <p>Пусть все твои мечты становятся реальностью!</p>
+        </section>
+
+        <section id="section4">
+            <h2>С праздником! 🎂</h2>
+            <img src="https://scontent.ffjr1-4.fna.fbcdn.net/v/t39.30808-6/448684259_18313671190196404_4692970862004758066_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=127cfc&_nc_ohc=AsQQHkv_IwQQ7kNvgGbz6At&_nc_zt=23&_nc_ht=scontent.ffjr1-4.fna&_nc_gid=AZ-myOr-UWqQlUX0psHecTx&oh=00_AYBbmqXP27CoYxC7HRqquZcuoOqBegR5Yhw82nhrRfFKVA&oe=6729C848"
+                 alt="Фото 4">
+            <p>Желаю тебе море улыбок и безграничного счастья!</p>
+        </section>
+
+        <section id="section5">
+            <h2>От всего сердца... 💝</h2>
+            <img src="https://scontent.ffjr1-6.fna.fbcdn.net/v/t39.30808-6/442441174_18310276657196404_5121462673474048633_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=JyxkO4ET5v8Q7kNvgGzbdVZ&_nc_zt=23&_nc_ht=scontent.ffjr1-6.fna&_nc_gid=A2Bws8dEDw8iEXhJGZs_AkD&oh=00_AYDAFvPrAy1O8zSwBUM9uwgJ2TWdiQXpXjuKUc15KF6mug&oe=6729C6D9"
+                 alt="Фото 5">
+            <p>Пусть жизнь будет полна приятных сюрпризов!</p>
+        </section>
+
+        <footer>
+            <h3>С наилучшими пожеланиями!</h3>
+            <p>Пусть этот день рождения станет началом самого прекрасного года в твоей жизни!</p>
+
+            <button onclick="showBirthdayWish()" style="
+    padding: 1em 2em;
+    font-size: 1.2em;
+    background-color: #741627;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+">
+                Получить поздравление 🎉
+            </button>
+        </footer>
+    </main>
+
+    <aside class="right-aside">
+        <div class="aside-content">
+            <img src="https://scontent.ffjr1-2.fna.fbcdn.net/v/t1.6435-9/123467677_2751318768518968_6531396523630604279_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=cFrBJtIzxQwQ7kNvgHcEwRP&_nc_zt=23&_nc_ht=scontent.ffjr1-2.fna&_nc_gid=AZyHADseuso7NvL5Bg_j7RH&oh=00_AYAi9bdaZmSlHcWBF3hrVnZDae7-sduBuTxO6eoppH64Vg&oe=674B469B"
+                 alt="Моё фото">
+            <h2>От меня лично</h2>
+            <div class="personal-message">
+                <p>Дорогая Люда!</p>
+                <p>В этот особенный день хочу пожелать тебе бесконечного счастья, любви и успехов во всём! Пусть каждый
+                    день приносит радость и новые открытия!</p>
+                <p>Твой друг, Вадим</p>
+            </div>
+        </div>
+
+    </aside>
+</div>
+<script>
+    // Массив с поздравлениями
+    const birthdayWishes = [
+        {
+            text: "В этот особенный день желаю тебе безграничного счастья! ✨",
+            emoji: "🌟",
+            color: "#FFD700"
+        },
+        {
+            text: "Пусть каждый день будет наполнен радостью и любовью!",
+            emoji: "💖",
+            color: "#FF69B4"
+        },
+        {
+            text: "Желаю чтобы все твои мечты превращались в реальность!",
+            emoji: "🎆",
+            color: "#4169E1"
+        },
+        {
+            text: "Будь счастлива и люби жизнь так же сильно, как она любит тебя!",
+            emoji: "🌺",
+            color: "#FF1493"
+        },
+        {
+            text: "Пусть этот год принесёт тебе много радостных моментов!",
+            emoji: "🎉",
+            color: "#9370DB"
+        }
+    ];
+
+    // Функция создания эффекта конфетти
+    function createConfetti() {
+        const colors = ['#FFD700', '#FF69B4', '#4169E1', '#FF1493', '#9370DB'];
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDelay = Math.random() * 3 + 's';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            document.body.appendChild(confetti);
+
+            // Удаляем конфетти после анимации
+            setTimeout(() => confetti.remove(), 5000);
+        }
+    }
+
+    // Функция создания всплывающих букв
+    function createFloatingLetters(text, color) {
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.top = '50%';
+        container.style.left = '50%';
+        container.style.transform = 'translate(-50%, -50%)';
+        container.style.zIndex = '1000';
+
+        text.split('').forEach((letter, index) => {
+            const span = document.createElement('span');
+            span.textContent = letter;
+            span.style.color = color;
+            span.style.position = 'relative';
+            span.style.display = 'inline-block';
+            span.style.animation = `floatIn 0.5s ease ${index * 0.1}s forwards`;
+            container.appendChild(span);
+        });
+
+        document.body.appendChild(container);
+        setTimeout(() => container.remove(), 4000);
+    }
+
+    // Основная функция поздравления
+    function showBirthdayWish() {
+        // Получаем случайное поздравление
+        const wish = birthdayWishes[Math.floor(Math.random() * birthdayWishes.length)];
+
+        // Создаем контейнер для поздравления
+        const wishContainer = document.getElementById('wish-container') || document.createElement('div');
+        wishContainer.id = 'wish-container';
+        wishContainer.style.position = 'fixed';
+        wishContainer.style.top = '50%';
+        wishContainer.style.left = '50%';
+        wishContainer.style.transform = 'translate(-50%, -50%)';
+        wishContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        wishContainer.style.padding = '2rem';
+        wishContainer.style.borderRadius = '1rem';
+        wishContainer.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.2)';
+        wishContainer.style.zIndex = '1000';
+        wishContainer.style.textAlign = 'center';
+        wishContainer.style.maxWidth = '80vw';
+        wishContainer.style.animation = 'scaleIn 0.5s ease forwards';
+
+        // Добавляем содержимое
+        wishContainer.innerHTML = `
+        <div style="font-size: 3em; margin-bottom: 0.5em;">${wish.emoji}</div>
+        <div style="font-size: 1.5em; color: ${wish.color}; margin-bottom: 1em;">${wish.text}</div>
+        <button onclick="closeWish()" style="
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 0.5em;
+            background-color: ${wish.color};
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        ">Спасибо! ✨</button>
+    `;
+
+        // Добавляем контейнер на страницу
+        document.body.appendChild(wishContainer);
+
+        // Запускаем эффекты
+        createConfetti();
+        createFloatingLetters(wish.text, wish.color);
+
+        // Добавляем музыкальный эффект (если разрешено в браузере)
+        try {
+            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgA');
+            audio.volume = 0.2;
+            audio.play().catch(() => console.log('Autoplay prevented'));
+        } catch (e) {
+            console.log('Audio playback prevented');
+        }
+    }
+
+    // Функция закрытия поздравления
+    function closeWish() {
+        const wishContainer = document.getElementById('wish-container');
+        if (wishContainer) {
+            wishContainer.style.animation = 'scaleOut 0.5s ease forwards';
+            setTimeout(() => wishContainer.remove(), 500);
+        }
+    }
+
+    // Добавляем необходимые стили
+    const styles = `
+    @keyframes scaleIn {
+        from { transform: translate(-50%, -50%) scale(0); }
+        to { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    @keyframes scaleOut {
+        from { transform: translate(-50%, -50%) scale(1); }
+        to { transform: translate(-50%, -50%) scale(0); }
+    }
+
+    @keyframes floatIn {
+        0% {
+            opacity: 0;
+            transform: translateY(20px) rotate(10deg);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) rotate(0deg);
+        }
+    }
+
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        pointer-events: none;
+        animation: fall 5s linear forwards;
+    }
+
+    @keyframes fall {
+        0% {
+            transform: translateY(-100vh) rotate(0deg);
+        }
+        100% {
+            transform: translateY(100vh) rotate(720deg);
+        }
+    }
+`;
+
+    // Добавляем стили на страницу
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+</script>
+
+
+<script>
+    // Скрипт для дублирования текста в бегущих строках
+    function duplicateRunningText() {
+        const runningTexts = document.querySelectorAll('.running-text');
+        runningTexts.forEach(text => {
+            const originalContent = text.innerHTML;
+            text.innerHTML = originalContent + originalContent;
+        });
+    }
+
+    // Вызываем функцию при загрузке страницы
+    window.addEventListener('load', duplicateRunningText);
+</script>
+</body>
+</html>
+
+

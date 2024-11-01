@@ -1318,12 +1318,21 @@
                 </div>
 
                 <div class="profile-details">
+
                     <div>День рождения: <span th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}"></span>
                     </div>
                     <div>Город: <span th:text="${user.location}"></span></div>
                     <br>
+                    <div>Статус:
+                        <span th:if="${fullUser.statusMessage != null}" th:text="${fullUser.statusMessage}"></span>
+                        <span th:unless="${fullUser.statusMessage != null}">Статус не установлен</span>
+                    </div>
+                    <br>
+                    <br>
                     <br>
                     <div>О себе: <span th:text="${user.getBio()}"></span></div>
+
+
                 </div>
 
                 <div class="profile-actions">

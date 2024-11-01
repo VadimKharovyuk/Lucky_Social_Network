@@ -49,8 +49,9 @@ public class User implements Serializable {
     @Column(length = 500)
     private String bio;
 
-    @Column(length = 50)
-    private String status;
+    // Статус пользователя
+    @Column(name = "status_message", length = 200)
+    private String statusMessage;
 
 
     @Column(name = "avatar_dropbox_path")
@@ -152,13 +153,6 @@ public class User implements Serializable {
     private Set<Photo> photos = new HashSet<>();
 
 
-//    // Время последней сессии
-//    @Column(name = "session_start")
-//    private LocalDateTime sessionStart;
-//
-//    @Column(name = "last_activity")
-//    private LocalDateTime lastActivity;
-
     // Статистика по дням
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserDailyActivity> dailyActivities = new ArrayList<>();
@@ -194,17 +188,6 @@ public class User implements Serializable {
 
     @Column(name = "account_locked")
     private Boolean accountLocked = false;
-
-    // Локализация и персонализация
-    @Column(name = "preferred_language")
-    private String preferredLanguage = "en";
-
-    @Column(name = "timezone")
-    private String timezone;
-
-    // Статус пользователя
-    @Column(name = "status_message", length = 200)
-    private String statusMessage;
 
 
     // Геолокация
