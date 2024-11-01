@@ -3,9 +3,11 @@ package com.example.lucky_social_network.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "social_links")
@@ -35,6 +37,7 @@ public class SocialLink {
     private LocalDateTime updatedAt;
 
     // Перечисление для поддерживаемых платформ
+    @Getter
     public enum SocialPlatform {
         FACEBOOK("Facebook"),
         TWITTER("Twitter"),
@@ -51,8 +54,5 @@ public class SocialLink {
             this.displayName = displayName;
         }
 
-        public String getDisplayName() {
-            return displayName;
-        }
     }
 }
