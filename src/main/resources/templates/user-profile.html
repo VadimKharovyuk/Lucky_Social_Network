@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="user-id" th:content="${user.id}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -1168,6 +1169,165 @@
             }
         }
 
+        .social-links-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .social-links-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .social-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 15px;
+            max-width: 300px;
+        }
+
+        .social-link {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .social-link i {
+            font-size: 20px;
+        }
+
+        /* Стили для Facebook */
+        .social-link.facebook {
+            background-color: #1877f2;
+        }
+
+        .social-link.facebook::after {
+            content: "Facebook";
+        }
+
+        /* Стили для Twitter */
+        .social-link.twitter {
+            background-color: #1da1f2;
+        }
+
+        .social-link.twitter::after {
+            content: "Twitter";
+        }
+
+        /* Стили для Instagram */
+        .social-link.instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+
+        .social-link.instagram::after {
+            content: "Instagram";
+        }
+
+        /* Стили для LinkedIn */
+        .social-link.linkedin {
+            background-color: #0077b5;
+        }
+
+        .social-link.linkedin::after {
+            content: "LinkedIn";
+        }
+
+        /* Стили для GitHub */
+        .social-link.github {
+            background-color: #333333;
+        }
+
+        .social-link.github::after {
+            content: "GitHub";
+        }
+
+        /* Стили для Telegram */
+        .social-link.telegram {
+            background-color: #0088cc;
+        }
+
+        .social-link.telegram::after {
+            content: "Telegram";
+        }
+
+        /* Стили для YouTube */
+        .social-link.youtube {
+            background-color: #ff0000;
+        }
+
+        .social-link.youtube::after {
+            content: "YouTube";
+        }
+
+        /* Стили для TikTok */
+        .social-link.tiktok {
+            background-color: #000000;
+        }
+
+        .social-link.tiktok::after {
+            content: "TikTok";
+        }
+
+        /* Общие стили для тултипа */
+        .social-link::after {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1000;
+        }
+
+        .social-link:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Дополнительные эффекты при наведении */
+        .social-link:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Адаптивность для маленьких экранов */
+        @media (max-width: 768px) {
+            .social-links-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+
+            .social-link {
+                width: 35px;
+                height: 35px;
+            }
+
+            .social-link i {
+                font-size: 18px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1318,7 +1478,6 @@
                 </div>
 
                 <div class="profile-details">
-
                     <div>День рождения: <span th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}"></span>
                     </div>
                     <div>Город: <span th:text="${user.location}"></span></div>
@@ -1328,11 +1487,32 @@
                         <span th:unless="${fullUser.statusMessage != null}">Статус не установлен</span>
                     </div>
                     <br>
-                    <br>
+
+                    <!-- Социальные ссылки -->
+                    <div class="social-links-container" th:if="${not #lists.isEmpty(userLinks)}">
+                        <div class="social-links-title">Социальные сети</div>
+                        <div class="social-links-grid">
+                            <a th:each="link : ${userLinks}"
+                               th:href="${link.url}"
+                               target="_blank"
+                               th:class="'social-link ' + ${#strings.toLowerCase(link.platform)}"
+                               th:data-platform="${link.platform}">
+                                <i th:class="'bi bi-' + ${
+                    link.platform == 'FACEBOOK' ? 'facebook' :
+                    link.platform == 'TWITTER' ? 'twitter' :
+                    link.platform == 'INSTAGRAM' ? 'instagram' :
+                    link.platform == 'LINKEDIN' ? 'linkedin' :
+                    link.platform == 'GITHUB' ? 'github' :
+                    link.platform == 'TELEGRAM' ? 'telegram' :
+                    link.platform == 'YOUTUBE' ? 'youtube' :
+                    link.platform == 'TIKTOK' ? 'tiktok' : 'link'}">
+                                </i>
+                            </a>
+                        </div>
+                    </div>
+
                     <br>
                     <div>О себе: <span th:text="${user.getBio()}"></span></div>
-
-
                 </div>
 
                 <div class="profile-actions">

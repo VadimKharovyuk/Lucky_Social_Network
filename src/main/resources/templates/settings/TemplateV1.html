@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <title>Настройки аккаунта - Lucky Social Network</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<style>
+    /* Корневые переменные с цветами */
+    :root {
+        /* Основные цвета */
+        --dark-primary: #1a1c1e;
+        --dark-secondary: #242628;
+        --dark-tertiary: #2f3235;
+
+        /* Акцентные цвета */
+        --accent-blue: #0ea5e9;
+        --accent-purple: #8b5cf6;
+        --accent-pink: #ec4899;
+        --accent-green: #22c55e;
+        --accent-yellow: #eab308;
+
+        /* Текстовые цвета */
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.7);
+        --text-tertiary: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Основные стили */
+    body {
+        background-color: var(--dark-primary);
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: var(--text-primary);
+    }
+
+    .settings-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Стили заголовка с информацией о пользователе */
+    .settings-header {
+        margin-bottom: 30px;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 25px;
+        background: var(--dark-secondary);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid var(--accent-blue);
+        transition: transform 0.3s ease;
+    }
+
+    .avatar:hover {
+        transform: scale(1.05);
+    }
+
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .user-details h2 {
+        margin: 0;
+        font-size: 26px;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .user-details p {
+        margin: 5px 0 0;
+        color: var(--text-secondary);
+    }
+
+    /* Сетка карточек */
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+    }
+
+    /* Стили карточек */
+    .settings-card {
+        background: var(--dark-secondary);
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .settings-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .settings-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .settings-card:hover::before {
+        opacity: 1;
+    }
+
+    /* Иконки для разных карточек */
+    .settings-card:nth-child(1) .card-icon {
+        background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    }
+
+    .settings-card:nth-child(2) .card-icon {
+        background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+    }
+
+    .settings-card:nth-child(3) .card-icon {
+        background: linear-gradient(135deg, var(--accent-pink), var(--accent-yellow));
+    }
+
+    .settings-card:nth-child(4) .card-icon {
+        background: linear-gradient(135deg, var(--accent-yellow), var(--accent-green));
+    }
+
+    .settings-card:nth-child(5) .card-icon {
+        background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+    }
+
+    .settings-card:nth-child(6) .card-icon {
+        background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    }
+
+    .card-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .settings-card:hover .card-icon {
+        transform: scale(1.1);
+    }
+
+    .card-icon i {
+        font-size: 26px;
+        color: var(--text-primary);
+    }
+
+    .card-content h3 {
+        margin: 0 0 12px;
+        font-size: 20px;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .card-content p {
+        margin: 0 0 20px;
+        color: var(--text-secondary);
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    /* Список настроек */
+    .settings-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 25px;
+    }
+
+    .settings-list li {
+        color: var(--text-tertiary);
+        font-size: 14px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: color 0.2s ease;
+    }
+
+    .settings-list li:hover {
+        color: var(--text-primary);
+    }
+
+    .settings-list li:last-child {
+        border-bottom: none;
+    }
+
+    /* Кнопка настроек */
+    .settings-button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 24px;
+        background: var(--dark-tertiary);
+        border-radius: 12px;
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .settings-button:hover {
+        background: var(--accent-blue);
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+    }
+
+    .settings-button i {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+    }
+
+    .settings-button:hover i {
+        transform: translateX(5px);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .user-info {
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .settings-card {
+            margin-bottom: 15px;
+            padding: 20px;
+        }
+    }
+
+    /* Анимация появления */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .settings-card {
+        animation: fadeInUp 0.5s ease forwards;
+        animation-delay: calc(var(--card-index) * 0.1s);
+    }
+</style>
+<body>
+<div class="settings-container">
+    <!-- Заголовок страницы -->
+    <div class="settings-header">
+        <div class="user-info">
+            <div class="avatar">
+                <img th:if="${avatarUrl != null}" th:src="${avatarUrl}" alt="Profile Picture">
+                <img th:unless="${avatarUrl != null}" src="/api/placeholder/150/150" alt="Default Profile Picture">
+            </div>
+            <div class="user-details">
+                <h2 th:if="${user != null}">
+                        <span th:if="${user.firstName != null and user.lastName != null}"
+                              th:text="${user.firstName + ' ' + user.lastName}"></span>
+                    <span th:unless="${user.firstName != null and user.lastName != null}"
+                          th:text="${user.username}"></span>
+                </h2>
+                <p th:text="${user.email}">email@example.com</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Сетка карточек с настройками -->
+    <div class="settings-grid">
+        <!-- Профиль -->
+        <div class="settings-card">
+            <div class="card-icon">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div class="card-content">
+                <h3>Профиль</h3>
+                <p>Управление личной информацией, контактными данными и основными настройками профиля</p>
+                <ul class="settings-list">
+                    <li>Личная информация</li>
+                    <li>Контактные данные</li>
+                    <li>Настройки профиля</li>
+                </ul>
+                <a th:href="@{/profile}" class="settings-button">
+                    <span>Настроить</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Безопасность -->
+        <div class="settings-card">
+            <div class="card-icon">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div class="card-content">
+                <h3>Безопасность</h3>
+                <p>Защита аккаунта, смена пароля и настройки двухфакторной аутентификации</p>
+                <ul class="settings-list">
+                    <li>Пароль и безопасность</li>
+                    <li>Двухфакторная аутентификация</li>
+                    <li>История входов</li>
+                </ul>
+                <a th:href="@{/settings/password}" class="settings-button">
+                    <span>Настроить</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Приватность -->
+        <div class="settings-card">
+            <div class="card-icon">
+                <i class="bi bi-eye-slash-fill"></i>
+            </div>
+            <div class="card-content">
+                <h3>Приватность</h3>
+                <p>Управление видимостью профиля и настройками конфиденциальности</p>
+                <ul class="settings-list">
+                    <li>Видимость профиля</li>
+                    <li>Статус онлайн</li>
+                    <li>Настройки приватности</li>
+                </ul>
+                <a th:href="@{/aut/forgot-password}" class="settings-button">
+                    <span>Настроить</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Уведомления -->
+        <div class="settings-card">
+            <div class="card-icon">
+                <i class="bi bi-bell-fill"></i>
+            </div>
+            <div class="card-content">
+                <h3>Уведомления</h3>
+                <p>Настройка уведомлений по email и в приложении</p>
+                <ul class="settings-list">
+                    <li>Email уведомления</li>
+                    <li>Уведомления о сообщениях</li>
+                    <li>Системные уведомления</li>
+                </ul>
+                <a th:href="@{/settings/notifications}" class="settings-button">
+                    <span>Настроить</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Социальные сети -->
+        <div class="settings-card">
+            <div class="card-icon">
+                <i class="bi bi-share-fill"></i>
+            </div>
+            <div class="card-content">
+                <h3>Социальные сети</h3>
+                <p>Управление подключенными социальными сетями</p>
+                <ul class="settings-list">
+                    <li>Подключенные аккаунты</li>
+                    <li>Добавление новых сетей</li>
+                    <li th:text="${'Активных подключений: ' + #lists.size(userLinks)}">Активных подключений: 0</li>
+                </ul>
+                <a th:href="@{/social-links/manage}" class="settings-button">
+                    <span>Настроить</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Поддержка -->
+        <div class="settings-card">
+            <div class="card-icon">
+                <i class="bi bi-headset"></i>
+            </div>
+            <div class="card-content">
+                <h3>Поддержка</h3>
+                <p>Техническая поддержка и помощь по работе с сервисом</p>
+                <ul class="settings-list">
+                    <li>Создать обращение</li>
+                    <li>История обращений</li>
+                    <li>Часто задаваемые вопросы</li>
+                </ul>
+                <a th:href="@{/user/tickets}" class="settings-button">
+                    <span>Перейти в поддержку</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

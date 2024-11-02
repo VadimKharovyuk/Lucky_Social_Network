@@ -1,9 +1,11 @@
 package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.dto.PasswordChangeDTO;
+import com.example.lucky_social_network.dto.SocialLinkResponseDTO;
 import com.example.lucky_social_network.dto.UserDisplayDTO;
 import com.example.lucky_social_network.model.SupportTicket;
 import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.service.SocialLinkServiceImpl;
 import com.example.lucky_social_network.service.SupportTicketService;
 import com.example.lucky_social_network.service.UserService;
 import com.example.lucky_social_network.service.picService.ImgurService;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Slf4j
 
 @Controller
@@ -30,6 +34,7 @@ public class SettingsController {
     private final UserService userService;
     private final SupportTicketService supportTicketService;
     private final ImgurService imgurService;
+    private final SocialLinkServiceImpl socialLinkService;
 
     @GetMapping
     public String settings(Model model) {
@@ -40,20 +45,29 @@ public class SettingsController {
             // Создаем DTO для отображения
             UserDisplayDTO userDisplay = UserDisplayDTO.fromUser(user);
 
+            List<SocialLinkResponseDTO> responseDTO = socialLinkService.getAllByUserId(user.getId());
+
             // Добавляем все необходимые атрибуты в модель
+            model.addAttribute("userLinks", responseDTO);
+
             model.addAttribute("avatarUrl", avatarUrl);
             model.addAttribute("ticket", new SupportTicket());
             model.addAttribute("user", user);
             model.addAttribute("userDisplay", userDisplay);
             model.addAttribute("passwordChangeDTO", new PasswordChangeDTO());
 
-            return "settings/Template";
+            return "settings/TemplateV1";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Ошибка при загрузке настроек: " + e.getMessage());
             return "redirect:/login";
         }
     }
 
+    @GetMapping("/password")
+    public String password(Model model) {
+        model.addAttribute("passwordChangeDTO", new PasswordChangeDTO());
+        return "settings/changePassword";
+    }
 
     @PostMapping("/change-password")
     public String changePassword(@Valid @ModelAttribute PasswordChangeDTO passwordChangeDTO,

@@ -10,8 +10,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 @Controller
 @RequestMapping("/user/tickets")
@@ -85,42 +87,42 @@ public class UserTicketController {
     }
 
 
-//    @GetMapping("/form")
-//    public String crateTicketForm(Model model) {
-//        model.addAttribute("ticket", new SupportTicket());
-//        return "support/ticket-form";
-//    }
-//
-//
-//    @PostMapping("/submit")
-//    public String submitTicket(@AuthenticationPrincipal UserDetails userDetails,
-//                               @ModelAttribute("ticket") SupportTicket ticket,
-//                               BindingResult bindingResult,
-//                               RedirectAttributes redirectAttributes) {
-//        if (bindingResult.hasErrors()) {
-//            return "support/ticket-form";
-//        }
-//
-//        try {
-//            // Получаем текущего пользователя из базы данных
-//            User user = userService.getUserByUsername(userDetails.getUsername());
-//
-//            // Создаем тикет с существующим пользователем
-//            SupportTicket createdTicket = supportTicketService.createTicket(
-//                    user,
-//                    ticket.getSubject(),
-//                    ticket.getMessage()
-//            );
-//
-//            redirectAttributes.addFlashAttribute("message",
-//                    "Тикет #" + createdTicket.getId() + " успешно создан");
-//
-//            return "redirect:/user/tickets";
-//
-//        } catch (Exception e) {
-//            redirectAttributes.addFlashAttribute("error",
-//                    "Ошибка при создании тикета: " + e.getMessage());
-//            return "redirect:/user/tickets/create";
-//        }
-//    }
+    @GetMapping("/form")
+    public String crateTicketForm(Model model) {
+        model.addAttribute("ticket", new SupportTicket());
+        return "support/ticket-form";
+    }
+
+
+    @PostMapping("/submit")
+    public String submitTicket(@AuthenticationPrincipal UserDetails userDetails,
+                               @ModelAttribute("ticket") SupportTicket ticket,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "support/ticket-form";
+        }
+
+        try {
+            // Получаем текущего пользователя из базы данных
+            User user = userService.getUserByUsername(userDetails.getUsername());
+
+            // Создаем тикет с существующим пользователем
+            SupportTicket createdTicket = supportTicketService.createTicket(
+                    user,
+                    ticket.getSubject(),
+                    ticket.getMessage()
+            );
+
+            redirectAttributes.addFlashAttribute("message",
+                    "Тикет #" + createdTicket.getId() + " успешно создан");
+
+            return "redirect:/user/tickets";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Ошибка при создании тикета: " + e.getMessage());
+            return "redirect:/user/tickets/create";
+        }
+    }
 }

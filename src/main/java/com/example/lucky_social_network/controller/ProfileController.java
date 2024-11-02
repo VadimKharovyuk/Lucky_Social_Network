@@ -1,6 +1,7 @@
 package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.dto.PostCreationDto;
+import com.example.lucky_social_network.dto.SocialLinkResponseDTO;
 import com.example.lucky_social_network.model.Album;
 import com.example.lucky_social_network.model.Notification;
 import com.example.lucky_social_network.model.Post;
@@ -35,6 +36,7 @@ public class ProfileController {
     private final NotificationService notificationService;
     private final ImgurService imgurService;
     private final AlbumService albumService;
+    private final SocialLinkServiceImpl socialLinkService;
 
 
 
@@ -97,11 +99,13 @@ public class ProfileController {
             // Получаем кэшированные базовые данные
             UserCacheDTO userProfile = userService.getUserProfileById(userId);
 
+
             // Получаем полную сущность для операций, требующих дополнительные данные
             User fullUser = userService.getUserFullProfile(userId);
 
             Long currentUserId = getCurrentUserId();
             User currentUser = userService.getUserFullProfile(currentUserId);
+
 
             // Проверка дня рождения перенесена в сервис
             boolean isBirthday = userService.isBirthdayToday(userId);
@@ -121,11 +125,9 @@ public class ProfileController {
             boolean isFriend = userService.areFriends(currentUserId, userId);
 
             String onlineStatus = userService.getUserOnlineStatus(userId);
-            model.addAttribute("onlineStatus", onlineStatus);
 
-            log.info("Получен пользователь: {}", fullUser.getUsername());
-            log.info("Время последнего входа: {}", fullUser.getLastLogin());
-            log.info("Статус онлайн: {}", onlineStatus);
+            List<SocialLinkResponseDTO> userLinks = socialLinkService.getAllByUserId(currentUser.getId());
+            model.addAttribute("userLinks", userLinks);
 
 
             model.addAttribute("currentUser", currentUser);

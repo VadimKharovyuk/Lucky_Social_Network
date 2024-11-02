@@ -16,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -32,15 +31,11 @@ public class SocialLinkController {
         User currentUser = userService.getCurrentUser();
         List<SocialLinkResponseDTO> userLinks = socialLinkService.getAllByUserId(currentUser.getId());
 
-        SocialLink.SocialPlatform[] platforms = SocialLink.SocialPlatform.values();
-        System.out.println("Available platforms: " + Arrays.toString(platforms)); // Логируем доступные платформы
-
-        model.addAttribute("platforms", platforms);
         model.addAttribute("userLinks", userLinks);
         model.addAttribute("user", currentUser);
         model.addAttribute("createDto", new SocialLinkCreateDTO());
-        model.addAttribute("platforms", SocialLink.SocialPlatform.values()); // Передаем платформы в модель
-        model.addAttribute("link", new SocialLink()); // Новый объект для формы
+        model.addAttribute("platforms", SocialLink.SocialPlatform.values());
+        model.addAttribute("link", new SocialLink());
 
         return "social-links/manage";
     }
@@ -107,10 +102,4 @@ public class SocialLinkController {
         return "redirect:/social-links/manage";
     }
 
-//    // Обработка ошибок
-//    @ExceptionHandler(Exception.class)
-//    public String handleError(Exception e, RedirectAttributes redirectAttributes) {
-//        redirectAttributes.addFlashAttribute("error", "Произошла ошибка: " + e.getMessage());
-//        return "redirect:/social-links/manage";
-//    }
 }
