@@ -47,9 +47,8 @@ public class SettingsController {
 
             List<SocialLinkResponseDTO> responseDTO = socialLinkService.getAllByUserId(user.getId());
 
-            // Добавляем все необходимые атрибуты в модель
-            model.addAttribute("userLinks", responseDTO);
 
+            model.addAttribute("userLinks", responseDTO);
             model.addAttribute("avatarUrl", avatarUrl);
             model.addAttribute("ticket", new SupportTicket());
             model.addAttribute("user", user);
