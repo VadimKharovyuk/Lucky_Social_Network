@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SocialLink {
+public class SocialLink implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,7 +37,6 @@ public class SocialLink {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Перечисление для поддерживаемых платформ
     @Getter
     public enum SocialPlatform {
         FACEBOOK("Facebook"),
