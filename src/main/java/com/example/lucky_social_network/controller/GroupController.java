@@ -77,7 +77,7 @@ public class GroupController {
     @PostMapping("/{groupId}/delete-post/{postId}")
     public String deletePostByIdInGroup(@PathVariable Long groupId, @PathVariable Long postId, RedirectAttributes redirectAttributes) {
         try {
-            groupService.deletePostInGroup(postId);
+            groupContentService.deletePostById(postId);
             redirectAttributes.addFlashAttribute("message", "Пост успешно удален");
         } catch (Exception e) {
             log.error("Error deleting post", e);
@@ -92,7 +92,7 @@ public class GroupController {
 
         boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
         boolean canPost = groupService.canUserPostInGroup(currentUser, group);
-        boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
+        boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
 
         List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
 
@@ -138,7 +138,7 @@ public class GroupController {
         try {
             Group group = groupService.getGroupById(groupId);
             User currentUser = userService.getCurrentUser();
-            boolean isOwner = groupService.isUserOwnerOfGroup(currentUser.getId(), groupId);
+            boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
 
             if (!isOwner) {
                 return "redirect:/groups/" + groupId + "?error=Not+authorized";

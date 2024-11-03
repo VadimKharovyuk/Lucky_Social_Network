@@ -1,11 +1,13 @@
 package com.example.lucky_social_network.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,7 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "groups")
-public class Group {
+public class Group implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,14 +32,14 @@ public class Group {
     @Column(length = 2500)
     private String description;
 
-
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
-
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "group_members",
@@ -48,7 +50,7 @@ public class Group {
 
     @Column(nullable = false)
     private Long membersCount = 0L;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GroupPost> posts = new HashSet<>();
 
@@ -90,7 +92,7 @@ public class Group {
             this.displayName = displayName;
         }
 
-
+        @JsonIgnore
         @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
         private List<GroupRule> rules = new ArrayList<>();
     }

@@ -1,15 +1,15 @@
 package com.example.lucky_social_network.service;
 
 import com.example.lucky_social_network.exception.ResourceNotFoundException;
-import com.example.lucky_social_network.model.Group;
-import com.example.lucky_social_network.model.GroupPost;
-import com.example.lucky_social_network.model.User;
-import com.example.lucky_social_network.model.UserActivityEvent;
+import com.example.lucky_social_network.model.*;
 import com.example.lucky_social_network.repository.GroupContentRepository;
 import com.example.lucky_social_network.repository.GroupRepository;
 import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +35,10 @@ public class GroupService {
     private final GroupContentRepository groupContentRepository;
     private final ActivityPublisher activityPublisher;
 
+    private static final String GROUPS_CACHE = "groups";
+    private static final String GROUP_MEMBERS_CACHE = "group_members";
+    private static final String USER_GROUPS_CACHE = "user_groups";
+
 
     public boolean canUserPostInGroup(User user, Group group) {
         return groupRepository.canUserPostInGroup(group.getId(), user.getId());
@@ -48,49 +52,50 @@ public class GroupService {
         return groupRepository.existsByIdAndOwnerId(groupId, userId);
     }
 
-    public Page<Group> getUserGroups(Long userId, Pageable pageable) {
-        return groupRepository.findUserGroups(userId, pageable);
+
+    @Cacheable(value = GROUPS_CACHE, key = "#id")
+    public Group getGroupById(Long id) {
+        activityPublisher.publishGroupActivity(id, GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
+        return groupRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
     }
 
-    public Page<Group> searchGroups(String query, Pageable pageable) {
-        return groupRepository.findByNameContainingIgnoreCase(query, pageable);
+    @Cacheable(value = GROUPS_CACHE, key = "'all'")
+    public List<Group> getAllGroups() {
+        return groupRepository.findAll();
     }
 
-    @Transactional
-    public Group createGroup(Group group) {
+    @CachePut(value = GROUPS_CACHE, key = "#result.id")
+    public Group createGroup(Group group, User owner) {
+        if (owner == null) {
+            log.info("Owner not provided, attempting to get current user");
+            owner = userService.getCurrentUser();
+        }
+        group.setOwner(owner);
         group.setCreatedAt(LocalDateTime.now());
-        return groupRepository.save(group);
+        group.setMembersCount(1L);
+        group.getMembers().add(owner);
+
+        Group savedGroup = groupRepository.save(group);
+        log.info("Group created successfully with id: {}", savedGroup.getId());
+        return savedGroup;
     }
 
-    @Transactional
-    public void addMember(Long groupId, User user) {
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
-        group.getMembers().add(user);
-        groupRepository.save(group);
+    @Cacheable(value = GROUP_MEMBERS_CACHE, key = "#groupId + '_' + #userId")
+    public boolean isUserMemberOfGroup(Long userId, Long groupId) {
+        return groupRepository.existsByIdAndMembersId(groupId, userId);
     }
 
-    @Transactional
-    public void removeMember(Long groupId, User user) {
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
-        group.getMembers().remove(user);
-        groupRepository.save(group);
+    //    @Cacheable(value = USER_GROUPS_CACHE,
+//            key = "T(String).format('%d_page%d_size%d_%s_%s_%s', #currentUserId, #page, #size, #sortBy, #sortDirection, #type != null ? #type : 'all')")
+    public Page<Group> getCurrentUserGroups(int page, int size, String sortBy, String sortDirection, String type) {
+        Long currentUserId = userService.getCurrentUserId();
+        Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return groupRepository.findByMembersId(currentUserId, pageable);
     }
 
-
-    public void deletePostInGroup(Long postId) {
-        GroupPost post = groupContentRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Пост не найден"));
-
-        Group group = post.getGroup();
-        group.getPosts().remove(post);
-        group.setPostsCount(group.getPostsCount() - 1);
-
-        groupContentRepository.delete(post);
-        groupRepository.save(group);
-    }
-
+    @CachePut(value = GROUPS_CACHE, key = "#result.id")
     @Transactional
     public Group updateGroup(Long groupId, String name, String description, byte[] photoData) {
         Group group = getGroupById(groupId);
@@ -115,7 +120,59 @@ public class GroupService {
 
         Group updatedGroup = groupRepository.save(group);
         log.info("Updated group with id: {}", groupId);
+
+        // Публикуем событие об обновлении группы
+        activityPublisher.publishGroupActivity(groupId, GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
+
         return updatedGroup;
+    }
+
+    @CacheEvict(value = GROUPS_CACHE, key = "#groupId")
+    @Transactional
+    public Group deleteGroupById(Long groupId) {
+        Optional<Group> groupOptional = groupRepository.findById(groupId);
+
+        if (groupOptional.isPresent()) {
+            Group group = groupOptional.get();
+            group.getMembers().clear();
+            group.getPosts().clear();
+            groupRepository.delete(group);
+            return group;
+        } else {
+            throw new RuntimeException("Group not found with id: " + groupId);
+        }
+    }
+
+    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
+            key = "#group.id + '_' + #user.id")
+    @Transactional
+    public void addMember(Group group, User user) {
+        if (group.getType() == Group.GroupType.INTERACTIVE) {
+            if (!group.getMembers().contains(user)) {
+                group.getMembers().add(user);
+                group.setMembersCount(group.getMembersCount() + 1);
+                groupRepository.save(group);
+                log.info("User {} successfully added to group {}", user.getUsername(), group.getName());
+            }
+        } else {
+            throw new IllegalStateException("Cannot add members to a non-interactive group");
+        }
+    }
+
+    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
+            key = "#group.id + '_' + #user.id")
+    @Transactional
+    public void leaveGroup(Group group, User user) {
+        if (group.getType() != Group.GroupType.INTERACTIVE) {
+            throw new IllegalStateException("Can only leave INTERACTIVE type groups");
+        }
+        if (user.equals(group.getOwner())) {
+            throw new IllegalStateException("The owner cannot leave the group");
+        }
+        if (group.getMembers().remove(user)) {
+            group.setMembersCount(group.getMembersCount() - 1);
+            groupRepository.save(group);
+        }
     }
 
     public byte[] getGroupPhoto(Long groupId) {
@@ -136,41 +193,6 @@ public class GroupService {
         }
     }
 
-    @Transactional
-    public Group createGroup(Group group, User owner) {
-
-        if (owner == null) {
-            log.info("Owner not provided, attempting to get current user");
-            owner = userService.getCurrentUser();
-        }
-        group.setOwner(owner);
-        group.setCreatedAt(LocalDateTime.now());
-        group.setMembersCount(1L);
-        group.getMembers().add(owner);
-
-
-        Group savedGroup = groupRepository.save(group);
-        log.info("Group created successfully with id: {}", savedGroup.getId());
-        return savedGroup;
-    }
-
-    @Transactional
-    public void addMember(Group group, User user) {
-        log.info("Adding user {} to group {}", user.getUsername(), group.getName());
-        if (group.getType() == Group.GroupType.INTERACTIVE) {
-            if (!group.getMembers().contains(user)) {
-                group.getMembers().add(user);
-                group.setMembersCount(group.getMembersCount() + 1);
-                groupRepository.save(group);
-                log.info("User {} successfully added to group {}", user.getUsername(), group.getName());
-            } else {
-                log.info("User {} is already a member of group {}", user.getUsername(), group.getName());
-            }
-        } else {
-            log.warn("Cannot add members to non-interactive group {}", group.getName());
-            throw new IllegalStateException("Cannot add members to a non-interactive group");
-        }
-    }
 
     @Transactional
     public void subscribeToGroup(Group group, User user) {
@@ -191,15 +213,7 @@ public class GroupService {
         }
     }
 
-    @Transactional
-    public void removeMember(Group group, User user) {
-        if (group.getMembers().remove(user)) {
-            group.setMembersCount(group.getMembersCount() - 1);
-            groupRepository.save(group);
-        }
-    }
-
-
+    //
     @Transactional
     public GroupPost createPost(Long groupId, User author, String content, byte[] imageData) {
         Group group = groupRepository.findById(groupId)
@@ -245,21 +259,9 @@ public class GroupService {
         return savedPost;
     }
 
-
-    @Transactional
-    public void updateGroupAvatar(Group group, String avatarDropboxPath) {
-        group.setImgurImageUrl(avatarDropboxPath);
-        groupRepository.save(group);
-    }
-
-    @Transactional
-    public void toggleGroupPrivacy(Group group) {
-        group.setIsPrivate(!group.getIsPrivate());
-        groupRepository.save(group);
-    }
-
-
-    // отписки от группы (только для SUBSCRIPTION типа)
+    //
+//
+//    // отписки от группы (только для SUBSCRIPTION типа)
     @Transactional
     public void unsubscribeFromGroup(Group group, User user) {
         if (group.getType() != Group.GroupType.SUBSCRIPTION) {
@@ -271,77 +273,127 @@ public class GroupService {
         }
     }
 
-    // отписки от группы (только для INTERACTIVE типа)
-    @Transactional
-    public void leaveGroup(Group group, User user) {
-        if (group.getType() != Group.GroupType.INTERACTIVE) {
-            throw new IllegalStateException("Can only leave INTERACTIVE type groups");
-        }
-        if (user.equals(group.getOwner())) {
-            throw new IllegalStateException("The owner cannot leave the group");
-        }
-        if (group.getMembers().remove(user)) {
-            group.setMembersCount(group.getMembersCount() - 1);
-            groupRepository.save(group);
-        }
-    }
 
-    public List<Group> getAllGroups() {
-        return groupRepository.findAll();
-    }
+//
+//    public List<Group> getAllGroups() {
+//        return groupRepository.findAll();
+//    }
+//
+//    public Group getGroupById(Long id) {
+//        activityPublisher.publishGroupActivity(id, GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
+//        return groupRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+//    }
+//
+//
+//    public Page<Group> getCurrentUserGroups(int page, int size, String sortBy, String sortDirection, String type) {
+//        Long currentUserId = userService.getCurrentUserId();
+//        Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+//        Pageable pageable = PageRequest.of(page, size, sort);
+//        return groupRepository.findByMembersId(currentUserId, pageable);
+//    }
+//
+//    @Transactional(readOnly = true)
+//    public boolean isUserMemberOfGroup(Long userId, Long groupId) {
+//        return groupRepository.existsByIdAndMembersId(groupId, userId);
+//    }
+//
+//    @Transactional(readOnly = true)
+//    public boolean isUserOwnerOfGroup(Long userId, Long groupId) {
+//        return groupRepository.existsByIdAndOwnerId(groupId, userId);
+//    }
+//
+//
+//    @Transactional
+//    public Group save(Group group) {
+//        activityPublisher.publishGroupActivity(group.getId(), GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
+//        return groupRepository.save(group);
+//    }
+//
+//    public Group findById(Long groupId) {
+//        Optional<Group> group = groupRepository.findById(groupId);
+//        activityPublisher.publishGroupActivity(groupId, GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
+//        return group.orElse(null);
+//    }
+//
+//
+//    @Transactional
+//    public Group deleteGroupById(Long groupId) {
+//        Optional<Group> groupOptional = groupRepository.findById(groupId);
+//
+//        if (groupOptional.isPresent()) {
+//            Group group = groupOptional.get();
+//
+//            // Очищаем связи
+//            group.getMembers().clear();
+//            group.getPosts().clear();
+//
+//            // Удаляем группу
+//            groupRepository.delete(group);
+//
+//            return group;
+//        } else {
+//            throw new RuntimeException("Group not found with id: " + groupId);
+//        }
+//    }
+    //
+//    @Transactional
+//    public void addMember(Group group, User user) {
+//        log.info("Adding user {} to group {}", user.getUsername(), group.getName());
+//        if (group.getType() == Group.GroupType.INTERACTIVE) {
+//            if (!group.getMembers().contains(user)) {
+//                group.getMembers().add(user);
+//                group.setMembersCount(group.getMembersCount() + 1);
+//                groupRepository.save(group);
+//                log.info("User {} successfully added to group {}", user.getUsername(), group.getName());
+//            } else {
+//                log.info("User {} is already a member of group {}", user.getUsername(), group.getName());
+//            }
+//        } else {
+//            log.warn("Cannot add members to non-interactive group {}", group.getName());
+//            throw new IllegalStateException("Cannot add members to a non-interactive group");
+//        }
+//    }
+//
 
-    public Group getGroupById(Long id) {
-        return groupRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
-    }
-
-
-    public Page<Group> getCurrentUserGroups(int page, int size, String sortBy, String sortDirection, String type) {
-        Long currentUserId = userService.getCurrentUserId();
-        Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return groupRepository.findByMembersId(currentUserId, pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean isUserMemberOfGroup(Long userId, Long groupId) {
-        return groupRepository.existsByIdAndMembersId(groupId, userId);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean isUserOwnerOfGroup(Long userId, Long groupId) {
-        return groupRepository.existsByIdAndOwnerId(groupId, userId);
-    }
-
-
-    @Transactional
-    public Group save(Group group) {
-        return groupRepository.save(group);
-    }
-
-    public Group findById(Long groupId) {
-        Optional<Group> group = groupRepository.findById(groupId);
-        return group.orElse(null);
-    }
-
-
-    @Transactional
-    public Group deleteGroupById(Long groupId) {
-        Optional<Group> groupOptional = groupRepository.findById(groupId);
-
-        if (groupOptional.isPresent()) {
-            Group group = groupOptional.get();
-
-            // Очищаем связи
-            group.getMembers().clear();
-            group.getPosts().clear();
-
-            // Удаляем группу
-            groupRepository.delete(group);
-
-            return group;
-        } else {
-            throw new RuntimeException("Group not found with id: " + groupId);
-        }
-    }
+    //
+//    public void deletePostInGroup(Long postId) {
+//        GroupPost post = groupContentRepository.findById(postId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Пост не найден"));
+//
+//        Group group = post.getGroup();
+//        group.getPosts().remove(post);
+//        group.setPostsCount(group.getPostsCount() - 1);
+//
+//        groupContentRepository.delete(post);
+//        groupRepository.save(group);
+//    }
+//
+//    @Transactional
+//    public Group updateGroup(Long groupId, String name, String description, byte[] photoData) {
+//        Group group = getGroupById(groupId);
+//
+//        if (name != null && !name.trim().isEmpty()) {
+//            group.setName(name);
+//        }
+//
+//        if (description != null) {
+//            group.setDescription(description);
+//        }
+//
+//        if (photoData != null && photoData.length > 0) {
+//            String imageUrl = imgurService.uploadImage(photoData);
+//            if (imageUrl != null) {
+//                group.setImgurImageUrl(imageUrl);
+//            } else {
+//                log.error("Failed to upload image for group with id: {}", groupId);
+//                throw new RuntimeException("Failed to upload image to Imgur");
+//            }
+//        }
+//
+//        Group updatedGroup = groupRepository.save(group);
+//        log.info("Updated group with id: {}", groupId);
+//        return updatedGroup;
+//    }
+//
 }

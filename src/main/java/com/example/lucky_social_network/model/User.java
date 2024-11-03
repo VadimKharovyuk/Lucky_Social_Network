@@ -155,12 +155,12 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Photo> photos = new HashSet<>();
 
-
+    @JsonIgnore
     // Статистика по дням
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserDailyActivity> dailyActivities = new ArrayList<>();
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("startDate DESC")
     private List<WorkExperience> workExperience = new ArrayList<>();
@@ -169,6 +169,8 @@ public class User implements Serializable {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserInterests userInterests;
 
+    
+    @JsonIgnore
     @BatchSize(size = 25)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("startDate DESC")
