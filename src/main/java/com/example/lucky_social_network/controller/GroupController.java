@@ -228,7 +228,9 @@ public class GroupController {
 
     @GetMapping("/create")
     public String showCreateForm(Model model) {
+        Long CurrentUser = userService.getCurrentUser().getId();
         model.addAttribute("group", new Group());
+        model.addAttribute("currentUser", CurrentUser);
         return "groups/create";
     }
 
