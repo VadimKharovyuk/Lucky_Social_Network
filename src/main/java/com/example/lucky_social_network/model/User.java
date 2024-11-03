@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.BatchSize;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 @Slf4j
 @Getter
 @Setter
@@ -23,6 +23,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
+@BatchSize(size = 25)
 public class User implements Serializable {
 
     @Id
@@ -80,7 +81,8 @@ public class User implements Serializable {
 
     // Также проверьте другие связи
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @BatchSize(size = 25)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_friends",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -159,23 +161,16 @@ public class User implements Serializable {
     private List<UserDailyActivity> dailyActivities = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("startDate DESC")
     private List<WorkExperience> workExperience = new ArrayList<>();
 
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserInterests userInterests;
 
-    public void setUserInterests(UserInterests userInterests) {
-        if (userInterests != null) {
-            userInterests.setUser(this);
-        }
-        this.userInterests = userInterests;
-    }
-
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @BatchSize(size = 25)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("startDate DESC")
     private List<Education> educationHistory = new ArrayList<>();
 

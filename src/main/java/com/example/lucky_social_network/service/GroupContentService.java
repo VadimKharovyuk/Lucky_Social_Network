@@ -97,5 +97,5 @@ public class GroupContentService {
         groupContentRepository.save(originalPost);
     }
 
-    // Дополнительные методы по мере необходимости
+
 }

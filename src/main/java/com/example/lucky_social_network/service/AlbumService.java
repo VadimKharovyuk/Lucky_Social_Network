@@ -17,7 +17,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
+
+@Transactional(readOnly = true)
 public class AlbumService {
     private final AlbumRepository albumRepository;
     public final ActivityPublisher activityPublisher;
@@ -53,7 +54,7 @@ public class AlbumService {
 
     // Получение всех публичных альбомов пользователя
     public Page<Album> getPublicAlbumsByUserId(Long userId, Pageable pageable) {
-        return albumRepository.findByOwnerIdAndIsPrivateFalse(userId, pageable);
+        return albumRepository.findPublicAlbums(userId, pageable);
     }
 
     // Получение всех альбомов пользователя (для владельца)
@@ -110,7 +111,7 @@ public class AlbumService {
                 .orElseThrow(() -> new ResourceNotFoundException("Album not found with id: " + albumId));
         return album.getOwner().getId().equals(user.getId());
     }
-
+    
     // Получение общего количества фотографий во всех альбомах пользователя
     public long getTotalPhotosCount(Long userId) {
         return albumRepository.findByOwnerId(userId).stream()

@@ -36,6 +36,49 @@ public class GroupService {
     private final ActivityPublisher activityPublisher;
 
 
+    public boolean canUserPostInGroup(User user, Group group) {
+        return groupRepository.canUserPostInGroup(group.getId(), user.getId());
+    }
+
+    public boolean isMember(Long groupId, Long userId) {
+        return groupRepository.existsByIdAndMembersId(groupId, userId);
+    }
+
+    public boolean isOwner(Long groupId, Long userId) {
+        return groupRepository.existsByIdAndOwnerId(groupId, userId);
+    }
+
+    public Page<Group> getUserGroups(Long userId, Pageable pageable) {
+        return groupRepository.findUserGroups(userId, pageable);
+    }
+
+    public Page<Group> searchGroups(String query, Pageable pageable) {
+        return groupRepository.findByNameContainingIgnoreCase(query, pageable);
+    }
+
+    @Transactional
+    public Group createGroup(Group group) {
+        group.setCreatedAt(LocalDateTime.now());
+        return groupRepository.save(group);
+    }
+
+    @Transactional
+    public void addMember(Long groupId, User user) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+        group.getMembers().add(user);
+        groupRepository.save(group);
+    }
+
+    @Transactional
+    public void removeMember(Long groupId, User user) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+        group.getMembers().remove(user);
+        groupRepository.save(group);
+    }
+
+
     public void deletePostInGroup(Long postId) {
         GroupPost post = groupContentRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Пост не найден"));
@@ -202,16 +245,6 @@ public class GroupService {
         return savedPost;
     }
 
-    @Transactional(readOnly = true)
-    public boolean canUserPostInGroup(User user, Group group) {
-        if (group.getType() == Group.GroupType.SUBSCRIPTION) {
-            return user.equals(group.getOwner());
-        } else if (group.getType() == Group.GroupType.INTERACTIVE) {
-            return group.getMembers().contains(user);
-        }
-        return false;
-    }
-
 
     @Transactional
     public void updateGroupAvatar(Group group, String avatarDropboxPath) {
@@ -291,26 +324,6 @@ public class GroupService {
         return group.orElse(null);
     }
 
-    @Transactional(readOnly = true)
-    public boolean isMember(Long userId, Long groupId) {
-        Optional<Group> groupOptional = groupRepository.findById(groupId);
-        Optional<User> userOptional = userService.findById(userId);
-
-        if (groupOptional.isPresent() && userOptional.isPresent()) {
-            Group group = groupOptional.get();
-            User user = userOptional.get();
-
-            // Проверяем, является ли пользователь владельцем группы
-            if (group.getOwner().equals(user)) {
-                return true;
-            }
-
-            // Проверяем, есть ли пользователь в списке участников группы
-            return group.getMembers().contains(user);
-        }
-
-        return false;
-    }
 
     @Transactional
     public Group deleteGroupById(Long groupId) {

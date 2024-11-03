@@ -21,7 +21,7 @@ import java.time.LocalDate;
 public class UserCacheDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    // Основные данные профиля (часто используются, редко меняются)
+
     private Long id;
     private String username;
     private String firstName;
@@ -33,8 +33,7 @@ public class UserCacheDTO implements Serializable {
     private String location;
     private String statusMessage;
 
-
-
+    
     // Базовые настройки профиля
     private Boolean isPrivate;
     private Boolean emailVerified;

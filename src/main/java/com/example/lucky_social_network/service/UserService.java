@@ -41,7 +41,6 @@ public class UserService {
     private final ActivityPublisher activityPublisher;
     private final UserActivityService userActivityService;
 
-
     @EventListener
     @Transactional
     public void onUserActivity(UserActivityEvent event) {
@@ -324,7 +323,6 @@ public class UserService {
     }
 
 
-
     @Transactional(readOnly = true)
     public String getUserOnlineStatus(Long userId) {
         log.debug("Получение статуса пользователя: {}", userId);
@@ -472,5 +470,10 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         return user.getStatusMessage();
+    }
+
+    public User getUserWithWorkExperience(Long id) {
+        return userRepository.findUserWithWorkExperience(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 }

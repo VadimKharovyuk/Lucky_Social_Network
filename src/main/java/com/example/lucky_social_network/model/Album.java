@@ -15,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+
 public class Album {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -197,7 +197,7 @@ public class GroupController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection,
-            @RequestParam(required = false) String type, // Добавлен параметр типа
+            @RequestParam(required = false) String type,
             Model model) {
 
         Page<Group> groupPage = groupService.getCurrentUserGroups(page, size, sortBy, sortDirection, type);

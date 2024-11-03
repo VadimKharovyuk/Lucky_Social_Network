@@ -26,7 +26,8 @@ public class WorkExperienceController {
     @GetMapping
     public String showWorkExperienceList(@PathVariable Long userId, Model model) {
         User currentUser = userService.getCurrentUser();
-        User targetUser = userService.getUserById(userId);
+       
+        User targetUser = userService.getUserWithWorkExperience(userId);
 
         model.addAttribute("workExperienceList", workExperienceService.getAllWorkExperience(userId));
         model.addAttribute("user", targetUser);
