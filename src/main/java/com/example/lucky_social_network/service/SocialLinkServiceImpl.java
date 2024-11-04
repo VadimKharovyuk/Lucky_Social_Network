@@ -30,6 +30,7 @@ public class SocialLinkServiceImpl implements SocialLinkService {
     private final SocialLinkRepository socialLinkRepository;
     private final SocialLinkMapper socialLinkMapper;
     private final UserRepository userRepository;
+    private final UserService userService;
 
 
     private static final String SOCIAL_LINK_CACHE = "socialLink";
@@ -41,15 +42,15 @@ public class SocialLinkServiceImpl implements SocialLinkService {
     })
     @CacheEvict(value = USER_SOCIAL_LINKS_CACHE, key = "#dto.userId")  // Только очищаем кэш списка
     public SocialLinkResponseDTO create(SocialLinkCreateDTO dto) {
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + dto.getUserId()));
+        User currentUser = userService.getCurrentUser();
 
-        if (socialLinkRepository.existsByUserIdAndPlatform(dto.getUserId(), dto.getPlatform())) {
+        // Проверяем, нет ли уже такой платформы у текущего пользователя
+        if (socialLinkRepository.existsByUserIdAndPlatform(currentUser.getId(), dto.getPlatform())) {
             throw new DuplicateResourceException("Social link for platform " + dto.getPlatform() + " already exists");
         }
 
         SocialLink socialLink = socialLinkMapper.toEntity(dto);
-        socialLink.setUser(user);
+        socialLink.setUser(currentUser);  // Устанавливаем только текущего пользователя
         socialLink.setCreatedAt(LocalDateTime.now());
         socialLink.setUpdatedAt(LocalDateTime.now());
 

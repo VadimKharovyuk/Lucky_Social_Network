@@ -14,7 +14,8 @@ import java.util.Optional;
 public interface SocialLinkRepository extends JpaRepository<SocialLink, Long> {
     // Найти ссылку по userId и платформе
     Optional<SocialLink> findByUserIdAndPlatform(Long userId, SocialLink.SocialPlatform platform);
-    
+
+
     @Query("SELECT sl FROM SocialLink sl WHERE sl.user.id = :userId")
     List<SocialLink> findByUserId(@Param("userId") Long userId);
 

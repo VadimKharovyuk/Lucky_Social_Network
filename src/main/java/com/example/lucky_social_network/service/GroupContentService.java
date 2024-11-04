@@ -13,8 +13,7 @@ import java.util.Optional;
 public class GroupContentService {
 
     private final GroupContentRepository groupContentRepository;
-    private final ActivityPublisher activityPublisher;
-
+   
 
     public GroupPost findById(Long postId) {
         Optional<GroupPost> post = groupContentRepository.findById(postId);

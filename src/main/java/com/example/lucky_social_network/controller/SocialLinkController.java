@@ -26,6 +26,7 @@ public class SocialLinkController {
     private final SocialLinkService socialLinkService;
     private final UserService userService;
 
+
     @GetMapping("/manage")
     public String manageSocialLinks(Model model) {
         User currentUser = userService.getCurrentUser();

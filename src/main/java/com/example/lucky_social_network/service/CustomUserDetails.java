@@ -67,25 +67,17 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true; // Вы можете добавить проверку статуса пользователя здесь в будущем
+        return true;
     }
 
     public Long getId() {
         return this.user.getId();
     }
 
-    // Дополнительный метод для проверки, является ли пользователь админом
+
     public boolean isAdmin() {
         return authorities.stream()
                 .anyMatch(a -> a.getAuthority().startsWith("ROLE_ADMIN"));
     }
 
-    // Метод для получения роли админа (если есть)
-    public String getAdminRole() {
-        return authorities.stream()
-                .filter(a -> a.getAuthority().startsWith("ROLE_") && !a.getAuthority().equals("ROLE_USER") && !a.getAuthority().equals("ROLE_ADMIN"))
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElse(null);
-    }
 }
