@@ -40,6 +40,20 @@ public class GroupController {
     private final PostService postService;
     private final PollServiceImpl pollService;
 
+    @PostMapping("/{groupId}/join")
+    public String joinGroup(@PathVariable Long groupId) {
+        User currentUser = userService.getCurrentUser();
+        Group group = groupService.getGroupById(groupId);
+
+        if (group.getType() == Group.GroupType.INTERACTIVE) {
+            groupService.addMember(group, currentUser);
+
+        } else {
+            groupService.subscribeToGroup(group, currentUser);
+        }
+        return "redirect:/groups/" + groupId;
+    }
+
     @GetMapping("/{groupId}")
     public String showGroup(@PathVariable Long groupId, Model model) {
         Group group = groupService.getGroupById(groupId);
@@ -212,19 +226,7 @@ public class GroupController {
     }
 
 
-    @PostMapping("/{groupId}/join")
-    public String joinGroup(@PathVariable Long groupId) {
-        User currentUser = userService.getCurrentUser();
-        Group group = groupService.getGroupById(groupId);
 
-        if (group.getType() == Group.GroupType.INTERACTIVE) {
-            groupService.addMember(group, currentUser);
-
-        } else {
-            groupService.subscribeToGroup(group, currentUser);
-        }
-        return "redirect:/groups/" + groupId;
-    }
 
     @GetMapping("/my")
     public String getCurrentUserGroups(

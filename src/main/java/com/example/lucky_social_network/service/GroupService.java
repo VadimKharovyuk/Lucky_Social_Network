@@ -7,9 +7,6 @@ import com.example.lucky_social_network.repository.GroupRepository;
 import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +50,7 @@ public class GroupService {
     }
 
 
-    @Cacheable(value = GROUPS_CACHE, key = "#id")
+    //    @Cacheable(value = GROUPS_CACHE, key = "#id")
     public Group getGroupById(Long id) {
         activityPublisher.publishGroupActivity(id, GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
         return groupRepository.findById(id)
@@ -61,13 +58,13 @@ public class GroupService {
     }
 
 
-    //при лобавлние новой групы она не попадает в кеш
-    @Cacheable(value = GROUPS_CACHE, key = "'all'")
+    //    //при лобавлние новой групы она не попадает в кеш
+//    @Cacheable(value = GROUPS_CACHE, key = "'all'")
     public List<Group> getAllGroups() {
         return groupRepository.findAll();
     }
 
-    @CachePut(value = GROUPS_CACHE, key = "#result.id")
+    //    @CachePut(value = GROUPS_CACHE, key = "#result.id")
     public Group createGroup(Group group, User owner) {
         if (owner == null) {
             log.info("Owner not provided, attempting to get current user");
@@ -83,7 +80,7 @@ public class GroupService {
         return savedGroup;
     }
 
-    @Cacheable(value = GROUP_MEMBERS_CACHE, key = "#groupId + '_' + #userId")
+    //    @Cacheable(value = GROUP_MEMBERS_CACHE, key = "#groupId + '_' + #userId")
     public boolean isUserMemberOfGroup(Long userId, Long groupId) {
         return groupRepository.existsByIdAndMembersId(groupId, userId);
     }
@@ -97,7 +94,7 @@ public class GroupService {
         return groupRepository.findByMembersId(currentUserId, pageable);
     }
 
-    @CachePut(value = GROUPS_CACHE, key = "#result.id")
+    //    @CachePut(value = GROUPS_CACHE, key = "#result.id")
     @Transactional
     public Group updateGroup(Long groupId, String name, String description, byte[] photoData) {
         Group group = getGroupById(groupId);
@@ -129,7 +126,7 @@ public class GroupService {
         return updatedGroup;
     }
 
-    @CacheEvict(value = GROUPS_CACHE, key = "#groupId")
+    //    @CacheEvict(value = GROUPS_CACHE, key = "#groupId")
     @Transactional
     public Group deleteGroupById(Long groupId) {
         Optional<Group> groupOptional = groupRepository.findById(groupId);
@@ -145,24 +142,44 @@ public class GroupService {
         }
     }
 
-    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
-            key = "#group.id + '_' + #user.id")
+    //    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
+//            key = "#group.id + '_' + #user.id")
     @Transactional
     public void addMember(Group group, User user) {
         if (group.getType() == Group.GroupType.INTERACTIVE) {
-            if (!group.getMembers().contains(user)) {
-                group.getMembers().add(user);
-                group.setMembersCount(group.getMembersCount() + 1);
-                groupRepository.save(group);
-                log.info("User {} successfully added to group {}", user.getUsername(), group.getName());
+            // Перезагружаем группу из базы данных
+            Group freshGroup = groupRepository.findById(group.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+
+            if (!freshGroup.getMembers().contains(user)) {
+                freshGroup.getMembers().add(user);
+                freshGroup.setMembersCount(freshGroup.getMembersCount() + 1);
+                groupRepository.save(freshGroup);
+                log.info("User {} successfully added to group {}", user.getUsername(), freshGroup.getName());
             }
         } else {
             throw new IllegalStateException("Cannot add members to a non-interactive group");
         }
     }
 
-    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
-            key = "#group.id + '_' + #user.id")
+//    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
+//            key = "#group.id + '_' + #user.id")
+//    @Transactional
+//    public void addMember(Group group, User user) {
+//        if (group.getType() == Group.GroupType.INTERACTIVE) {
+//            if (!group.getMembers().contains(user)) {
+//                group.getMembers().add(user);
+//                group.setMembersCount(group.getMembersCount() + 1);
+//                groupRepository.save(group);
+//                log.info("User {} successfully added to group {}", user.getUsername(), group.getName());
+//            }
+//        } else {
+//            throw new IllegalStateException("Cannot add members to a non-interactive group");
+//        }
+//    }
+
+    //    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
+//            key = "#group.id + '_' + #user.id")
     @Transactional
     public void leaveGroup(Group group, User user) {
         if (group.getType() != Group.GroupType.INTERACTIVE) {

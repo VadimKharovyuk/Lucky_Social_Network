@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${poll.question}">Poll Question</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* Основные стили */
+        /* Основные стили остаются те же */
         body {
             margin: 0;
             padding: 0;
@@ -12,12 +13,15 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
-        /* Навигация */
+        /* Навигация - обновленная */
         .nav-bar {
             background: #fff;
             padding: 1rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .nav-content {
@@ -26,187 +30,259 @@
             display: flex;
             align-items: center;
             gap: 20px;
+            padding: 0 15px;
         }
 
-        .back-button {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            color: #666;
-            transition: color 0.3s;
-        }
-
-        .back-button:hover {
-            color: #007bff;
-        }
-
-        /* Основной контейнер */
+        /* Основной контейнер - обновленный */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 15px;
             display: grid;
             grid-template-columns: 1fr 350px;
             gap: 30px;
         }
 
-        /* Основная секция */
-        .main-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .poll-header {
-            margin-bottom: 30px;
-        }
-
-        .poll-title {
-            font-size: 2em;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .poll-description {
-            color: #666;
-            font-size: 1.1em;
-            line-height: 1.5;
-        }
-
-        .poll-meta {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            color: #888;
-            font-size: 0.9em;
-        }
-
-        /* Варианты ответов */
-        .poll-options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .option-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .option-card:hover {
-            background: #e9ecef;
-            transform: translateY(-2px);
-        }
-
-        /* Боковая панель */
-        aside {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .results-section {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .section-title {
-            font-size: 1.2em;
-            color: #333;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
-        }
-
-        /* Статистика */
-        .stats-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .stats-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            color: #666;
-        }
-
-        /* Прогресс-бар */
-        .progress {
-            height: 20px;
-            background: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 8px 0;
-        }
-
-        .progress-bar {
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.9em;
-            transition: width 0.6s ease;
-        }
-
-        /* Адаптивный дизайн */
+        /* Адаптивные стили - расширенные */
         @media (max-width: 1024px) {
             .container {
                 grid-template-columns: 1fr;
+                gap: 20px;
             }
 
             aside {
                 order: -1;
             }
-        }
 
-        .delete-button {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            background-color: #dc3545;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-        }
-
-        .delete-button:hover {
-            background-color: #c82333;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
-        }
-
-        .delete-button i {
-            font-size: 1.1em;
+            .main-section, .results-section {
+                padding: 20px;
+            }
         }
 
         @media (max-width: 768px) {
+            .nav-bar {
+                padding: 0.75rem;
+            }
+
+            .nav-content {
+                padding: 0 10px;
+            }
+
+            .container {
+                padding: 0 10px;
+            }
+
+            .poll-title {
+                font-size: 1.5em;
+            }
+
+            .poll-description {
+                font-size: 1em;
+            }
+
             .poll-header-top {
                 flex-direction: column;
+                gap: 15px;
             }
 
             .poll-actions {
                 width: 100%;
-                justify-content: flex-end;
             }
 
             .delete-button {
-                width: auto;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .option-card {
+                padding: 15px;
+            }
+
+            .progress {
+                height: 16px;
+            }
+
+            .progress-bar {
+                font-size: 0.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-section, .results-section {
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            .poll-meta {
+                font-size: 0.8em;
+                flex-wrap: wrap;
+            }
+
+            .stats-card {
+                padding: 10px;
+            }
+
+            .section-title {
+                font-size: 1.1em;
+            }
+
+            .option-card {
+                padding: 12px;
+            }
+
+            /* Улучшаем отображение чекбоксов и радио кнопок на мобильных */
+            input[type="checkbox"],
+            input[type="radio"] {
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+            }
+
+            .option-label {
+                display: flex;
+                align-items: center;
+                min-height: 44px; /* Минимальная высота для удобного тапа */
+            }
+        }
+
+        /* Улучшения для тач-устройств */
+        @media (hover: none) {
+            .option-card {
+                transition: none;
+            }
+
+            .option-card:active {
+                background: #e9ecef;
+                transform: scale(0.98);
+            }
+
+            .delete-button:active {
+                transform: scale(0.98);
+            }
+
+            /* Увеличиваем области касания */
+            .back-button {
+                padding: 8px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+
+            .option-label {
+                padding: 8px 0;
+            }
+        }
+
+        /* Темная тема */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #1a1a1a;
+                color: #e0e0e0;
+            }
+
+            .nav-bar, .main-section, .results-section {
+                background: #2d2d2d;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .poll-title {
+                color: #ffffff;
+            }
+
+            .poll-description, .poll-meta {
+                color: #b0b0b0;
+            }
+
+            .option-card {
+                background: #3d3d3d;
+            }
+
+            .option-card:hover {
+                background: #4d4d4d;
+            }
+
+            .progress {
+                background: #404040;
+            }
+
+            .section-title {
+                color: #ffffff;
+                border-bottom-color: #404040;
+            }
+
+            .stats-card {
+                background: #3d3d3d;
+            }
+
+            .back-button {
+                color: #b0b0b0;
+            }
+
+            .back-button:hover {
+                color: #007bff;
+            }
+        }
+
+        /* Анимации для улучшения UX */
+        .option-card {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .progress-bar {
+            animation: progressFill 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes progressFill {
+            from {
+                width: 0;
+            }
+        }
+
+        /* Улучшения для доступности */
+        .option-label:focus-within {
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+        }
+
+        /* Стили для кнопки голосования */
+        .btn-primary {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 8px;
+            background: #007bff;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .btn-primary {
+                position: sticky;
+                bottom: 20px;
+                margin: 20px -15px;
+                width: calc(100% + 30px);
+                border-radius: 0;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
             }
         }
     </style>
@@ -309,302 +385,3 @@
 </div>
 </body>
 </html>
-
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--    <style>-->
-<!--        /* Основной контейнер опроса */-->
-<!--        .poll-content {-->
-<!--            background: white;-->
-<!--            border-radius: 12px;-->
-<!--            padding: 25px;-->
-<!--            margin: 20px 0;-->
-<!--            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);-->
-<!--        }-->
-
-<!--        /* Форма голосования */-->
-<!--        .poll-vote-form {-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            gap: 15px;-->
-<!--        }-->
-
-<!--        /* Вариант ответа */-->
-<!--        .poll-option {-->
-<!--            background: #f8f9fa;-->
-<!--            border-radius: 8px;-->
-<!--            padding: 12px 15px;-->
-<!--            margin: 8px 0;-->
-<!--            transition: all 0.3s ease;-->
-<!--        }-->
-
-<!--        .poll-option:hover {-->
-<!--            background: #e9ecef;-->
-<!--            transform: translateY(-2px);-->
-<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
-<!--        }-->
-
-<!--        /* Метка для варианта ответа */-->
-<!--        .option-label {-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--            gap: 12px;-->
-<!--            cursor: pointer;-->
-<!--            width: 100%;-->
-<!--            font-size: 1.1em;-->
-<!--        }-->
-
-<!--        /* Стили для checkbox и radio */-->
-<!--        .form-check-input {-->
-<!--            width: 20px;-->
-<!--            height: 20px;-->
-<!--            cursor: pointer;-->
-<!--            margin: 0;-->
-<!--            transition: all 0.2s ease;-->
-<!--        }-->
-
-<!--        .form-check-input:checked {-->
-<!--            border-color: #007bff;-->
-<!--            background-color: #007bff;-->
-<!--        }-->
-
-<!--        /* Кнопка голосования */-->
-<!--        .btn-primary {-->
-<!--            background: #007bff;-->
-<!--            color: white;-->
-<!--            border: none;-->
-<!--            padding: 12px 24px;-->
-<!--            border-radius: 6px;-->
-<!--            font-size: 1.1em;-->
-<!--            cursor: pointer;-->
-<!--            transition: all 0.3s ease;-->
-<!--        }-->
-
-<!--        .btn-primary:hover {-->
-<!--            background: #0056b3;-->
-<!--            transform: translateY(-2px);-->
-<!--            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);-->
-<!--        }-->
-
-<!--        /* Блок результатов */-->
-<!--        .poll-results {-->
-<!--            margin-top: 20px;-->
-<!--        }-->
-
-<!--        /* Результат для каждого варианта */-->
-<!--        .poll-option-result {-->
-<!--            background: #f8f9fa;-->
-<!--            border-radius: 8px;-->
-<!--            padding: 15px;-->
-<!--            margin: 10px 0;-->
-<!--            transition: all 0.3s ease;-->
-<!--        }-->
-
-<!--        .poll-option-result:hover {-->
-<!--            background: #e9ecef;-->
-<!--            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);-->
-<!--        }-->
-
-<!--        /* Текст варианта в результатах */-->
-<!--        .option-text {-->
-<!--            font-size: 1.1em;-->
-<!--            font-weight: 500;-->
-<!--            margin-bottom: 10px;-->
-<!--            color: #333;-->
-<!--        }-->
-
-<!--        /* Прогресс-бар */-->
-<!--        .progress {-->
-<!--            height: 25px;-->
-<!--            background: #e9ecef;-->
-<!--            border-radius: 12px;-->
-<!--            overflow: hidden;-->
-<!--            margin: 10px 0;-->
-<!--            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);-->
-<!--        }-->
-
-<!--        .progress-bar {-->
-<!--            background: linear-gradient(45deg, #007bff, #0056b3);-->
-<!--            color: white;-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--            justify-content: center;-->
-<!--            font-weight: 500;-->
-<!--            transition: width 0.6s ease;-->
-<!--            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);-->
-<!--        }-->
-
-<!--        /* Информация о голосах */-->
-<!--        .votes-info {-->
-<!--            display: flex;-->
-<!--            justify-content: space-between;-->
-<!--            align-items: flex-start;-->
-<!--            margin-top: 10px;-->
-<!--            font-size: 0.95em;-->
-<!--            color: #666;-->
-<!--        }-->
-
-<!--        /* Список проголосовавших */-->
-<!--        .voters-list {-->
-<!--            background: white;-->
-<!--            border-radius: 6px;-->
-<!--            padding: 12px;-->
-<!--            margin-top: 10px;-->
-<!--            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);-->
-<!--        }-->
-
-<!--        .voters-list span {-->
-<!--            color: #666;-->
-<!--            font-size: 0.9em;-->
-<!--        }-->
-
-<!--        .voters-list ul {-->
-<!--            list-style: none;-->
-<!--            padding: 0;-->
-<!--            margin: 8px 0 0 0;-->
-<!--            display: flex;-->
-<!--            flex-wrap: wrap;-->
-<!--            gap: 8px;-->
-<!--        }-->
-
-<!--        .voters-list li {-->
-<!--            background: #e9ecef;-->
-<!--            padding: 4px 12px;-->
-<!--            border-radius: 15px;-->
-<!--            font-size: 0.9em;-->
-<!--            color: #495057;-->
-<!--            transition: all 0.2s ease;-->
-<!--        }-->
-
-<!--        .voters-list li:hover {-->
-<!--            background: #dee2e6;-->
-<!--            transform: translateY(-1px);-->
-<!--        }-->
-
-<!--        /* Общая статистика */-->
-<!--        .poll-stats {-->
-<!--            margin-top: 20px;-->
-<!--            padding-top: 15px;-->
-<!--            border-top: 1px solid #dee2e6;-->
-<!--            color: #495057;-->
-<!--            font-size: 1.1em;-->
-<!--            display: flex;-->
-<!--            justify-content: flex-end;-->
-<!--            gap: 8px;-->
-<!--        }-->
-
-<!--        /* Адаптивный дизайн */-->
-<!--        @media (max-width: 768px) {-->
-<!--            .poll-content {-->
-<!--                padding: 15px;-->
-<!--            }-->
-
-<!--            .option-label {-->
-<!--                font-size: 1em;-->
-<!--            }-->
-
-<!--            .progress {-->
-<!--                height: 20px;-->
-<!--            }-->
-
-<!--            .voters-list ul {-->
-<!--                flex-direction: column;-->
-<!--            }-->
-
-<!--            .poll-stats {-->
-<!--                flex-direction: column;-->
-<!--                align-items: flex-start;-->
-<!--            }-->
-<!--        }-->
-
-<!--        /* Анимации */-->
-<!--        @keyframes fadeIn {-->
-<!--            from {-->
-<!--                opacity: 0;-->
-<!--                transform: translateY(10px);-->
-<!--            }-->
-<!--            to {-->
-<!--                opacity: 1;-->
-<!--                transform: translateY(0);-->
-<!--            }-->
-<!--        }-->
-
-<!--        .poll-option, .poll-option-result {-->
-<!--            animation: fadeIn 0.3s ease forwards;-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--<div>-->
-<!--    <div class="poll-content">-->
-<!--        <div class="poll-option">-->
-<!--            <div class="poll-option-text">-->
-<!--                <div class="votes-info">-->
-<!--                    <div class="votes-info">-->
-<!--                        <div class="votes-info">-->
-<!--                            <span>Hell word</span>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-<!--<div th:fragment="poll-content(poll)" class="poll-content">-->
-<!--    &lt;!&ndash; Форма для голосования &ndash;&gt;-->
-<!--    <div th:if="${poll.canVote}">-->
-<!--        <form th:action="@{/groups/{groupId}/polls/{pollId}/vote(groupId=${groupId},pollId=${poll.id})}"-->
-<!--              method="post"-->
-<!--              class="poll-vote-form">-->
-<!--            <div th:each="option : ${poll.options}" class="poll-option">-->
-<!--                <label class="option-label">-->
-<!--                    <input th:if="${poll.multipleChoice}"-->
-<!--                           type="checkbox"-->
-<!--                           th:name="optionIds"-->
-<!--                           th:value="${option.id}"-->
-<!--                           class="form-check-input"/>-->
-<!--                    <input th:unless="${poll.multipleChoice}"-->
-<!--                           type="radio"-->
-<!--                           th:name="optionIds"-->
-<!--                           th:value="${option.id}"-->
-<!--                           class="form-check-input"/>-->
-<!--                    <span th:text="${option.text}"></span>-->
-<!--                </label>-->
-<!--            </div>-->
-<!--            <button type="submit" class="btn btn-primary">Проголосовать</button>-->
-<!--        </form>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; Отображение результатов &ndash;&gt;-->
-<!--    <div th:unless="${poll.canVote}" class="poll-results">-->
-<!--        <div th:each="option : ${poll.options}" class="poll-option-result">-->
-<!--            <div class="option-text" th:text="${option.text}"></div>-->
-<!--            <div class="progress">-->
-<!--                <div class="progress-bar" role="progressbar"-->
-<!--                     th:style="'width: ' + ${option.percentage} + '%'"-->
-<!--                     th:text="${option.percentage + '%'}">-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="votes-info">-->
-<!--                <span th:text="${option.votesCount + ' голосов'}"></span>-->
-<!--                &lt;!&ndash; Список проголосовавших &ndash;&gt;-->
-<!--                <div th:if="${!poll.anonymous && poll.totalVotes != null && poll.minimumVotesToShow != null && poll.totalVotes >= poll.minimumVotesToShow && !#lists.isEmpty(option.voters)}"-->
-<!--                     class="voters-list">-->
-<!--                    <span>Проголосовали:</span>-->
-<!--                    <ul>-->
-<!--                        <li th:each="voter : ${option.voters}"-->
-<!--                            th:text="${voter.username}"></li>-->
-<!--                    </ul>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        &lt;!&ndash; Общая статистика &ndash;&gt;-->
-<!--        <div class="poll-stats">-->
-<!--            <span>Всего голосов: </span>-->
-<!--            <span th:text="${poll.totalVotes}"></span>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-<!--</body>-->
-<!--</html>-->
