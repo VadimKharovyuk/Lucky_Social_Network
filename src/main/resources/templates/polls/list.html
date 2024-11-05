@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Polls</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Polls</h1>
+        <a th:href="@{/polls/create(groupId=${groupId})}"
+           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Create New Poll
+        </a>
+    </div>
+
+    <div class="grid gap-4">
+        <div th:each="poll : ${polls}"
+             class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-xl font-semibold mb-2"
+                        th:text="${poll.question}">Question</h2>
+                    <p class="text-gray-600"
+                       th:text="${poll.description}">Description</p>
+                </div>
+                <span class="px-2 py-1 rounded text-sm"
+                      th:text="${poll.status}"
+                      th:class="${poll.status == 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                        Status
+                    </span>
+            </div>
+
+            <div class="mt-4 flex justify-between items-center text-sm text-gray-500">
+                <span th:text="${'Votes: ' + poll.totalVotes}">Votes: 0</span>
+                <span th:text="${'Ends at: ' + #temporals.format(poll.endsAt, 'dd-MM-yyyy HH:mm')}">
+                        Ends at: 01-01-2024
+                    </span>
+            </div>
+
+            <a th:href="@{/polls/{id}(id=${poll.id})}"
+               class="mt-4 inline-block text-blue-500 hover:text-blue-700">
+                View Poll →
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

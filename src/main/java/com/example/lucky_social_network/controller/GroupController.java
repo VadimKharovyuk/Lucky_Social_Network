@@ -102,6 +102,7 @@ public class GroupController {
         model.addAttribute("isMember", isMember);
         model.addAttribute("canPost", canPost);
         model.addAttribute("isOwner", isOwner);
+        model.addAttribute("groupId", group);
 
         Map<Long, Boolean> canRepostMap = new HashMap<>();
         for (GroupPost post : posts) {

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+//ОпросГолосовать
 public class PollVote {
 
     @Id

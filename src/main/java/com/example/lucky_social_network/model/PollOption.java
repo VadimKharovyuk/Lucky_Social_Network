@@ -9,6 +9,7 @@ import java.util.Set;
 @Entity
 @Table(name = "poll_options")
 @Data
+//Опция опроса
 public class PollOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +21,9 @@ public class PollOption {
 
     private String text;
     private Long votesCount = 0L;
+    // Добавляем поле position для сортировки вариантов
+    @Column(name = "position")
+    private Integer position;
 
     @ManyToMany
     @JoinTable(name = "poll_votes")
