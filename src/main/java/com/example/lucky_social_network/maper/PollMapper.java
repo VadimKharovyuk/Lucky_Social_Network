@@ -34,6 +34,7 @@ public class PollMapper {
         poll.setCreatedAt(LocalDateTime.now());
         poll.setCreatedBy(creator.getId());
         poll.setStatus(Poll.PollStatus.ACTIVE);
+        dto.setMinimumVotesToShow(poll.getMinimumVotesToShow());
 
         if (dto.getOptions() != null) {
             List<PollOption> options = new ArrayList<>();
@@ -88,22 +89,42 @@ public class PollMapper {
         dto.setId(option.getId());
         dto.setText(option.getText());
         dto.setVotesCount(option.getVotesCount());
-
-        // Вычисляем процент голосов
         dto.setPercentage(calculatePercentage(option, poll));
-
-        // Проверяем выбор текущего пользователя
         dto.setSelectedByCurrentUser(option.getVoters().contains(currentUser));
 
-        // Добавляем список проголосовавших, если опрос не анонимный и достаточно голосов
-        if (shouldShowVoters(option, poll)) {
+        // Добавляем список проголосовавших
+        if (!poll.isAnonymous() && poll.getTotalVotes() >= poll.getMinimumVotesToShow()) {
             dto.setVoters(option.getVoters().stream()
                     .map(this::toUserShortDTO)
                     .collect(Collectors.toList()));
+        } else {
+            dto.setVoters(new ArrayList<>()); // Пустой список если голоса скрыты
         }
 
         return dto;
     }
+
+//    private PollOptionResponseDTO toPollOptionResponseDTO(PollOption option, Poll poll, User currentUser) {
+//        PollOptionResponseDTO dto = new PollOptionResponseDTO();
+//        dto.setId(option.getId());
+//        dto.setText(option.getText());
+//        dto.setVotesCount(option.getVotesCount());
+//
+//        // Вычисляем процент голосов
+//        dto.setPercentage(calculatePercentage(option, poll));
+//
+//        // Проверяем выбор текущего пользователя
+//        dto.setSelectedByCurrentUser(option.getVoters().contains(currentUser));
+//
+//        // Добавляем список проголосовавших, если опрос не анонимный и достаточно голосов
+//        if (shouldShowVoters(option, poll)) {
+//            dto.setVoters(option.getVoters().stream()
+//                    .map(this::toUserShortDTO)
+//                    .collect(Collectors.toList()));
+//        }
+//
+//        return dto;
+//    }
 
     private double calculatePercentage(PollOption option, Poll poll) {
         if (poll.getTotalVotes() > 0) {

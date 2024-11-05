@@ -60,6 +60,8 @@ public class GroupService {
                 .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
     }
 
+
+    //при лобавлние новой групы она не попадает в кеш
     @Cacheable(value = GROUPS_CACHE, key = "'all'")
     public List<Group> getAllGroups() {
         return groupRepository.findAll();

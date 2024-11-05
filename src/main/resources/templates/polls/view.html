@@ -2,242 +2,609 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${poll.question}">Poll Question</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .poll-container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 20px;
+        /* Основные стили */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f6f8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        /* Навигация */
+        .nav-bar {
+            background: #fff;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #666;
+            transition: color 0.3s;
+        }
+
+        .back-button:hover {
+            color: #007bff;
+        }
+
+        /* Основной контейнер */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        /* Основная секция */
+        .main-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .poll-header {
+            margin-bottom: 30px;
+        }
+
+        .poll-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 10px;
         }
 
         .poll-description {
-            margin-bottom: 25px;
             color: #666;
+            font-size: 1.1em;
+            line-height: 1.5;
         }
 
-        .poll-option {
-            margin: 15px 0;
-            padding: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            transition: background-color 0.2s;
-        }
-
-        .poll-option:hover {
-            background-color: #f8f9fa;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        .option-results {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .progress {
-            height: 20px;
-            flex-grow: 1;
-        }
-
-        .votes-count {
-            min-width: 80px;
-            text-align: right;
-            color: #666;
-        }
-
-        .voters-list {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .voters-list ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .voters-list li {
-            display: inline-block;
-            margin-right: 10px;
-            padding: 2px 8px;
-            background-color: #e9ecef;
-            border-radius: 12px;
+        .poll-meta {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            color: #888;
             font-size: 0.9em;
         }
 
-        .admin-controls {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #dee2e6;
+        /* Варианты ответов */
+        .poll-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .custom-checkbox .form-check-input,
-        .custom-radio .form-check-input {
-            width: 1.5em;
-            height: 1.5em;
-            margin-right: 10px;
+        .option-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .alert {
-            margin-bottom: 20px;
+        .option-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        /* Боковая панель */
+        aside {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        /* Статистика */
+        .stats-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        /* Прогресс-бар */
+        .progress {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-bar {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9em;
+            transition: width 0.6s ease;
+        }
+
+        /* Адаптивный дизайн */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            aside {
+                order: -1;
+            }
+        }
+
+        .delete-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background-color: #dc3545;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+        }
+
+        .delete-button i {
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .poll-header-top {
+                flex-direction: column;
+            }
+
+            .poll-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .delete-button {
+                width: auto;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container poll-container">
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-
-    <h1 class="mb-4" th:text="${poll.question}"></h1>
-    <p class="poll-description" th:text="${poll.description}"></p>
-
-    <div th:if="${poll.canVote}">
-        <form th:action="@{/groups/{groupId}/polls/{id}/vote(groupId=${groupId}, id=${poll.id})}"
-              th:object="${voteDTO}"
-              method="post">
-            <div th:each="option : ${poll.options}" class="poll-option">
-                <label class="option-label">
-                    <input th:if="${poll.multipleChoice}"
-                           type="checkbox"
-                           class="form-check-input"
-                           th:value="${option.id}"
-                           th:field="*{optionIds}"/>
-                    <input th:unless="${poll.multipleChoice}"
-                           type="radio"
-                           class="form-check-input"
-                           th:value="${option.id}"
-                           th:field="*{optionIds}"/>
-                    <span th:text="${option.text}"></span>
-                </label>
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Vote</button>
-        </form>
+<!-- Навигация -->
+<nav class="nav-bar">
+    <div class="nav-content">
+        <a th:href="@{/groups/{groupId}(groupId=${groupId})}" class="back-button">
+            <i class="bi bi-arrow-left"></i>
+            Вернуться к группе
+        </a>
     </div>
+</nav>
 
-    <div th:unless="${poll.canVote}">
-        <div th:each="option : ${poll.options}" class="poll-option">
-            <div class="option-text" th:text="${option.text}"></div>
-            <div class="option-results">
+<div class="container">
+    <!-- Основная секция -->
+    <main class="main-section">
+        <!-- Заголовок опроса -->
+        <section class="poll-header">
+            <div class="poll-header-top">
+                <div class="poll-header-content">
+                    <h1 class="poll-title" th:text="${poll.question}">Question</h1>
+                    <p class="poll-description" th:text="${poll.description}">Description</p>
+                    <div class="poll-meta">
+                        <span>Создано: </span>
+                        <span th:text="${#temporals.format(poll.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                        <span th:if="${poll.endsAt}">
+                    | Окончание:
+                    <span th:text="${#temporals.format(poll.endsAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </span>
+                    </div>
+                </div>
+                <div class="poll-actions" th:if="${poll.createdBy != null && poll.createdBy.id == currentUser}">
+                    <form th:action="@{/groups/{groupId}/polls/{pollId}/delete(groupId=${groupId},pollId=${poll.id})}"
+                          method="post"
+                          onsubmit="return confirm('Вы уверены, что хотите удалить этот опрос?');">
+                        <button type="submit" class="delete-button">
+                            <i class="bi bi-trash"></i>
+                            Удалить опрос
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Варианты ответов -->
+        <section class="poll-options" th:if="${poll.canVote}">
+            <form th:action="@{/groups/{groupId}/polls/{pollId}/vote(groupId=${groupId},pollId=${poll.id})}"
+                  method="post">
+                <div th:each="option : ${poll.options}" class="option-card">
+                    <label class="option-label">
+                        <input th:if="${poll.multipleChoice}"
+                               type="checkbox"
+                               th:name="optionIds"
+                               th:value="${option.id}"/>
+                        <input th:unless="${poll.multipleChoice}"
+                               type="radio"
+                               th:name="optionIds"
+                               th:value="${option.id}"/>
+                        <span th:text="${option.text}"></span>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary mt-4">Проголосовать</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Боковая панель с результатами -->
+    <aside>
+        <section class="results-section">
+            <h2 class="section-title">Результаты голосования</h2>
+            <div class="stats-card">
+                <div class="stats-item">
+                    <span>Всего голосов:</span>
+                    <span th:text="${poll.totalVotes}">0</span>
+                </div>
+                <div class="stats-item">
+                    <span>Уникальных участников:</span>
+                    <span th:text="${poll.uniqueVoters}">0</span>
+                </div>
+            </div>
+
+            <div th:each="option : ${poll.options}" class="poll-result">
+                <div class="option-text" th:text="${option.text}"></div>
                 <div class="progress">
-                    <div class="progress-bar" role="progressbar"
+                    <div class="progress-bar"
                          th:style="'width: ' + ${option.percentage} + '%'"
                          th:text="${option.percentage + '%'}">
                     </div>
                 </div>
-                <span class="votes-count" th:text="${option.votesCount + ' votes'}"></span>
+                <div class="voters-info" th:if="${poll.canShowVoters()}">
+                    <small>
+                        <span th:text="${option.votesCount}"></span> голосов
+                    </small>
+                </div>
             </div>
-
-            <div th:if="${!poll.anonymous && poll.totalVotes != null && poll.minimumVotesToShow != null && poll.totalVotes >= poll.minimumVotesToShow}"
-                 class="voters-list">
-                <span>Voters:</span>
-                <ul>
-                    <li th:each="voter : ${option.voters}"
-                        th:text="${voter.username}"></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="mt-3 text-muted">
-            Total votes: <span th:text="${poll.totalVotes}"></span>
-        </div>
-    </div>
-
-    <div th:if="${poll.createdBy.id == #authentication.principal.id}" class="admin-controls">
-        <a th:href="@{/groups/{groupId}/polls/{id}/edit(groupId=${groupId}, id=${poll.id})}"
-           class="btn btn-outline-primary">Edit</a>
-        <form th:action="@{/groups/{groupId}/polls/{id}/delete(groupId=${groupId}, id=${poll.id})}"
-              method="post"
-              style="display: inline;">
-            <button type="submit" class="btn btn-outline-danger ms-2"
-                    onclick="return confirm('Are you sure you want to delete this poll?')">
-                Delete
-            </button>
-        </form>
-    </div>
+        </section>
+    </aside>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Добавляем анимацию для progress bar
-    document.addEventListener('DOMContentLoaded', function () {
-        const progressBars = document.querySelectorAll('.progress-bar');
-        setTimeout(() => {
-            progressBars.forEach(bar => {
-                bar.style.transition = 'width 1s ease-in-out';
-                bar.style.width = bar.getAttribute('data-width');
-            });
-        }, 100);
-    });
-</script>
 </body>
 </html>
 
 <!--<!DOCTYPE html>-->
 <!--<html xmlns:th="http://www.thymeleaf.org">-->
 <!--<head>-->
-<!--    <title th:text="${poll.question}">Poll Question</title>-->
+<!--    <style>-->
+<!--        /* Основной контейнер опроса */-->
+<!--        .poll-content {-->
+<!--            background: white;-->
+<!--            border-radius: 12px;-->
+<!--            padding: 25px;-->
+<!--            margin: 20px 0;-->
+<!--            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        /* Форма голосования */-->
+<!--        .poll-vote-form {-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            gap: 15px;-->
+<!--        }-->
+
+<!--        /* Вариант ответа */-->
+<!--        .poll-option {-->
+<!--            background: #f8f9fa;-->
+<!--            border-radius: 8px;-->
+<!--            padding: 12px 15px;-->
+<!--            margin: 8px 0;-->
+<!--            transition: all 0.3s ease;-->
+<!--        }-->
+
+<!--        .poll-option:hover {-->
+<!--            background: #e9ecef;-->
+<!--            transform: translateY(-2px);-->
+<!--            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        /* Метка для варианта ответа */-->
+<!--        .option-label {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 12px;-->
+<!--            cursor: pointer;-->
+<!--            width: 100%;-->
+<!--            font-size: 1.1em;-->
+<!--        }-->
+
+<!--        /* Стили для checkbox и radio */-->
+<!--        .form-check-input {-->
+<!--            width: 20px;-->
+<!--            height: 20px;-->
+<!--            cursor: pointer;-->
+<!--            margin: 0;-->
+<!--            transition: all 0.2s ease;-->
+<!--        }-->
+
+<!--        .form-check-input:checked {-->
+<!--            border-color: #007bff;-->
+<!--            background-color: #007bff;-->
+<!--        }-->
+
+<!--        /* Кнопка голосования */-->
+<!--        .btn-primary {-->
+<!--            background: #007bff;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 12px 24px;-->
+<!--            border-radius: 6px;-->
+<!--            font-size: 1.1em;-->
+<!--            cursor: pointer;-->
+<!--            transition: all 0.3s ease;-->
+<!--        }-->
+
+<!--        .btn-primary:hover {-->
+<!--            background: #0056b3;-->
+<!--            transform: translateY(-2px);-->
+<!--            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);-->
+<!--        }-->
+
+<!--        /* Блок результатов */-->
+<!--        .poll-results {-->
+<!--            margin-top: 20px;-->
+<!--        }-->
+
+<!--        /* Результат для каждого варианта */-->
+<!--        .poll-option-result {-->
+<!--            background: #f8f9fa;-->
+<!--            border-radius: 8px;-->
+<!--            padding: 15px;-->
+<!--            margin: 10px 0;-->
+<!--            transition: all 0.3s ease;-->
+<!--        }-->
+
+<!--        .poll-option-result:hover {-->
+<!--            background: #e9ecef;-->
+<!--            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        /* Текст варианта в результатах */-->
+<!--        .option-text {-->
+<!--            font-size: 1.1em;-->
+<!--            font-weight: 500;-->
+<!--            margin-bottom: 10px;-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        /* Прогресс-бар */-->
+<!--        .progress {-->
+<!--            height: 25px;-->
+<!--            background: #e9ecef;-->
+<!--            border-radius: 12px;-->
+<!--            overflow: hidden;-->
+<!--            margin: 10px 0;-->
+<!--            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        .progress-bar {-->
+<!--            background: linear-gradient(45deg, #007bff, #0056b3);-->
+<!--            color: white;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            font-weight: 500;-->
+<!--            transition: width 0.6s ease;-->
+<!--            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);-->
+<!--        }-->
+
+<!--        /* Информация о голосах */-->
+<!--        .votes-info {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: flex-start;-->
+<!--            margin-top: 10px;-->
+<!--            font-size: 0.95em;-->
+<!--            color: #666;-->
+<!--        }-->
+
+<!--        /* Список проголосовавших */-->
+<!--        .voters-list {-->
+<!--            background: white;-->
+<!--            border-radius: 6px;-->
+<!--            padding: 12px;-->
+<!--            margin-top: 10px;-->
+<!--            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        .voters-list span {-->
+<!--            color: #666;-->
+<!--            font-size: 0.9em;-->
+<!--        }-->
+
+<!--        .voters-list ul {-->
+<!--            list-style: none;-->
+<!--            padding: 0;-->
+<!--            margin: 8px 0 0 0;-->
+<!--            display: flex;-->
+<!--            flex-wrap: wrap;-->
+<!--            gap: 8px;-->
+<!--        }-->
+
+<!--        .voters-list li {-->
+<!--            background: #e9ecef;-->
+<!--            padding: 4px 12px;-->
+<!--            border-radius: 15px;-->
+<!--            font-size: 0.9em;-->
+<!--            color: #495057;-->
+<!--            transition: all 0.2s ease;-->
+<!--        }-->
+
+<!--        .voters-list li:hover {-->
+<!--            background: #dee2e6;-->
+<!--            transform: translateY(-1px);-->
+<!--        }-->
+
+<!--        /* Общая статистика */-->
+<!--        .poll-stats {-->
+<!--            margin-top: 20px;-->
+<!--            padding-top: 15px;-->
+<!--            border-top: 1px solid #dee2e6;-->
+<!--            color: #495057;-->
+<!--            font-size: 1.1em;-->
+<!--            display: flex;-->
+<!--            justify-content: flex-end;-->
+<!--            gap: 8px;-->
+<!--        }-->
+
+<!--        /* Адаптивный дизайн */-->
+<!--        @media (max-width: 768px) {-->
+<!--            .poll-content {-->
+<!--                padding: 15px;-->
+<!--            }-->
+
+<!--            .option-label {-->
+<!--                font-size: 1em;-->
+<!--            }-->
+
+<!--            .progress {-->
+<!--                height: 20px;-->
+<!--            }-->
+
+<!--            .voters-list ul {-->
+<!--                flex-direction: column;-->
+<!--            }-->
+
+<!--            .poll-stats {-->
+<!--                flex-direction: column;-->
+<!--                align-items: flex-start;-->
+<!--            }-->
+<!--        }-->
+
+<!--        /* Анимации */-->
+<!--        @keyframes fadeIn {-->
+<!--            from {-->
+<!--                opacity: 0;-->
+<!--                transform: translateY(10px);-->
+<!--            }-->
+<!--            to {-->
+<!--                opacity: 1;-->
+<!--                transform: translateY(0);-->
+<!--            }-->
+<!--        }-->
+
+<!--        .poll-option, .poll-option-result {-->
+<!--            animation: fadeIn 0.3s ease forwards;-->
+<!--        }-->
+<!--    </style>-->
 <!--</head>-->
 <!--<body>-->
-<!--<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>-->
-<!--<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>-->
-
-<!--<h1 th:text="${poll.question}"></h1>-->
-<!--<p th:text="${poll.description}"></p>-->
-
-<!--<div th:if="${poll.canVote}">-->
-<!--    <form th:action="@{/polls/{id}/vote(id=${poll.id})}" th:object="${voteDTO}" method="post">-->
-<!--        <div th:each="option : ${poll.options}">-->
-<!--            <label>-->
-<!--                <input th:if="${poll.multipleChoice}"-->
-<!--                       type="checkbox"-->
-<!--                       th:value="${option.id}"-->
-<!--                       th:field="*{optionIds}"/>-->
-<!--                <input th:unless="${poll.multipleChoice}"-->
-<!--                       type="radio"-->
-<!--                       th:value="${option.id}"-->
-<!--                       th:field="*{optionIds}"/>-->
-<!--                <span th:text="${option.text}"></span>-->
-<!--            </label>-->
-<!--        </div>-->
-<!--        <button type="submit">Vote</button>-->
-<!--    </form>-->
-<!--</div>-->
-
-<!--<div th:unless="${poll.canVote}">-->
-<!--    <div th:each="option : ${poll.options}">-->
-<!--        <div>-->
-<!--            <span th:text="${option.text}"></span>-->
-<!--            <span th:text="${option.votesCount}">votes</span>-->
-<!--            <span th:text="${option.percentage + '%'}"></span>-->
-
-<!--            <div th:if="${!poll.anonymous && poll.totalVotes >= poll.minimumVotesToShow}">-->
-<!--                <span>Voters:</span>-->
-<!--                <ul>-->
-<!--                    <li th:each="voter : ${option.voters}"-->
-<!--                        th:text="${voter.username}"></li>-->
-<!--                </ul>-->
+<!--<div>-->
+<!--    <div class="poll-content">-->
+<!--        <div class="poll-option">-->
+<!--            <div class="poll-option-text">-->
+<!--                <div class="votes-info">-->
+<!--                    <div class="votes-info">-->
+<!--                        <div class="votes-info">-->
+<!--                            <span>Hell word</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
 <!--            </div>-->
 <!--        </div>-->
 <!--    </div>-->
 <!--</div>-->
+<!--<div th:fragment="poll-content(poll)" class="poll-content">-->
+<!--    &lt;!&ndash; Форма для голосования &ndash;&gt;-->
+<!--    <div th:if="${poll.canVote}">-->
+<!--        <form th:action="@{/groups/{groupId}/polls/{pollId}/vote(groupId=${groupId},pollId=${poll.id})}"-->
+<!--              method="post"-->
+<!--              class="poll-vote-form">-->
+<!--            <div th:each="option : ${poll.options}" class="poll-option">-->
+<!--                <label class="option-label">-->
+<!--                    <input th:if="${poll.multipleChoice}"-->
+<!--                           type="checkbox"-->
+<!--                           th:name="optionIds"-->
+<!--                           th:value="${option.id}"-->
+<!--                           class="form-check-input"/>-->
+<!--                    <input th:unless="${poll.multipleChoice}"-->
+<!--                           type="radio"-->
+<!--                           th:name="optionIds"-->
+<!--                           th:value="${option.id}"-->
+<!--                           class="form-check-input"/>-->
+<!--                    <span th:text="${option.text}"></span>-->
+<!--                </label>-->
+<!--            </div>-->
+<!--            <button type="submit" class="btn btn-primary">Проголосовать</button>-->
+<!--        </form>-->
+<!--    </div>-->
 
-<!--<div th:if="${poll.createdBy.id == #authentication.principal.id}">-->
-<!--    <a th:href="@{/polls/{id}/edit(id=${poll.id})}" class="btn btn-primary">Edit</a>-->
-<!--    <form th:action="@{/polls/{id}/delete(id=${poll.id})}" method="post" style="display: inline;">-->
-<!--        <button type="submit" class="btn btn-danger"-->
-<!--                onclick="return confirm('Are you sure you want to delete this poll?')">-->
-<!--            Delete-->
-<!--        </button>-->
-<!--    </form>-->
+<!--    &lt;!&ndash; Отображение результатов &ndash;&gt;-->
+<!--    <div th:unless="${poll.canVote}" class="poll-results">-->
+<!--        <div th:each="option : ${poll.options}" class="poll-option-result">-->
+<!--            <div class="option-text" th:text="${option.text}"></div>-->
+<!--            <div class="progress">-->
+<!--                <div class="progress-bar" role="progressbar"-->
+<!--                     th:style="'width: ' + ${option.percentage} + '%'"-->
+<!--                     th:text="${option.percentage + '%'}">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="votes-info">-->
+<!--                <span th:text="${option.votesCount + ' голосов'}"></span>-->
+<!--                &lt;!&ndash; Список проголосовавших &ndash;&gt;-->
+<!--                <div th:if="${!poll.anonymous && poll.totalVotes != null && poll.minimumVotesToShow != null && poll.totalVotes >= poll.minimumVotesToShow && !#lists.isEmpty(option.voters)}"-->
+<!--                     class="voters-list">-->
+<!--                    <span>Проголосовали:</span>-->
+<!--                    <ul>-->
+<!--                        <li th:each="voter : ${option.voters}"-->
+<!--                            th:text="${voter.username}"></li>-->
+<!--                    </ul>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash; Общая статистика &ndash;&gt;-->
+<!--        <div class="poll-stats">-->
+<!--            <span>Всего голосов: </span>-->
+<!--            <span th:text="${poll.totalVotes}"></span>-->
+<!--        </div>-->
+<!--    </div>-->
 <!--</div>-->
 <!--</body>-->
 <!--</html>-->

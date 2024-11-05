@@ -284,35 +284,52 @@
             margin-right: 3px;
         }
 
-        .create-content-tabs {
-            margin-bottom: 20px;
+
+        .poll-card {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
         }
 
-        .tab-button {
-            padding: 10px 20px;
-            margin-right: 10px;
-            border: none;
-            background: #f0f0f0;
-            cursor: pointer;
+        .poll-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .tab-button.active {
-            background: #007bff;
-            color: white;
-        }
-
-        .create-poll-button {
-            margin-top: 20px;
-            display: inline-block;
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
+        .poll-link {
+            display: block;
+            padding: 20px;
             text-decoration: none;
-            border-radius: 4px;
+            color: inherit;
         }
 
-        .create-poll-button:hover {
-            background: #0056b3;
+        .poll-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .poll-link h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .poll-preview {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .poll-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            background-color: #e9ecef;
+            font-size: 0.85em;
         }
     </style>
 </head>
@@ -359,6 +376,55 @@
         <button type="submit">Покинуть группу</button>
     </form>
 
+    <div th:if="${canPost}" class="create-content">
+        <div class="create-buttons">
+            <button onclick="showCreatePost()" class="btn create-btn">
+                <i class="bi bi-file-text"></i>
+                Создать пост
+            </button>
+            <a th:href="@{/groups/{groupId}/polls/create(groupId=${group.id})}" class="btn create-btn">
+                <i class="bi bi-bar-chart-fill"></i>
+                Создать опрос
+            </a>
+        </div>
+
+        <!-- Форма создания поста -->
+        <div id="createPostForm" style="display:none;">
+            <h3>Создать новый пост</h3>
+            <form th:action="@{/groups/{id}/post(id=${group.id})}" method="post"
+                  enctype="multipart/form-data" class="post-form">
+                <textarea name="content" required placeholder="Напишите что-нибудь..."></textarea>
+                <input type="file" name="image" accept="image/*" onchange="previewImage(event)">
+                <img id="image-preview" alt="Preview">
+                <button type="submit" class="btn btn-publish">Опубликовать</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function showCreatePost() {
+            const form = document.getElementById('createPostForm');
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        function previewImage(event) {
+            const preview = document.getElementById('image-preview');
+            const file = event.target.files[0];
+            if (file) {
+                preview.style.display = 'block';
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+    </script>
 
     <!--    <h3>Создать новый пост</h3>-->
     <!--    <form th:if="${canPost}" th:action="@{/groups/{id}/post(id=${group.id})}" method="post"-->
@@ -369,53 +435,30 @@
     <!--        <button type="submit">Опубликовать</button>-->
     <!--    </form>-->
 
-    <div th:if="${canPost}">
-        <div class="create-content-tabs">
-            <button class="tab-button active" onclick="showTab('post')">Создать пост</button>
-            <button class="tab-button" onclick="showTab('poll')">Создать голосование</button>
-        </div>
-
-        <div id="postTab" class="tab-content">
-            <h3>Создать новый пост</h3>
-            <form th:action="@{/groups/{id}/post(id=${group.id})}" method="post"
-                  enctype="multipart/form-data" class="post-form">
-                <textarea name="content" required placeholder="Напишите что-нибудь..."></textarea>
-                <input type="file" name="image" accept="image/*" onchange="previewImage(event)">
-                <img id="image-preview" alt="Preview">
-                <button type="submit">Опубликовать</button>
-            </form>
-        </div>
-
-        <div id="pollTab" class="tab-content" style="display:none;">
-            <a th:href="@{/groups/{groupId}/polls/create(groupId=${group.id})}" class="btn btn-primary">
-                Создать голосование
-            </a>
-        </div>
-
-
-        <script>
-            function showTab(tabName) {
-                // Скрываем все вкладки
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.style.display = 'none';
-                });
-
-                // Убираем активный класс у всех кнопок
-                document.querySelectorAll('.tab-button').forEach(button => {
-                    button.classList.remove('active');
-                });
-
-                // Показываем выбранную вкладку
-                document.getElementById(tabName + 'Tab').style.display = 'block';
-
-                // Добавляем активный класс нужной кнопке
-                event.target.classList.add('active');
-            }
-        </script>
-
     <h2>Посты</h2>
+
+    <div th:each="poll : ${polls}" class="poll-card">
+        <a th:href="@{/groups/{groupId}/polls/{pollId}(groupId=${groupId},pollId=${poll.id})}"
+           class="poll-link">
+            <h3 th:text="${poll.question}"></h3>
+            <p th:text="${poll.description}"></p>
+            <p th:text="${#temporals.format(poll.createdAt, 'dd-MM-yyyy HH:mm')}"></p>
+
+            <!-- Добавляем краткую статистику -->
+            <div class="poll-preview">
+            <span class="votes-count">
+                Голосов: <span th:text="${poll.totalVotes ?: 0}"></span>
+            </span>
+                <span th:if="${poll.endsAt}" class="poll-status"
+                      th:text="${poll.endsAt.isAfter(T(java.time.LocalDateTime).now()) ? 'Активно' : 'Завершено'}">
+            </span>
+            </div>
+        </a>
+    </div>
+
     <ul class="posts-list" th:if="${not #lists.isEmpty(posts)}">
-        <li th:each="post : ${posts}" class="post-item">
+
+    <li th:each="post : ${posts}" class="post-item">
             <div class="post-content">
                 <p th:text="${post.content}"></p>
                 <img th:if="${post.imgurImageUrl}" th:src="${post.imgurImageUrl}" alt="Post image" class="post-image">

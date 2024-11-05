@@ -9,6 +9,7 @@ import com.example.lucky_social_network.model.Group;
 import com.example.lucky_social_network.model.Poll;
 import com.example.lucky_social_network.service.GroupService;
 import com.example.lucky_social_network.service.PollService;
+import com.example.lucky_social_network.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,21 @@ import java.util.List;
 public class PollController {
     private final PollService pollService;
     private final GroupService groupService;
+    private final UserService userService;
+
+    @PostMapping("/{pollId}/delete")
+    public String deletePoll(@PathVariable Long groupId,  // добавляем groupId
+                             @PathVariable Long pollId,
+                             RedirectAttributes redirectAttributes) {
+        try {
+            pollService.deletePoll(pollId);
+            redirectAttributes.addFlashAttribute("successMessage", "Poll deleted successfully!");
+            return "redirect:/groups/" + groupId + "/polls";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete poll: " + e.getMessage());
+            return "redirect:/groups/" + groupId + "/polls/" + pollId;
+        }
+    }
 
     @GetMapping("/create")
     public String showCreatePollForm(@PathVariable Long groupId, Model model) {
@@ -89,15 +105,18 @@ public class PollController {
         return "redirect:/groups/" + groupId + "/polls/" + pollId;
     }
 
+
     @GetMapping("/{pollId}")
-    public String getPoll(@PathVariable Long groupId,  // добавляем groupId
+    public String getPoll(@PathVariable Long groupId,
                           @PathVariable Long pollId,
                           Model model) {
         try {
             PollResponseDTO poll = pollService.getPoll(pollId);
+            Long currentUser = userService.getCurrentUserId();
             model.addAttribute("poll", poll);
             model.addAttribute("voteDTO", new PollVoteDTO());
             model.addAttribute("groupId", groupId);
+            model.addAttribute("currentUser", currentUser);
             return "polls/view";
         } catch (PollNotFoundException e) {
             return "errors/not-found";
@@ -105,7 +124,7 @@ public class PollController {
     }
 
     @GetMapping("/{pollId}/edit")
-    public String showEditForm(@PathVariable Long groupId,  // добавляем groupId
+    public String showEditForm(@PathVariable Long groupId,
                                @PathVariable Long pollId,
                                Model model) {
         try {
@@ -146,17 +165,5 @@ public class PollController {
         }
     }
 
-    @PostMapping("/{pollId}/delete")
-    public String deletePoll(@PathVariable Long groupId,  // добавляем groupId
-                             @PathVariable Long pollId,
-                             RedirectAttributes redirectAttributes) {
-        try {
-            pollService.deletePoll(pollId);
-            redirectAttributes.addFlashAttribute("successMessage", "Poll deleted successfully!");
-            return "redirect:/groups/" + groupId + "/polls";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete poll: " + e.getMessage());
-            return "redirect:/groups/" + groupId + "/polls/" + pollId;
-        }
-    }
+
 }

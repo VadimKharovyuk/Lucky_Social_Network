@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @Data
 public class PollResponseDTO {
     private Long id;
@@ -39,5 +40,16 @@ public class PollResponseDTO {
     private LocalDateTime createdAt;
     private UserShortDTO createdBy;
 
+
+    // Добавляем недостающее поле
+    private Integer minimumVotesToShow;
+
+    
+    public boolean canShowVoters() {
+        return !this.anonymous &&
+                this.totalVotes != null &&
+                this.minimumVotesToShow != null &&
+                this.totalVotes >= this.minimumVotesToShow;
+    }
 
 }

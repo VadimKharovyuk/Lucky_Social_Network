@@ -89,6 +89,13 @@ public class PollServiceImpl implements PollService {
             throw new AccessDeniedException("You don't have permission to delete this poll");
         }
 
+        // Сначала удаляем все голоса для этого опроса
+        pollVoteRepository.deleteByPoll(poll);
+
+        // Удаляем все варианты ответов
+        pollOptionRepository.deleteByPoll(poll);
+
+        // Теперь можно удалить сам опрос
         pollRepository.delete(poll);
     }
 

@@ -15,4 +15,7 @@ public interface PollVoteRepository extends JpaRepository<PollVote, Long> {
 
     @Query("SELECT COUNT(DISTINCT v.user) FROM PollVote v WHERE v.poll = :poll")
     long countDistinctUsersByPoll(Poll poll);
+
+    void deleteByPoll(Poll poll);
+
 }

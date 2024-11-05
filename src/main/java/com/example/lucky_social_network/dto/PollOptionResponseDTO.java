@@ -13,6 +13,6 @@ public class PollOptionResponseDTO {
     private List<UserShortDTO> voters;
     private boolean selectedByCurrentUser;
 
-    
+
 }
 

@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+
 @Data
 public class PollUpdateDTO {
     @Size(min = 5, max = 255, message = "Question must be between 5 and 255 characters")

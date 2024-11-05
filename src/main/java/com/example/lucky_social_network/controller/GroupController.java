@@ -1,15 +1,13 @@
 package com.example.lucky_social_network.controller;
 
+import com.example.lucky_social_network.dto.PollResponseDTO;
 import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.Group;
 import com.example.lucky_social_network.model.GroupPost;
 import com.example.lucky_social_network.model.Post;
 import com.example.lucky_social_network.model.User;
 import com.example.lucky_social_network.repository.GroupContentRepository;
-import com.example.lucky_social_network.service.GroupContentService;
-import com.example.lucky_social_network.service.GroupService;
-import com.example.lucky_social_network.service.PostService;
-import com.example.lucky_social_network.service.UserService;
+import com.example.lucky_social_network.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,6 +38,40 @@ public class GroupController {
     private final GroupContentRepository groupContentRepository;
     public final GroupContentService groupContentService;
     private final PostService postService;
+    private final PollServiceImpl pollService;
+
+    @GetMapping("/{groupId}")
+    public String showGroup(@PathVariable Long groupId, Model model) {
+        Group group = groupService.getGroupById(groupId);
+        User currentUser = userService.getCurrentUser();
+
+        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
+        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
+        boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
+
+        // Получаем посты и опросы
+        List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
+        List<PollResponseDTO> polls = pollService.getAllPolls(groupId);
+
+        model.addAttribute("group", group);
+        model.addAttribute("posts", posts);
+        model.addAttribute("polls", polls);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("isMember", isMember);
+        model.addAttribute("canPost", canPost);
+        model.addAttribute("isOwner", isOwner);
+        model.addAttribute("groupId", groupId);
+
+        // Карта для проверки возможности репоста
+        Map<Long, Boolean> canRepostMap = new HashMap<>();
+        for (GroupPost post : posts) {
+            boolean canRepost = isMember && !post.getAuthor().getId().equals(currentUser.getId());
+            canRepostMap.put(post.getId(), canRepost);
+        }
+        model.addAttribute("canRepostMap", canRepostMap);
+
+        return "groups/view";
+    }
 
 
     @PostMapping("/{groupId}/repost/{postId}")
@@ -85,35 +117,37 @@ public class GroupController {
         }
         return "redirect:/groups/" + groupId;
     }
-    @GetMapping("/{groupId}")
-    public String showGroup(@PathVariable Long groupId, Model model) {
-        Group group = groupService.getGroupById(groupId);
-        User currentUser = userService.getCurrentUser();
 
-        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
-        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
-        boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
 
-        List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
-
-        model.addAttribute("group", group);
-        model.addAttribute("posts", posts);
-        model.addAttribute("currentUser", currentUser);
-        model.addAttribute("isMember", isMember);
-        model.addAttribute("canPost", canPost);
-        model.addAttribute("isOwner", isOwner);
-        model.addAttribute("groupId", group);
-
-        Map<Long, Boolean> canRepostMap = new HashMap<>();
-        for (GroupPost post : posts) {
-            // Разрешаем репост, если пользователь является членом группы и не автором поста
-            boolean canRepost = isMember && !post.getAuthor().getId().equals(currentUser.getId());
-            canRepostMap.put(post.getId(), canRepost);
-        }
-        model.addAttribute("canRepostMap", canRepostMap);
-
-        return "groups/view";
-    }
+//    @GetMapping("/{groupId}")
+//    public String showGroup(@PathVariable Long groupId, Model model) {
+//        Group group = groupService.getGroupById(groupId);
+//        User currentUser = userService.getCurrentUser();
+//
+//        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
+//        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
+//        boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
+//
+//        List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
+//
+//        model.addAttribute("group", group);
+//        model.addAttribute("posts", posts);
+//        model.addAttribute("currentUser", currentUser);
+//        model.addAttribute("isMember", isMember);
+//        model.addAttribute("canPost", canPost);
+//        model.addAttribute("isOwner", isOwner);
+//        model.addAttribute("groupId", group);
+//
+//        Map<Long, Boolean> canRepostMap = new HashMap<>();
+//        for (GroupPost post : posts) {
+//            // Разрешаем репост, если пользователь является членом группы и не автором поста
+//            boolean canRepost = isMember && !post.getAuthor().getId().equals(currentUser.getId());
+//            canRepostMap.put(post.getId(), canRepost);
+//        }
+//        model.addAttribute("canRepostMap", canRepostMap);
+//
+//        return "groups/view";
+//    }
 
     // Метод для отображения фото группы
     @GetMapping("/{groupId}/photo")

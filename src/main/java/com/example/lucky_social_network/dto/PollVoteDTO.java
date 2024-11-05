@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.List;
 
+
 @Data
 public class PollVoteDTO {
     // ID опроса
