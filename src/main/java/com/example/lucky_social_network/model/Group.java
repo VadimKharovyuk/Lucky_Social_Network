@@ -2,10 +2,7 @@ package com.example.lucky_social_network.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -14,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
@@ -24,6 +22,16 @@ public class Group implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GroupJoinRequest> joinRequests = new HashSet<>();
+
+    // Новый флаг, определяющий, требуется ли одобрение для вступления
+    @Column(nullable = false)
+    private Boolean requiresJoinApproval = false;
+  
 
     @Column(nullable = false)
     private String name;

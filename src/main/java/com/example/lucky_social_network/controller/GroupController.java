@@ -39,20 +39,7 @@ public class GroupController {
     public final GroupContentService groupContentService;
     private final PostService postService;
     private final PollServiceImpl pollService;
-
-    @PostMapping("/{groupId}/join")
-    public String joinGroup(@PathVariable Long groupId) {
-        User currentUser = userService.getCurrentUser();
-        Group group = groupService.getGroupById(groupId);
-
-        if (group.getType() == Group.GroupType.INTERACTIVE) {
-            groupService.addMember(group, currentUser);
-
-        } else {
-            groupService.subscribeToGroup(group, currentUser);
-        }
-        return "redirect:/groups/" + groupId;
-    }
+    private final GroupJoinRequestService groupJoinRequestService;
 
     @GetMapping("/{groupId}")
     public String showGroup(@PathVariable Long groupId, Model model) {
@@ -66,6 +53,32 @@ public class GroupController {
         // Получаем посты и опросы
         List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
         List<PollResponseDTO> polls = pollService.getAllPolls(groupId);
+
+        log.info("Showing group {}, currentUser: {}, isOwner: {}",
+                groupId, currentUser.getUsername(), isOwner);
+
+        if (isOwner) {
+            try {
+                // Отладочная информация
+                groupJoinRequestService.debugGroupRequests(groupId);
+
+                long pendingRequestsCount = groupJoinRequestService.countPendingRequests(groupId);
+                log.info("Pending requests count: {}", pendingRequestsCount);
+                model.addAttribute("pendingRequestsCount", pendingRequestsCount);
+
+                // Добавляем дополнительную проверку
+                if (pendingRequestsCount > 0) {
+                    log.info("Found {} pending requests for group {}", pendingRequestsCount, groupId);
+                } else {
+                    log.info("No pending requests found for group {}", groupId);
+                }
+            } catch (Exception e) {
+                log.error("Error processing pending requests: ", e);
+                model.addAttribute("pendingRequestsCount", 0L);
+            }
+        } else {
+            log.info("User is not owner of group {}", groupId);
+        }
 
         model.addAttribute("group", group);
         model.addAttribute("posts", posts);
@@ -86,6 +99,88 @@ public class GroupController {
 
         return "groups/view";
     }
+
+
+    @PostMapping("/{groupId}/join")
+    public String joinGroup(@PathVariable Long groupId,
+                            RedirectAttributes redirectAttributes) {
+        User currentUser = userService.getCurrentUser();
+        Group group = groupService.getGroupById(groupId);
+
+        try {
+            if (group.getType() == Group.GroupType.INTERACTIVE) {
+                // Если группа требует одобрения и это интерактивная группа
+                if (group.getRequiresJoinApproval()) {
+                    // Создаем запрос на вступление
+                    groupJoinRequestService.createJoinRequest(groupId, currentUser, null);
+                    redirectAttributes.addFlashAttribute("message",
+                            "Запрос на вступление отправлен. Ожидайте одобрения администратора.");
+                } else {
+                    // Если одобрение не требуется, используем существующую логику
+                    groupService.addMember(group, currentUser);
+                    redirectAttributes.addFlashAttribute("message",
+                            "Вы успешно присоединились к группе.");
+                }
+            } else {
+                // Для неинтерактивных групп используем существующую логику подписки
+                groupService.subscribeToGroup(group, currentUser);
+                redirectAttributes.addFlashAttribute("message",
+                        "Вы успешно подписались на группу.");
+            }
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/groups/" + groupId;
+    }
+
+    //    @PostMapping("/{groupId}/join")
+//    public String joinGroup(@PathVariable Long groupId) {
+//        User currentUser = userService.getCurrentUser();
+//        Group group = groupService.getGroupById(groupId);
+//
+//        if (group.getType() == Group.GroupType.INTERACTIVE) {
+//            groupService.addMember(group, currentUser);
+//
+//        } else {
+//            groupService.subscribeToGroup(group, currentUser);
+//        }
+//        return "redirect:/groups/" + groupId;
+//    }
+
+
+//    @GetMapping("/{groupId}")
+//    public String showGroup(@PathVariable Long groupId, Model model) {
+//        Group group = groupService.getGroupById(groupId);
+//        User currentUser = userService.getCurrentUser();
+//
+//        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
+//        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
+//        boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
+//
+//        // Получаем посты и опросы
+//        List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
+//        List<PollResponseDTO> polls = pollService.getAllPolls(groupId);
+//
+//        model.addAttribute("group", group);
+//        model.addAttribute("posts", posts);
+//        model.addAttribute("polls", polls);
+//        model.addAttribute("currentUser", currentUser);
+//        model.addAttribute("isMember", isMember);
+//        model.addAttribute("canPost", canPost);
+//        model.addAttribute("isOwner", isOwner);
+//        model.addAttribute("groupId", groupId);
+//
+//        // Карта для проверки возможности репоста
+//        Map<Long, Boolean> canRepostMap = new HashMap<>();
+//        for (GroupPost post : posts) {
+//            boolean canRepost = isMember && !post.getAuthor().getId().equals(currentUser.getId());
+//            canRepostMap.put(post.getId(), canRepost);
+//        }
+//        model.addAttribute("canRepostMap", canRepostMap);
+//
+//        return "groups/view";
+//    }
 
 
     @PostMapping("/{groupId}/repost/{postId}")

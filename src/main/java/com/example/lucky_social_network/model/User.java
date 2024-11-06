@@ -2,10 +2,7 @@ package com.example.lucky_social_network.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.BatchSize;
 
@@ -24,6 +21,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @BatchSize(size = 25)
+@Builder
 public class User implements Serializable {
 
     @Id

@@ -3,6 +3,7 @@ package com.example.lucky_social_network.service;
 import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.*;
 import com.example.lucky_social_network.repository.GroupContentRepository;
+import com.example.lucky_social_network.repository.GroupJoinRequestRepository;
 import com.example.lucky_social_network.repository.GroupRepository;
 import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +32,8 @@ public class GroupService {
     private final ImgurService imgurService;
     private final GroupContentRepository groupContentRepository;
     private final ActivityPublisher activityPublisher;
-
-    private static final String GROUPS_CACHE = "groups";
-    private static final String GROUP_MEMBERS_CACHE = "group_members";
-    private static final String USER_GROUPS_CACHE = "user_groups";
+    private final GroupJoinRequestServiceImpl joinRequestService;
+    private final GroupJoinRequestRepository groupJoinRequestRepository;
 
 
     public boolean canUserPostInGroup(User user, Group group) {
@@ -45,8 +44,16 @@ public class GroupService {
         return groupRepository.existsByIdAndMembersId(groupId, userId);
     }
 
-    public boolean isOwner(Long groupId, Long userId) {
-        return groupRepository.existsByIdAndOwnerId(groupId, userId);
+    // Или если у вас другая реализация, добавьте логирование
+    public boolean isOwner(Long userId, Long groupId) {
+        Group group = getGroupById(groupId);
+        boolean isOwner = group.getOwner().getId().equals(userId);
+        log.info("User {} {} owner of group {}. Owner ID: {}",
+                userId,
+                isOwner ? "is" : "is not",
+                groupId,
+                group.getOwner().getId());
+        return isOwner;
     }
 
 
@@ -146,21 +153,53 @@ public class GroupService {
 //            key = "#group.id + '_' + #user.id")
     @Transactional
     public void addMember(Group group, User user) {
-        if (group.getType() == Group.GroupType.INTERACTIVE) {
-            // Перезагружаем группу из базы данных
-            Group freshGroup = groupRepository.findById(group.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
-
-            if (!freshGroup.getMembers().contains(user)) {
-                freshGroup.getMembers().add(user);
-                freshGroup.setMembersCount(freshGroup.getMembersCount() + 1);
-                groupRepository.save(freshGroup);
-                log.info("User {} successfully added to group {}", user.getUsername(), freshGroup.getName());
-            }
-        } else {
+        if (group.getType() != Group.GroupType.INTERACTIVE) {
             throw new IllegalStateException("Cannot add members to a non-interactive group");
         }
+
+        // Перезагружаем группу из базы данных
+        Group freshGroup = groupRepository.findById(group.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+
+        if (!freshGroup.getMembers().contains(user)) {
+            // Проверяем, не является ли пользователь уже участником группы
+            if (freshGroup.getMembers().contains(user)) {
+                throw new IllegalStateException("User is already a member of this group");
+            }
+
+            freshGroup.getMembers().add(user);
+            freshGroup.setMembersCount(freshGroup.getMembersCount() + 1);
+            groupRepository.save(freshGroup);
+            log.info("User {} successfully added to group {}", user.getUsername(), freshGroup.getName());
+        }
     }
+
+    // GroupServiceImpl.java - добавляем новый метод для проверки существующего запроса
+    @Transactional(readOnly = true)
+    public boolean hasActiveJoinRequest(Long groupId, User user) {
+        return groupJoinRequestRepository.existsByGroupAndUserAndStatus(
+                Group.builder().id(groupId).build(),
+                user,
+                GroupJoinRequest.RequestStatus.PENDING
+        );
+    }
+//    @Transactional
+//    public void addMember(Group group, User user) {
+//        if (group.getType() == Group.GroupType.INTERACTIVE) {
+//            // Перезагружаем группу из базы данных
+//            Group freshGroup = groupRepository.findById(group.getId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+//
+//            if (!freshGroup.getMembers().contains(user)) {
+//                freshGroup.getMembers().add(user);
+//                freshGroup.setMembersCount(freshGroup.getMembersCount() + 1);
+//                groupRepository.save(freshGroup);
+//                log.info("User {} successfully added to group {}", user.getUsername(), freshGroup.getName());
+//            }
+//        } else {
+//            throw new IllegalStateException("Cannot add members to a non-interactive group");
+//        }
+//    }
 
 //    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
 //            key = "#group.id + '_' + #user.id")

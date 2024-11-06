@@ -1,0 +1,40 @@
+package com.example.lucky_social_network.repository;
+
+import com.example.lucky_social_network.model.Group;
+import com.example.lucky_social_network.model.GroupJoinRequest;
+import com.example.lucky_social_network.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface GroupJoinRequestRepository extends JpaRepository<GroupJoinRequest, Long> {
+    List<GroupJoinRequest> findAllByGroupAndStatus(Group group, GroupJoinRequest.RequestStatus status);
+
+    List<GroupJoinRequest> findAllByUserAndStatus(User user, GroupJoinRequest.RequestStatus status);
+
+    Optional<GroupJoinRequest> findByGroupAndUserAndStatus(Group group, User user, GroupJoinRequest.RequestStatus status);
+
+    boolean existsByGroupAndUserAndStatus(Group group, User user, GroupJoinRequest.RequestStatus status);
+
+
+//    @Query(value = "SELECT COUNT(*) FROM group_join_requests WHERE group_id = :groupId AND status = cast(:status as varchar)",
+//            nativeQuery = true)
+//    long countByGroupIdAndStatus(@Param("groupId") Long groupId,
+//                                 @Param("status") String status);
+
+    // Или альтернативный вариант с JPQL (предпочтительнее):
+    @Query("SELECT COUNT(gr) FROM GroupJoinRequest gr WHERE gr.group.id = :groupId AND gr.status = :status")
+    long countByGroupIdAndStatusJPQL(@Param("groupId") Long groupId,
+                                     @Param("status") GroupJoinRequest.RequestStatus status);
+
+
+    // Добавьте метод для отладки
+    @Query(value = "SELECT * FROM group_join_requests WHERE group_id = :groupId",
+            nativeQuery = true)
+    List<GroupJoinRequest> findAllByGroupId(@Param("groupId") Long groupId);
+}
