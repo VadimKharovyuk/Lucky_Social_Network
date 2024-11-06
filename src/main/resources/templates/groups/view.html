@@ -460,8 +460,16 @@
         <p>Тип: <span th:text="${group.type}"></span></p>
         <p>Участники: <span th:text="${group.membersCount}"></span></p>
 
-        <div th:if="${isOwner}" class="owner-actions">
-            <a th:href="@{/groups/update/{id}(id=${group.id})}" class="update-button">Обновить группу</a>
+        <!-- Информация о типе видимости -->
+        <div class="visibility-info">
+            <span class="visibility-badge" th:text="${group.visibility.displayName}">Тип группы</span>
+        </div>
+
+        <!-- Блок действий для владельца -->
+        <div th:if="${accessInfo.isOwner()}" class="owner-actions">
+            <a th:href="@{/groups/update/{id}(id=${group.id})}" class="update-button">
+                Обновить группу
+            </a>
 
             <a th:href="@{/group-requests/view/{id}(id=${group.id})}"
                class="join-requests-button"
@@ -470,8 +478,7 @@
                 Заявки на вступление
                 <span th:if="${pendingRequestsCount > 0}"
                       class="requests-count"
-                      th:text="${pendingRequestsCount}"
-                      style="margin-left: 5px; background-color: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px;">
+                      th:text="${pendingRequestsCount}">
             </span>
             </a>
 
@@ -486,7 +493,8 @@
             </form>
         </div>
 
-        <div th:if="${!isMember and !isOwner}" class="join-actions">
+        <!-- Блок для отправки заявки -->
+        <div th:if="${!accessInfo.isMember() && !accessInfo.isOwner()}" class="join-actions">
             <form th:action="@{/group-requests/join/{id}(id=${group.id})}" method="post">
             <textarea name="message"
                       placeholder="Сообщение для владельца группы (необязательно)"

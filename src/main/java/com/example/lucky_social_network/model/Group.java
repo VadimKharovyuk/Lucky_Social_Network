@@ -23,6 +23,32 @@ public class Group implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private VisibilityType visibility = VisibilityType.PUBLIC;
+
+
+    public enum VisibilityType {
+        PUBLIC("Открытая группа", "Контент доступен всем"),
+        RESTRICTED("Ограниченная группа", "Контент виден после одобрения заявки"),
+        PRIVATE("Закрытая группа", "Контент скрыт до вступления");
+
+        private final String displayName;
+        private final String description;
+
+        VisibilityType(String displayName, String description) {
+            this.displayName = displayName;
+            this.description = description;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
 
     @JsonIgnore
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)

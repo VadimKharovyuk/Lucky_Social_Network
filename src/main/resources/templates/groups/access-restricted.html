@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Доступ ограничен</title>
+</head>
+<style>
+    :root {
+        --primary-color: #4A90E2;
+        --danger-color: #FF5252;
+        --success-color: #4CAF50;
+        --warning-color: #FFC107;
+        --text-primary: #2C3E50;
+        --text-secondary: #7F8C8D;
+        --background-light: #F8FAFC;
+        --border-color: #E2E8F0;
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background-color: var(--background-light);
+        color: var(--text-primary);
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .access-restricted {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        padding: 2rem;
+        transition: var(--transition);
+    }
+
+    .access-restricted:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .group-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .group-header h1 {
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+    }
+
+    .visibility-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: var(--background-light);
+        color: var(--text-secondary);
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .visibility-badge:hover {
+        background: #ECF0F1;
+        transform: translateY(-1px);
+    }
+
+    .group-preview {
+        background: var(--background-light);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .group-description {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .group-stats {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+    }
+
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        padding: 0.5rem 1rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .stat:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat i {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+    }
+
+    .access-message {
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .private-message,
+    .restricted-message {
+        padding: 2rem;
+    }
+
+    .private-message i,
+    .restricted-message i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .private-message i {
+        color: var(--danger-color);
+    }
+
+    .restricted-message i {
+        color: var(--warning-color);
+    }
+
+    .pending-status i {
+        color: var(--warning-color);
+    }
+
+    .rejected-status i {
+        color: var(--danger-color);
+    }
+
+    .action-buttons {
+        margin-top: 2rem;
+    }
+
+    .join-message {
+        width: 100%;
+        min-height: 120px;
+        padding: 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        margin: 1rem 0;
+        font-size: 1rem;
+        resize: vertical;
+        transition: var(--transition);
+    }
+
+    .join-message:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .join-button,
+    .retry-button {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .join-button:hover,
+    .retry-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+    }
+
+    .retry-button {
+        background: var(--danger-color);
+    }
+
+    .retry-button:hover {
+        box-shadow: 0 4px 12px rgba(255, 82, 82, 0.2);
+    }
+
+    .request-status {
+        padding: 2rem;
+        border-radius: 12px;
+        background: var(--background-light);
+    }
+
+    .pending-status,
+    .rejected-status {
+        text-align: center;
+    }
+
+    .pending-status h2,
+    .rejected-status h2 {
+        color: var(--text-primary);
+        margin: 1rem 0;
+        font-size: 1.5rem;
+    }
+
+    .pending-status p,
+    .rejected-status p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Анимации */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .access-restricted {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .container {
+            margin: 1rem;
+        }
+
+        .access-restricted {
+            padding: 1.5rem;
+        }
+
+        .group-stats {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stat {
+            justify-content: center;
+        }
+
+        .join-message {
+            min-height: 100px;
+        }
+    }
+
+    /* Дополнительные эффекты при фокусе */
+    .join-button:focus,
+    .retry-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+    }
+
+    /* Эффект пульсации для счетчика заявок */
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .requests-count {
+        animation: pulse 2s infinite;
+    }
+</style>
+<body>
+<div class="container">
+    <div class="access-restricted">
+        <div class="group-header">
+            <h1 th:text="${group.name}">Название группы</h1>
+            <div class="visibility-badge"
+                 th:text="${group.visibility.displayName}">
+                Тип группы
+            </div>
+        </div>
+
+        <div class="group-preview">
+            <p th:text="${group.description}" class="group-description">
+                Описание группы
+            </p>
+            <div class="group-stats">
+                <div class="stat">
+                    <i class="fas fa-users"></i>
+                    <span th:text="${group.membersCount}">0</span> участников
+                </div>
+                <div class="stat">
+                    <i class="fas fa-file-alt"></i>
+                    <span th:text="${group.postsCount}">0</span> публикаций
+                </div>
+            </div>
+        </div>
+
+        <!-- Различные сообщения в зависимости от типа доступа -->
+        <div class="access-message" th:switch="${group.visibility}">
+            <!-- Закрытая группа -->
+            <div th:case="${T(com.example.lucky_social_network.model.Group.VisibilityType).PRIVATE}"
+                 class="private-message">
+                <i class="fas fa-lock"></i>
+                <h2>Закрытая группа</h2>
+                <p>Содержимое этой группы доступно только её участникам.</p>
+                <div class="action-buttons">
+                    <form th:action="@{/group-requests/join/{id}(id=${group.id})}"
+                          method="post">
+                        <button type="submit" class="join-button">
+                            Отправить заявку на вступление
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Ограниченная группа -->
+            <div th:case="${T(com.example.lucky_social_network.model.Group.VisibilityType).RESTRICTED}"
+                 class="restricted-message">
+                <!-- Если нет заявки -->
+                <div th:if="${requestStatus == null}" class="join-form">
+                    <i class="fas fa-user-lock"></i>
+                    <h2>Требуется одобрение</h2>
+                    <p>Для просмотра содержимого необходимо вступить в группу.</p>
+                    <form th:action="@{/group-requests/join/{id}(id=${group.id})}"
+                          method="post">
+                        <textarea name="message"
+                                  placeholder="Сообщение для администратора (необязательно)"
+                                  class="join-message"></textarea>
+                        <button type="submit" class="join-button">
+                            Отправить заявку
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Если есть заявка -->
+                <div th:if="${requestStatus != null}"
+                     th:switch="${requestStatus}"
+                     class="request-status">
+                    <!-- Ожидающая заявка -->
+                    <div th:case="${T(com.example.lucky_social_network.model.GroupJoinRequest.RequestStatus).PENDING}"
+                         class="pending-status">
+                        <i class="fas fa-clock"></i>
+                        <h2>Заявка на рассмотрении</h2>
+                        <p>Ваша заявка находится на рассмотрении.
+                            Мы уведомим вас о решении администратора.</p>
+                    </div>
+
+                    <!-- Отклоненная заявка -->
+                    <div th:case="${T(com.example.lucky_social_network.model.GroupJoinRequest.RequestStatus).REJECTED}"
+                         class="rejected-status">
+                        <i class="fas fa-times-circle"></i>
+                        <h2>Заявка отклонена</h2>
+                        <p>К сожалению, ваша заявка была отклонена.</p>
+                        <form th:action="@{/group-requests/join/{id}(id=${group.id})}"
+                              method="post">
+                            <textarea name="message"
+                                      placeholder="Сообщение для повторной заявки"
+                                      class="join-message"></textarea>
+                            <button type="submit" class="retry-button">
+                                Отправить новую заявку
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -6,6 +6,8 @@ import com.example.lucky_social_network.repository.GroupContentRepository;
 import com.example.lucky_social_network.repository.GroupJoinRequestRepository;
 import com.example.lucky_social_network.repository.GroupRepository;
 import com.example.lucky_social_network.service.picService.ImgurService;
+import lombok.Builder;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -56,8 +58,6 @@ public class GroupService {
         return isOwner;
     }
 
-
-    //    @Cacheable(value = GROUPS_CACHE, key = "#id")
     public Group getGroupById(Long id) {
         activityPublisher.publishGroupActivity(id, GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
         return groupRepository.findById(id)
@@ -65,35 +65,46 @@ public class GroupService {
     }
 
 
-    //    //при лобавлние новой групы она не попадает в кеш
-//    @Cacheable(value = GROUPS_CACHE, key = "'all'")
     public List<Group> getAllGroups() {
         return groupRepository.findAll();
     }
 
-    //    @CachePut(value = GROUPS_CACHE, key = "#result.id")
+
+    @Transactional
     public Group createGroup(Group group, User owner) {
         if (owner == null) {
             log.info("Owner not provided, attempting to get current user");
             owner = userService.getCurrentUser();
         }
+
+        // Устанавливаем настройки приватности в зависимости от типа видимости
+        switch (group.getVisibility()) {
+            case PRIVATE:
+            case RESTRICTED:
+                group.setRequiresJoinApproval(true);
+                break;
+            case PUBLIC:
+                group.setRequiresJoinApproval(false);
+                break;
+        }
+
         group.setOwner(owner);
         group.setCreatedAt(LocalDateTime.now());
         group.setMembersCount(1L);
         group.getMembers().add(owner);
 
         Group savedGroup = groupRepository.save(group);
-        log.info("Group created successfully with id: {}", savedGroup.getId());
+        log.info("Group created successfully with id: {} and visibility: {}",
+                savedGroup.getId(), savedGroup.getVisibility());
         return savedGroup;
     }
 
-    //    @Cacheable(value = GROUP_MEMBERS_CACHE, key = "#groupId + '_' + #userId")
+
     public boolean isUserMemberOfGroup(Long userId, Long groupId) {
         return groupRepository.existsByIdAndMembersId(groupId, userId);
     }
 
-    //    @Cacheable(value = USER_GROUPS_CACHE,
-//            key = "T(String).format('%d_page%d_size%d_%s_%s_%s', #currentUserId, #page, #size, #sortBy, #sortDirection, #type != null ? #type : 'all')")
+
     public Page<Group> getCurrentUserGroups(int page, int size, String sortBy, String sortDirection, String type) {
         Long currentUserId = userService.getCurrentUserId();
         Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
@@ -101,7 +112,7 @@ public class GroupService {
         return groupRepository.findByMembersId(currentUserId, pageable);
     }
 
-    //    @CachePut(value = GROUPS_CACHE, key = "#result.id")
+
     @Transactional
     public Group updateGroup(Long groupId, String name, String description, byte[] photoData) {
         Group group = getGroupById(groupId);
@@ -132,8 +143,6 @@ public class GroupService {
 
         return updatedGroup;
     }
-
-    //    @CacheEvict(value = GROUPS_CACHE, key = "#groupId")
     @Transactional
     public Group deleteGroupById(Long groupId) {
         Optional<Group> groupOptional = groupRepository.findById(groupId);
@@ -149,22 +158,27 @@ public class GroupService {
         }
     }
 
-    //    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
-//            key = "#group.id + '_' + #user.id")
+
     @Transactional
     public void addMember(Group group, User user) {
         if (group.getType() != Group.GroupType.INTERACTIVE) {
             throw new IllegalStateException("Cannot add members to a non-interactive group");
         }
 
-        // Перезагружаем группу из базы данных
         Group freshGroup = groupRepository.findById(group.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
 
         if (!freshGroup.getMembers().contains(user)) {
-            // Проверяем, не является ли пользователь уже участником группы
-            if (freshGroup.getMembers().contains(user)) {
-                throw new IllegalStateException("User is already a member of this group");
+            // Проверяем необходимость одобрения
+            if (needsJoinRequest(freshGroup)) {
+                // Если нет активной заявки, создаем её
+                if (!hasActiveJoinRequest(freshGroup.getId(), user)) {
+                    throw new IllegalStateException("Join request required for this group");
+                }
+                // Проверяем статус заявки
+                GroupJoinRequest request = groupJoinRequestRepository
+                        .findByGroupAndUserAndStatus(freshGroup, user, GroupJoinRequest.RequestStatus.APPROVED)
+                        .orElseThrow(() -> new IllegalStateException("Join request not approved"));
             }
 
             freshGroup.getMembers().add(user);
@@ -183,42 +197,7 @@ public class GroupService {
                 GroupJoinRequest.RequestStatus.PENDING
         );
     }
-//    @Transactional
-//    public void addMember(Group group, User user) {
-//        if (group.getType() == Group.GroupType.INTERACTIVE) {
-//            // Перезагружаем группу из базы данных
-//            Group freshGroup = groupRepository.findById(group.getId())
-//                    .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
-//
-//            if (!freshGroup.getMembers().contains(user)) {
-//                freshGroup.getMembers().add(user);
-//                freshGroup.setMembersCount(freshGroup.getMembersCount() + 1);
-//                groupRepository.save(freshGroup);
-//                log.info("User {} successfully added to group {}", user.getUsername(), freshGroup.getName());
-//            }
-//        } else {
-//            throw new IllegalStateException("Cannot add members to a non-interactive group");
-//        }
-//    }
 
-//    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
-//            key = "#group.id + '_' + #user.id")
-//    @Transactional
-//    public void addMember(Group group, User user) {
-//        if (group.getType() == Group.GroupType.INTERACTIVE) {
-//            if (!group.getMembers().contains(user)) {
-//                group.getMembers().add(user);
-//                group.setMembersCount(group.getMembersCount() + 1);
-//                groupRepository.save(group);
-//                log.info("User {} successfully added to group {}", user.getUsername(), group.getName());
-//            }
-//        } else {
-//            throw new IllegalStateException("Cannot add members to a non-interactive group");
-//        }
-//    }
-
-    //    @CacheEvict(value = {GROUP_MEMBERS_CACHE, USER_GROUPS_CACHE},
-//            key = "#group.id + '_' + #user.id")
     @Transactional
     public void leaveGroup(Group group, User user) {
         if (group.getType() != Group.GroupType.INTERACTIVE) {
@@ -331,127 +310,100 @@ public class GroupService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public boolean canAccessGroup(User user, Group group) {
+        // Владелец всегда имеет доступ
+        if (isOwner(user.getId(), group.getId())) {
+            return true;
+        }
 
-//
-//    public List<Group> getAllGroups() {
-//        return groupRepository.findAll();
-//    }
-//
-//    public Group getGroupById(Long id) {
-//        activityPublisher.publishGroupActivity(id, GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
-//        return groupRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
-//    }
-//
-//
-//    public Page<Group> getCurrentUserGroups(int page, int size, String sortBy, String sortDirection, String type) {
-//        Long currentUserId = userService.getCurrentUserId();
-//        Sort sort = Sort.by(sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
-//        Pageable pageable = PageRequest.of(page, size, sort);
-//        return groupRepository.findByMembersId(currentUserId, pageable);
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public boolean isUserMemberOfGroup(Long userId, Long groupId) {
-//        return groupRepository.existsByIdAndMembersId(groupId, userId);
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public boolean isUserOwnerOfGroup(Long userId, Long groupId) {
-//        return groupRepository.existsByIdAndOwnerId(groupId, userId);
-//    }
-//
-//
-//    @Transactional
-//    public Group save(Group group) {
-//        activityPublisher.publishGroupActivity(group.getId(), GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
-//        return groupRepository.save(group);
-//    }
-//
-//    public Group findById(Long groupId) {
-//        Optional<Group> group = groupRepository.findById(groupId);
-//        activityPublisher.publishGroupActivity(groupId, GroupActivityEvent.GroupActivityType.GROUP_UPDATED);
-//        return group.orElse(null);
-//    }
-//
-//
-//    @Transactional
-//    public Group deleteGroupById(Long groupId) {
-//        Optional<Group> groupOptional = groupRepository.findById(groupId);
-//
-//        if (groupOptional.isPresent()) {
-//            Group group = groupOptional.get();
-//
-//            // Очищаем связи
-//            group.getMembers().clear();
-//            group.getPosts().clear();
-//
-//            // Удаляем группу
-//            groupRepository.delete(group);
-//
-//            return group;
-//        } else {
-//            throw new RuntimeException("Group not found with id: " + groupId);
-//        }
-//    }
-    //
-//    @Transactional
-//    public void addMember(Group group, User user) {
-//        log.info("Adding user {} to group {}", user.getUsername(), group.getName());
-//        if (group.getType() == Group.GroupType.INTERACTIVE) {
-//            if (!group.getMembers().contains(user)) {
-//                group.getMembers().add(user);
-//                group.setMembersCount(group.getMembersCount() + 1);
-//                groupRepository.save(group);
-//                log.info("User {} successfully added to group {}", user.getUsername(), group.getName());
-//            } else {
-//                log.info("User {} is already a member of group {}", user.getUsername(), group.getName());
-//            }
-//        } else {
-//            log.warn("Cannot add members to non-interactive group {}", group.getName());
-//            throw new IllegalStateException("Cannot add members to a non-interactive group");
-//        }
-//    }
-//
+        // Участник группы всегда имеет доступ
+        if (isUserMemberOfGroup(user.getId(), group.getId())) {
+            return true;
+        }
 
-    //
-//    public void deletePostInGroup(Long postId) {
-//        GroupPost post = groupContentRepository.findById(postId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Пост не найден"));
-//
-//        Group group = post.getGroup();
-//        group.getPosts().remove(post);
-//        group.setPostsCount(group.getPostsCount() - 1);
-//
-//        groupContentRepository.delete(post);
-//        groupRepository.save(group);
-//    }
-//
-//    @Transactional
-//    public Group updateGroup(Long groupId, String name, String description, byte[] photoData) {
-//        Group group = getGroupById(groupId);
-//
-//        if (name != null && !name.trim().isEmpty()) {
-//            group.setName(name);
-//        }
-//
-//        if (description != null) {
-//            group.setDescription(description);
-//        }
-//
-//        if (photoData != null && photoData.length > 0) {
-//            String imageUrl = imgurService.uploadImage(photoData);
-//            if (imageUrl != null) {
-//                group.setImgurImageUrl(imageUrl);
-//            } else {
-//                log.error("Failed to upload image for group with id: {}", groupId);
-//                throw new RuntimeException("Failed to upload image to Imgur");
-//            }
-//        }
-//
-//        Group updatedGroup = groupRepository.save(group);
-//        log.info("Updated group with id: {}", groupId);
-//        return updatedGroup;
-//    }
-//
+        // Проверка доступа на основе типа видимости
+        switch (group.getVisibility()) {
+            case PUBLIC:
+                return true;
+            case RESTRICTED:
+                // Проверяем наличие одобренной заявки
+                return groupJoinRequestRepository
+                        .findByGroupAndUserAndStatus(group, user, GroupJoinRequest.RequestStatus.APPROVED)
+                        .isPresent();
+            case PRIVATE:
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public boolean needsJoinRequest(Group group) {
+        return group.getVisibility() != Group.VisibilityType.PUBLIC || group.getRequiresJoinApproval();
+    }
+
+    @Transactional(readOnly = true)
+    public GroupAccessInfo getGroupAccessInfo(Long groupId, User currentUser) {
+        Group group = getGroupById(groupId);
+        boolean isMember = isUserMemberOfGroup(currentUser.getId(), groupId);
+        boolean isOwner = isOwner(currentUser.getId(), groupId);
+
+        // Получаем статус заявки, если пользователь не участник и не владелец
+        GroupJoinRequest.RequestStatus joinRequestStatus = null;
+        if (!isMember && !isOwner) {
+            joinRequestStatus = groupJoinRequestRepository
+                    .findTopByGroupIdAndUserIdOrderByCreatedAtDesc(groupId, currentUser.getId())
+                    .map(GroupJoinRequest::getStatus)
+                    .orElse(null);
+        }
+
+        // Определяем, может ли пользователь просматривать контент
+        boolean canAccess = calculateCanAccess(group, currentUser, isMember, isOwner, joinRequestStatus);
+
+        log.info("Access info for group {}: isMember={}, isOwner={}, canAccess={}, visibility={}, requestStatus={}",
+                groupId, isMember, isOwner, canAccess, group.getVisibility(), joinRequestStatus);
+
+        return GroupAccessInfo.builder()
+                .canAccess(canAccess)
+                .isMember(isMember)
+                .isOwner(isOwner)
+                .joinRequestStatus(joinRequestStatus)
+                .visibility(group.getVisibility())
+                .requiresJoinApproval(group.getRequiresJoinApproval())
+                .build();
+    }
+
+    private boolean calculateCanAccess(Group group, User user, boolean isMember, boolean isOwner,
+                                       GroupJoinRequest.RequestStatus requestStatus) {
+        // Владелец и участники всегда имеют доступ
+        if (isOwner || isMember) {
+            return true;
+        }
+
+        // Проверяем доступ на основе типа видимости группы
+        switch (group.getVisibility()) {
+            case PUBLIC:
+                return true;
+            case RESTRICTED:
+                // Для ограниченной группы нужна одобренная заявка
+                return requestStatus == GroupJoinRequest.RequestStatus.APPROVED;
+            case PRIVATE:
+                // Для закрытой группы нужно быть участником
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    @Data
+    @Builder
+    public static class GroupAccessInfo {
+        private boolean canAccess;
+        private boolean isMember;
+        private boolean isOwner;
+        private GroupJoinRequest.RequestStatus joinRequestStatus;
+        private Group.VisibilityType visibility;
+        private boolean requiresJoinApproval;
+    }
 }

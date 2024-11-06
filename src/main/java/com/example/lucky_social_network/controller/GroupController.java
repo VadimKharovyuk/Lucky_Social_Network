@@ -43,68 +43,71 @@ public class GroupController {
         Group group = groupService.getGroupById(groupId);
         User currentUser = userService.getCurrentUser();
 
-        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
-        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
-        boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
+        // Получаем всю информацию о доступе через GroupAccessInfo
+        GroupService.GroupAccessInfo accessInfo = groupService.getGroupAccessInfo(groupId, currentUser);
 
-        // Проверяем доступ к группе
-        if (!isMember && !isOwner) {
-            GroupJoinRequest.RequestStatus requestStatus =
-                    groupJoinRequestService.getRequestStatus(groupId, currentUser.getId());
-
-            // Если есть заявка, которая не одобрена - показываем страницу с ограниченным доступом
-            if (requestStatus != null && requestStatus != GroupJoinRequest.RequestStatus.APPROVED) {
-                log.info("User {} has pending/rejected request for group {}, status: {}",
-                        currentUser.getUsername(), groupId, requestStatus);
-
+        // Проверяем базовый доступ к группе
+        if (!accessInfo.isCanAccess()) {
+            if (group.getVisibility() == Group.VisibilityType.PRIVATE) {
+                // Для закрытой группы
                 model.addAttribute("group", group);
-                model.addAttribute("requestStatus", requestStatus);
-                return "groups/access";
+                model.addAttribute("accessInfo", accessInfo);
+                return "groups/access-restricted";
+            } else if (group.getVisibility() == Group.VisibilityType.RESTRICTED) {
+                // Проверяем статус заявки для ограниченной группы
+                GroupJoinRequest.RequestStatus requestStatus =
+                        groupJoinRequestService.getRequestStatus(groupId, currentUser.getId());
+
+                if (requestStatus == null) {
+                    // Нет заявки - показываем форму подачи
+                    model.addAttribute("group", group);
+                    model.addAttribute("accessInfo", accessInfo);
+                    return "groups/access-restricted";
+                } else if (requestStatus != GroupJoinRequest.RequestStatus.APPROVED) {
+                    // Есть заявка, но не одобрена
+                    model.addAttribute("group", group);
+                    model.addAttribute("requestStatus", requestStatus);
+                    model.addAttribute("accessInfo", accessInfo);
+                    return "groups/access-restricted";
+                }
             }
         }
 
-        // Получаем посты и опросы
+        // Если есть доступ, получаем контент
+        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
         List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
         List<PollResponseDTO> polls = pollService.getAllPolls(groupId);
 
-        log.info("Showing group {}, currentUser: {}, isOwner: {}",
-                groupId, currentUser.getUsername(), isOwner);
+        log.info("Showing group {}, currentUser: {}, isOwner: {}, visibility: {}",
+                groupId, currentUser.getUsername(), accessInfo.isOwner(), group.getVisibility());
 
-        if (isOwner) {
+        // Для владельца добавляем информацию о заявках
+        if (accessInfo.isOwner()) {
             try {
-                groupJoinRequestService.debugGroupRequests(groupId);
                 long pendingRequestsCount = groupJoinRequestService.countPendingRequests(groupId);
-                log.info("Pending requests count: {}", pendingRequestsCount);
+                log.info("Found {} pending requests for group {}", pendingRequestsCount, groupId);
                 model.addAttribute("pendingRequestsCount", pendingRequestsCount);
-
-                if (pendingRequestsCount > 0) {
-                    log.info("Found {} pending requests for group {}", pendingRequestsCount, groupId);
-                } else {
-                    log.info("No pending requests found for group {}", groupId);
-                }
             } catch (Exception e) {
                 log.error("Error processing pending requests: ", e);
                 model.addAttribute("pendingRequestsCount", 0L);
             }
-        } else {
-            log.info("User is not owner of group {}", groupId);
         }
-
-        model.addAttribute("group", group);
-        model.addAttribute("posts", posts);
-        model.addAttribute("polls", polls);
-        model.addAttribute("currentUser", currentUser);
-        model.addAttribute("isMember", isMember);
-        model.addAttribute("canPost", canPost);
-        model.addAttribute("isOwner", isOwner);
-        model.addAttribute("groupId", groupId);
 
         // Карта для проверки возможности репоста
         Map<Long, Boolean> canRepostMap = new HashMap<>();
         for (GroupPost post : posts) {
-            boolean canRepost = isMember && !post.getAuthor().getId().equals(currentUser.getId());
+            boolean canRepost = accessInfo.isMember() &&
+                    !post.getAuthor().getId().equals(currentUser.getId());
             canRepostMap.put(post.getId(), canRepost);
         }
+
+        // Добавляем все в модель
+        model.addAttribute("group", group);
+        model.addAttribute("posts", posts);
+        model.addAttribute("polls", polls);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("accessInfo", accessInfo);
+        model.addAttribute("canPost", canPost);
         model.addAttribute("canRepostMap", canRepostMap);
 
         return "groups/view";
@@ -191,36 +194,6 @@ public class GroupController {
         return "redirect:/groups/" + groupId;
     }
 
-
-//    @GetMapping("/{groupId}")
-//    public String showGroup(@PathVariable Long groupId, Model model) {
-//        Group group = groupService.getGroupById(groupId);
-//        User currentUser = userService.getCurrentUser();
-//
-//        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
-//        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
-//        boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
-//
-//        List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
-//
-//        model.addAttribute("group", group);
-//        model.addAttribute("posts", posts);
-//        model.addAttribute("currentUser", currentUser);
-//        model.addAttribute("isMember", isMember);
-//        model.addAttribute("canPost", canPost);
-//        model.addAttribute("isOwner", isOwner);
-//        model.addAttribute("groupId", group);
-//
-//        Map<Long, Boolean> canRepostMap = new HashMap<>();
-//        for (GroupPost post : posts) {
-//            // Разрешаем репост, если пользователь является членом группы и не автором поста
-//            boolean canRepost = isMember && !post.getAuthor().getId().equals(currentUser.getId());
-//            canRepostMap.put(post.getId(), canRepost);
-//        }
-//        model.addAttribute("canRepostMap", canRepostMap);
-//
-//        return "groups/view";
-//    }
 
     // Метод для отображения фото группы
     @GetMapping("/{groupId}/photo")
@@ -324,16 +297,29 @@ public class GroupController {
 
     @GetMapping("/create")
     public String showCreateForm(Model model) {
-        Long CurrentUser = userService.getCurrentUser().getId();
-        model.addAttribute("group", new Group());
-        model.addAttribute("currentUser", CurrentUser);
+        Long currentUser = userService.getCurrentUser().getId();
+        Group group = new Group();
+
+        // Добавляем все возможные значения enum для выбора в форме
+        model.addAttribute("visibilityTypes", Group.VisibilityType.values());
+        model.addAttribute("groupTypes", Group.GroupType.values());
+        model.addAttribute("group", group);
+        model.addAttribute("currentUser", currentUser);
+
         return "groups/create";
     }
 
     @PostMapping("/create")
     public String createGroup(@ModelAttribute Group group) {
-        User currentUser;
-        currentUser = userService.getCurrentUser();
+        User currentUser = userService.getCurrentUser();
+
+        // Устанавливаем параметры приватности в зависимости от типа группы
+        if (group.getVisibility() == Group.VisibilityType.PUBLIC) {
+            group.setRequiresJoinApproval(false);
+        } else {
+            group.setRequiresJoinApproval(true);
+        }
+
         groupService.createGroup(group, currentUser);
         return "redirect:/groups/my";
     }
