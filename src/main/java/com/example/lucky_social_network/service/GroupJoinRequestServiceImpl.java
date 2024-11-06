@@ -168,4 +168,20 @@ public class GroupJoinRequestServiceImpl implements GroupJoinRequestService {
                         request.getStatus())
         );
     }
+
+    @Transactional(readOnly = true)
+    public boolean hasApprovedRequest(Long groupId, Long userId) {
+        return requestRepository.existsByGroupAndUserAndStatus(
+                Group.builder().id(groupId).build(),
+                User.builder().id(userId).build(),
+                GroupJoinRequest.RequestStatus.APPROVED
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public GroupJoinRequest.RequestStatus getRequestStatus(Long groupId, Long userId) {
+        return requestRepository.findTopByGroupIdAndUserIdOrderByCreatedAtDesc(groupId, userId)
+                .map(GroupJoinRequest::getStatus)
+                .orElse(null);
+    }
 }

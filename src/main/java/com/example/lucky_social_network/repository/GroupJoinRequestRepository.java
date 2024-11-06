@@ -37,4 +37,12 @@ public interface GroupJoinRequestRepository extends JpaRepository<GroupJoinReque
     @Query(value = "SELECT * FROM group_join_requests WHERE group_id = :groupId",
             nativeQuery = true)
     List<GroupJoinRequest> findAllByGroupId(@Param("groupId") Long groupId);
+
+    @Query("SELECT gr FROM GroupJoinRequest gr " +
+            "WHERE gr.group.id = :groupId AND gr.user.id = :userId " +
+            "ORDER BY gr.createdAt DESC")
+    Optional<GroupJoinRequest> findTopByGroupIdAndUserIdOrderByCreatedAtDesc(
+            @Param("groupId") Long groupId,
+            @Param("userId") Long userId);
+
 }

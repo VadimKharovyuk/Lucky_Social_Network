@@ -1,6 +1,7 @@
 package com.example.lucky_social_network.service;
 
 import com.example.lucky_social_network.dto.GroupJoinRequestDto;
+import com.example.lucky_social_network.model.GroupJoinRequest;
 import com.example.lucky_social_network.model.User;
 
 import java.util.List;
@@ -32,5 +33,6 @@ public interface GroupJoinRequestService {
 
 
     void debugGroupRequests(Long groupId);
-    
+
+    GroupJoinRequest.RequestStatus getRequestStatus(Long groupId, Long id);
 }

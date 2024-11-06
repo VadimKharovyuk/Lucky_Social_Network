@@ -2,10 +2,7 @@ package com.example.lucky_social_network.controller;
 
 import com.example.lucky_social_network.dto.PollResponseDTO;
 import com.example.lucky_social_network.exception.ResourceNotFoundException;
-import com.example.lucky_social_network.model.Group;
-import com.example.lucky_social_network.model.GroupPost;
-import com.example.lucky_social_network.model.Post;
-import com.example.lucky_social_network.model.User;
+import com.example.lucky_social_network.model.*;
 import com.example.lucky_social_network.repository.GroupContentRepository;
 import com.example.lucky_social_network.service.*;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +47,22 @@ public class GroupController {
         boolean canPost = groupService.canUserPostInGroup(currentUser, group);
         boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
 
+        // Проверяем доступ к группе
+        if (!isMember && !isOwner) {
+            GroupJoinRequest.RequestStatus requestStatus =
+                    groupJoinRequestService.getRequestStatus(groupId, currentUser.getId());
+
+            // Если есть заявка, которая не одобрена - показываем страницу с ограниченным доступом
+            if (requestStatus != null && requestStatus != GroupJoinRequest.RequestStatus.APPROVED) {
+                log.info("User {} has pending/rejected request for group {}, status: {}",
+                        currentUser.getUsername(), groupId, requestStatus);
+
+                model.addAttribute("group", group);
+                model.addAttribute("requestStatus", requestStatus);
+                return "groups/access";
+            }
+        }
+
         // Получаем посты и опросы
         List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
         List<PollResponseDTO> polls = pollService.getAllPolls(groupId);
@@ -59,14 +72,11 @@ public class GroupController {
 
         if (isOwner) {
             try {
-                // Отладочная информация
                 groupJoinRequestService.debugGroupRequests(groupId);
-
                 long pendingRequestsCount = groupJoinRequestService.countPendingRequests(groupId);
                 log.info("Pending requests count: {}", pendingRequestsCount);
                 model.addAttribute("pendingRequestsCount", pendingRequestsCount);
 
-                // Добавляем дополнительную проверку
                 if (pendingRequestsCount > 0) {
                     log.info("Found {} pending requests for group {}", pendingRequestsCount, groupId);
                 } else {
@@ -134,53 +144,7 @@ public class GroupController {
         return "redirect:/groups/" + groupId;
     }
 
-    //    @PostMapping("/{groupId}/join")
-//    public String joinGroup(@PathVariable Long groupId) {
-//        User currentUser = userService.getCurrentUser();
-//        Group group = groupService.getGroupById(groupId);
-//
-//        if (group.getType() == Group.GroupType.INTERACTIVE) {
-//            groupService.addMember(group, currentUser);
-//
-//        } else {
-//            groupService.subscribeToGroup(group, currentUser);
-//        }
-//        return "redirect:/groups/" + groupId;
-//    }
 
-
-//    @GetMapping("/{groupId}")
-//    public String showGroup(@PathVariable Long groupId, Model model) {
-//        Group group = groupService.getGroupById(groupId);
-//        User currentUser = userService.getCurrentUser();
-//
-//        boolean isMember = groupService.isUserMemberOfGroup(currentUser.getId(), groupId);
-//        boolean canPost = groupService.canUserPostInGroup(currentUser, group);
-//        boolean isOwner = groupService.isOwner(currentUser.getId(), groupId);
-//
-//        // Получаем посты и опросы
-//        List<GroupPost> posts = groupContentRepository.findByGroupIdOrderByTimestampDesc(groupId);
-//        List<PollResponseDTO> polls = pollService.getAllPolls(groupId);
-//
-//        model.addAttribute("group", group);
-//        model.addAttribute("posts", posts);
-//        model.addAttribute("polls", polls);
-//        model.addAttribute("currentUser", currentUser);
-//        model.addAttribute("isMember", isMember);
-//        model.addAttribute("canPost", canPost);
-//        model.addAttribute("isOwner", isOwner);
-//        model.addAttribute("groupId", groupId);
-//
-//        // Карта для проверки возможности репоста
-//        Map<Long, Boolean> canRepostMap = new HashMap<>();
-//        for (GroupPost post : posts) {
-//            boolean canRepost = isMember && !post.getAuthor().getId().equals(currentUser.getId());
-//            canRepostMap.put(post.getId(), canRepost);
-//        }
-//        model.addAttribute("canRepostMap", canRepostMap);
-//
-//        return "groups/view";
-//    }
 
 
     @PostMapping("/{groupId}/repost/{postId}")
