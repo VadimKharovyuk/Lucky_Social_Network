@@ -4,6 +4,7 @@ import com.example.lucky_social_network.model.Group;
 import com.example.lucky_social_network.model.GroupJoinRequest;
 import com.example.lucky_social_network.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -21,11 +22,6 @@ public interface GroupJoinRequestRepository extends JpaRepository<GroupJoinReque
 
     boolean existsByGroupAndUserAndStatus(Group group, User user, GroupJoinRequest.RequestStatus status);
 
-
-//    @Query(value = "SELECT COUNT(*) FROM group_join_requests WHERE group_id = :groupId AND status = cast(:status as varchar)",
-//            nativeQuery = true)
-//    long countByGroupIdAndStatus(@Param("groupId") Long groupId,
-//                                 @Param("status") String status);
 
     // Или альтернативный вариант с JPQL (предпочтительнее):
     @Query("SELECT COUNT(gr) FROM GroupJoinRequest gr WHERE gr.group.id = :groupId AND gr.status = :status")
@@ -45,4 +41,7 @@ public interface GroupJoinRequestRepository extends JpaRepository<GroupJoinReque
             @Param("groupId") Long groupId,
             @Param("userId") Long userId);
 
+    @Modifying
+    @Query("DELETE FROM GroupJoinRequest jr WHERE jr.group.id = :groupId")
+    void deleteAllByGroupId(@Param("groupId") Long groupId);
 }

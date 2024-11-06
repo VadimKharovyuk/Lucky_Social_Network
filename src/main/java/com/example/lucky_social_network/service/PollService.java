@@ -7,7 +7,11 @@ import com.example.lucky_social_network.dto.PollUpdateDTO;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 
+
 public interface PollService {
+
+
+    void deleteAllPollsByGroupId(Long groupId);
     PollResponseDTO createPoll(PollCreateDTO createDTO);
 
     PollResponseDTO getPoll(Long id);
@@ -19,4 +23,6 @@ public interface PollService {
     void votePoll(Long pollId, List<Long> optionIds);
 
     void updatePoll(Long id, PollUpdateDTO updateDTO) throws AccessDeniedException;
+
+
 }

@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,10 +33,81 @@ public class GroupService {
     private final ImgurService imgurService;
     private final GroupContentRepository groupContentRepository;
     private final ActivityPublisher activityPublisher;
-    private final GroupJoinRequestServiceImpl joinRequestService;
+    private final PollService pollService;
     private final GroupJoinRequestRepository groupJoinRequestRepository;
 
 
+    @Transactional
+    public Group deleteGroupById(Long groupId) {
+        log.info("Starting deletion of group with id: {}", groupId);
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found with id: " + groupId));
+
+        try {
+            // Удаляем все заявки на вступление
+            log.info("Deleting join requests for group: {}", groupId);
+            groupJoinRequestRepository.deleteAllByGroupId(groupId);
+
+            // Удаляем все опросы
+            log.info("Deleting polls for group: {}", groupId);
+            pollService.deleteAllPollsByGroupId(groupId);
+
+            // Получаем и удаляем все посты группы
+            log.info("Deleting posts for group: {}", groupId);
+            List<GroupPost> posts = groupContentRepository.findByGroupId(groupId);
+
+            for (GroupPost post : posts) {
+                // Очищаем ссылки на оригинальный пост
+                if (post.getOriginalGroupPost() != null) {
+                    post.setOriginalGroupPost(null);
+                }
+
+                // Удаляем лайки, если они есть
+                if (post.getLikesCount() > 0) {
+                    post.setLikesCount(0L);
+                }
+
+                // Обнуляем количество репостов
+                if (post.getRepostsCount() > 0) {
+                    post.setRepostsCount(0L);
+                }
+
+                // Обнуляем количество комментариев
+                if (post.getCommentsCount() > 0) {
+                    post.setCommentsCount(0L);
+                }
+            }
+
+            // Удаляем все посты
+            groupContentRepository.deleteAll(posts);
+
+            // Очищаем связи с участниками
+            log.info("Clearing member associations for group: {}", groupId);
+            group.getMembers().clear();
+
+            // Очищаем все посты в группе
+            log.info("Clearing posts reference in group: {}", groupId);
+            group.getPosts().clear();
+
+            // Удаляем изображение группы, если есть
+            if (group.getImgurImageUrl() != null) {
+                log.info("Removing group image reference: {}", groupId);
+                group.setImgurImageUrl(null);
+            }
+
+            // Удаляем саму группу
+            log.info("Deleting group entity: {}", groupId);
+            groupRepository.delete(group);
+
+            log.info("Successfully deleted group: {}", groupId);
+            return group;
+
+        } catch (Exception e) {
+            log.error("Error during group deletion: ", e);
+            throw new RuntimeException("Error deleting group: " + e.getMessage());
+        }
+    }
     public boolean canUserPostInGroup(User user, Group group) {
         return groupRepository.canUserPostInGroup(group.getId(), user.getId());
     }
@@ -143,20 +213,7 @@ public class GroupService {
 
         return updatedGroup;
     }
-    @Transactional
-    public Group deleteGroupById(Long groupId) {
-        Optional<Group> groupOptional = groupRepository.findById(groupId);
 
-        if (groupOptional.isPresent()) {
-            Group group = groupOptional.get();
-            group.getMembers().clear();
-            group.getPosts().clear();
-            groupRepository.delete(group);
-            return group;
-        } else {
-            throw new RuntimeException("Group not found with id: " + groupId);
-        }
-    }
 
 
     @Transactional

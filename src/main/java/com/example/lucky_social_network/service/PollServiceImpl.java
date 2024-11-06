@@ -11,6 +11,7 @@ import com.example.lucky_social_network.maper.PollMapper;
 import com.example.lucky_social_network.model.*;
 import com.example.lucky_social_network.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PollServiceImpl implements PollService {
@@ -127,6 +129,32 @@ public class PollServiceImpl implements PollService {
 
         pollRepository.save(poll);
     }
+
+    @Override
+    @Transactional
+    public void deleteAllPollsByGroupId(Long groupId) {
+        log.info("Starting deletion of all polls for group: {}", groupId);
+
+        try {
+            // Сначала удаляем все голоса
+            log.debug("Deleting poll votes for group: {}", groupId);
+            pollVoteRepository.deleteAllByPollGroupId(groupId);
+
+            // Затем удаляем варианты ответов
+            log.debug("Deleting poll options for group: {}", groupId);
+            pollOptionRepository.deleteAllByPollGroupId(groupId);
+
+            // В конце удаляем сами опросы
+            log.debug("Deleting polls for group: {}", groupId);
+            pollRepository.deleteAllByGroupId(groupId);
+
+            log.info("Successfully deleted all polls and related data for group: {}", groupId);
+        } catch (Exception e) {
+            log.error("Error deleting polls for group {}: {}", groupId, e.getMessage());
+            throw new RuntimeException("Failed to delete polls for group: " + groupId, e);
+        }
+    }
+
 
     // Вспомогательные методы
     private void handlePostConnection(Poll poll, PollCreateDTO createDTO, Group group, User currentUser) {
