@@ -133,22 +133,31 @@ public class PollServiceImpl implements PollService {
     @Override
     @Transactional
     public void deleteAllPollsByGroupId(Long groupId) {
-        log.info("Starting deletion of all polls for group: {}", groupId);
-
         try {
-            // Сначала удаляем все голоса
-            log.debug("Deleting poll votes for group: {}", groupId);
-            pollVoteRepository.deleteAllByPollGroupId(groupId);
+            log.info("Starting deletion of polls for group: {}", groupId);
 
-            // Затем удаляем варианты ответов
-            log.debug("Deleting poll options for group: {}", groupId);
-            pollOptionRepository.deleteAllByPollGroupId(groupId);
+            // 1. Сначала находим все опросы группы
+            List<Poll> polls = pollRepository.findByGroupId(groupId);
 
-            // В конце удаляем сами опросы
-            log.debug("Deleting polls for group: {}", groupId);
-            pollRepository.deleteAllByGroupId(groupId);
+            // 2. Собираем ID всех опций этих опросов
+            List<Long> pollIds = polls.stream()
+                    .map(Poll::getId)
+                    .collect(Collectors.toList());
 
-            log.info("Successfully deleted all polls and related data for group: {}", groupId);
+            // 3. Удаляем голоса
+            if (!pollIds.isEmpty()) {
+                pollVoteRepository.deleteAllByPollIdIn(pollIds);
+                log.info("Deleted votes for polls: {}", pollIds);
+            }
+
+            // 4. Удаляем опции
+            pollOptionRepository.deleteAllByPollIdIn(pollIds);
+            log.info("Deleted options for polls: {}", pollIds);
+
+            // 5. Удаляем сами опросы
+            pollRepository.deleteByGroupId(groupId);
+            log.info("Deleted polls for group: {}", groupId);
+
         } catch (Exception e) {
             log.error("Error deleting polls for group {}: {}", groupId, e.getMessage());
             throw new RuntimeException("Failed to delete polls for group: " + groupId, e);

@@ -42,7 +42,7 @@ public class GroupJoinRequestController {
         log.info("Approving request {} by user {}", requestId, currentUser.getUsername());
 
         GroupJoinRequestDto request = joinRequestService.approveRequest(requestId, currentUser);
-        return STR."redirect:/group-requests/view/\{request.getGroupId()}";
+        return "redirect:/group-requests/view/" + request.getGroupId();
     }
 
     @PostMapping("/reject/{requestId}")
@@ -63,6 +63,4 @@ public class GroupJoinRequestController {
         joinRequestService.createJoinRequest(groupId, currentUser, message);
         return "redirect:/groups/" + groupId;
     }
-
-
 }

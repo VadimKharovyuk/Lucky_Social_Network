@@ -1,16 +1,22 @@
-# docker-compose.prod.yml
 version: '3.8'
 
 services:
   app:
-    image: lucky1911/lucky_social_network:latest    # Использует готовый образ из Docker Hub
+    image: lucky1911/lucky_social_network:latest
     ports:
       - "1050:1050"
     environment:
+      # Существующие настройки базы данных
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/Lucky_Social_Network
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=19111993
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      # Меняем на validate, так как миграции будет делать Flyway
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      # Добавляем настройки Flyway
+      - SPRING_FLYWAY_ENABLED=true
+      - SPRING_FLYWAY_BASELINE_ON_MIGRATE=true
+      - SPRING_FLYWAY_LOCATIONS=classpath:db/migration
+      # Остальные настройки
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
       - SPRING_RABBITMQ_HOST=rabbitmq
@@ -18,9 +24,12 @@ services:
       - SPRING_RABBITMQ_USERNAME=guest
       - SPRING_RABBITMQ_PASSWORD=guest
     depends_on:
-      - db
-      - redis
-      - rabbitmq
+      db:
+        condition: service_healthy  # Добавляем проверку готовности базы
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
 
   db:
     image: postgres:13
@@ -30,8 +39,15 @@ services:
       - POSTGRES_PASSWORD=19111993
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # Добавляем папку для инициализации
+      - ./init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
+    healthcheck: # Добавляем проверку здоровья
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7
@@ -56,7 +72,66 @@ volumes:
   postgres_data:
   redis_data:
   rabbitmq_data:
-
+    
+## docker-compose.prod.yml
+#version: '3.8'
+#
+#services:
+#  app:
+#    image: lucky1911/lucky_social_network:latest    # Использует готовый образ из Docker Hub
+#    ports:
+#      - "1050:1050"
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/Lucky_Social_Network
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=19111993
+#      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#      - SPRING_REDIS_HOST=redis
+#      - SPRING_REDIS_PORT=6379
+#      - SPRING_RABBITMQ_HOST=rabbitmq
+#      - SPRING_RABBITMQ_PORT=5672
+#      - SPRING_RABBITMQ_USERNAME=guest
+#      - SPRING_RABBITMQ_PASSWORD=guest
+#    depends_on:
+#      - db
+#      - redis
+#      - rabbitmq
+#
+#  db:
+#    image: postgres:13
+#    environment:
+#      - POSTGRES_DB=Lucky_Social_Network
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=19111993
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    ports:
+#      - "5432:5432"
+#
+#  redis:
+#    image: redis:7
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - redis_data:/data
+#    command: redis-server --appendonly yes
+#
+#  rabbitmq:
+#    image: rabbitmq:3-management
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+#    environment:
+#      - RABBITMQ_DEFAULT_USER=guest
+#      - RABBITMQ_DEFAULT_PASS=guest
+#    volumes:
+#      - rabbitmq_data:/var/lib/rabbitmq
+#
+#volumes:
+#  postgres_data:
+#  redis_data:
+#  rabbitmq_data:
+#
 
 #    # 1. Получаете обновленный образ
 #    docker-compose -f docker-compose.prod.yml pull app

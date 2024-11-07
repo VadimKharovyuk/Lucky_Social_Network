@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PollVoteRepository extends JpaRepository<PollVote, Long> {
     boolean existsByPollAndUser(Poll poll, User user);
@@ -25,6 +27,8 @@ public interface PollVoteRepository extends JpaRepository<PollVote, Long> {
     @Query("DELETE FROM PollVote v WHERE v.poll.group.id = :groupId")
     void deleteAllByPollGroupId(@Param("groupId") Long groupId);
 
+
+    void deleteAllByPollIdIn(@Param("pollIds") List<Long> pollIds);
 }
 
 

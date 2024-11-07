@@ -609,7 +609,7 @@
                     <span th:text="${#temporals.format(post.timestamp, 'dd-MM-yyyy HH:mm')}"></span>
                 </small>
                 <div class="post-actions">
-                    <form th:if="${isOwner || currentUser.id == post.author.id}"
+                    <form th:if="${accessInfo.isOwner() || currentUser.id == post.author.id}"
                           th:action="@{/groups/{groupId}/delete-post/{postId}(groupId=${group.id},postId=${post.id})}"
                           method="post" style="display: inline;">
                         <button type="submit" class="btn btn-danger btn-sm delete-post-btn"

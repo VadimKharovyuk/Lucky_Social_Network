@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PollOptionRepository extends JpaRepository<PollOption, Long> {
     void deleteByPoll(Poll poll);
@@ -15,4 +17,7 @@ public interface PollOptionRepository extends JpaRepository<PollOption, Long> {
     @Modifying
     @Query("DELETE FROM PollOption o WHERE o.poll.group.id = :groupId")
     void deleteAllByPollGroupId(@Param("groupId") Long groupId);
+
+    void deleteAllByPollIdIn(List<Long> pollIds);
+
 }

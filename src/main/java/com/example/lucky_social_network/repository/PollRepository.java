@@ -17,4 +17,10 @@ public interface PollRepository extends JpaRepository<Poll, Long> {
     @Modifying
     @Query("DELETE FROM Poll p WHERE p.group.id = :groupId")
     void deleteAllByGroupId(@Param("groupId") Long groupId);
+
+
+    List<Poll> findByGroupId(Long groupId);
+
+    void deleteByGroupId(Long groupId);
+
 }

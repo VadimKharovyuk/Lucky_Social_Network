@@ -109,6 +109,7 @@ public class GroupController {
         model.addAttribute("accessInfo", accessInfo);
         model.addAttribute("canPost", canPost);
         model.addAttribute("canRepostMap", canRepostMap);
+        model.addAttribute("isOwner", accessInfo.isOwner());
 
         return "groups/view";
     }
