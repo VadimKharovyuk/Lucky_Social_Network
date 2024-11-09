@@ -23,11 +23,43 @@ public class Group implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    @OneToMany(mappedBy = "group")
+    private Set<GroupMembership> memberships = new HashSet<>();
+
+    // Вспомогательные методы
+    public boolean isOwner(User user) {
+        return memberships.stream()
+                .anyMatch(m -> m.getUser().equals(user) &&
+                        m.getRole() == GroupMembership.GroupRole.OWNER);
+    }
+
+    public boolean isAdmin(User user) {
+        return memberships.stream()
+                .anyMatch(m -> m.getUser().equals(user) &&
+                        (m.getRole() == GroupMembership.GroupRole.ADMIN ||
+                                m.getRole() == GroupMembership.GroupRole.OWNER));
+    }
+
+    public boolean isModerator(User user) {
+        return memberships.stream()
+                .anyMatch(m -> m.getUser().equals(user) &&
+                        (m.getRole() == GroupMembership.GroupRole.MODERATOR ||
+                                m.getRole() == GroupMembership.GroupRole.ADMIN ||
+                                m.getRole() == GroupMembership.GroupRole.OWNER));
+    }
+
+    public boolean isMember(User user) {
+        return memberships.stream()
+                .anyMatch(m -> m.getUser().equals(user));
+    }
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private VisibilityType visibility = VisibilityType.PUBLIC;
 
 
+    @Getter
     public enum VisibilityType {
         PUBLIC("Открытая группа", "Контент доступен всем"),
         RESTRICTED("Ограниченная группа", "Контент виден после одобрения заявки"),
@@ -41,13 +73,6 @@ public class Group implements Serializable {
             this.description = description;
         }
 
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        public String getDescription() {
-            return description;
-        }
     }
 
     @JsonIgnore

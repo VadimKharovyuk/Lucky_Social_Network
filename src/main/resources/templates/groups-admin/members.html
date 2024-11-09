@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управление участниками группы</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .member-card {
+            transition: all 0.3s ease;
+        }
+
+        .member-card:hover {
+            background-color: #f8f9fa;
+        }
+
+        .role-badge {
+            font-size: 0.8em;
+            padding: 0.4em 0.8em;
+        }
+
+        .role-OWNER {
+            background-color: #dc3545;
+        }
+
+        .role-ADMIN {
+            background-color: #0d6efd;
+        }
+
+        .role-MODERATOR {
+            background-color: #198754;
+        }
+
+        .role-MEMBER {
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <!-- Навигация -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/groups">Группы</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}">Группа</a>
+            </li>
+            <li class="breadcrumb-item active">Управление участниками</li>
+        </ol>
+    </nav>
+
+    <!-- Сообщения об успехе/ошибке -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Список участников -->
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Участники группы</h4>
+                <span class="badge bg-primary" th:text="${group.memberships.size() + ' участников'}"></span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                <div th:each="membership : ${group.memberships}" class="list-group-item member-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1" th:text="${membership.user.username}"></h5>
+                            <small class="text-muted"
+                                   th:text="'Присоединился: ' +
+                                               ${#temporals.format(membership.joinedAt, 'dd.MM.yyyy')}">
+                            </small>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                                <span th:class="'badge role-badge role-' + ${membership.role}"
+                                      th:text="${membership.role}">
+                                </span>
+
+                            <div th:if="${group.isOwner(currentUser) ||
+                                            (group.isAdmin(currentUser) &&
+                                             membership.role != T(com.example.lucky_social_network.model.GroupMembership.GroupRole).OWNER)}"
+                                 class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown">
+                                    Действия
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <!-- Изменены URLs в формах -->
+                                    <li th:if="${group.isOwner(currentUser) &&
+                                                    !membership.user.equals(currentUser)}">
+                                        <form th:action="@{/groups-admin/{groupId}/members/{userId}/role(groupId=${group.id},userId=${membership.user.id})}"
+                                              method="post"
+                                              class="dropdown-item">
+                                            <input type="hidden" name="role" value="ADMIN">
+                                            <button type="submit" class="btn btn-link text-decoration-none">
+                                                Сделать администратором
+                                            </button>
+                                        </form>
+                                    </li>
+
+                                    <li th:if="${(group.isOwner(currentUser) || group.isAdmin(currentUser)) &&
+                                                    !membership.user.equals(currentUser)}">
+                                        <form th:action="@{/groups-admin/{groupId}/members/{userId}/role(groupId=${group.id},userId=${membership.user.id})}"
+                                              method="post"
+                                              class="dropdown-item">
+                                            <input type="hidden" name="role" value="MODERATOR">
+                                            <button type="submit" class="btn btn-link text-decoration-none">
+                                                Сделать модератором
+                                            </button>
+                                        </form>
+                                    </li>
+
+                                    <li th:if="${(group.isOwner(currentUser) || group.isAdmin(currentUser)) &&
+                                                    !membership.user.equals(currentUser) &&
+                                                    membership.role != T(com.example.lucky_social_network.model.GroupMembership.GroupRole).MEMBER}">
+                                        <form th:action="@{/groups-admin/{groupId}/members/{userId}/role(groupId=${group.id},userId=${membership.user.id})}"
+                                              method="post"
+                                              class="dropdown-item">
+                                            <input type="hidden" name="role" value="MEMBER">
+                                            <button type="submit" class="btn btn-link text-decoration-none">
+                                                Сделать участником
+                                            </button>
+                                        </form>
+                                    </li>
+
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+
+                                    <li th:if="${group.isOwner(currentUser) || group.isAdmin(currentUser)}">
+                                        <form th:action="@{/groups-admin/{groupId}/members/{userId}/remove(groupId=${group.id},userId=${membership.user.id})}"
+                                              method="post"
+                                              class="dropdown-item"
+                                              onsubmit="return confirm('Вы уверены, что хотите удалить этого участника?')">
+                                            <button type="submit" class="btn btn-link text-danger text-decoration-none">
+                                                Удалить из группы
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

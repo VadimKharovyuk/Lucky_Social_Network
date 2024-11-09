@@ -139,10 +139,11 @@ public class User implements Serializable {
         this.roles.add(role);
     }
 
+    @Getter
     public enum Role {
-        USER,
-        ADMIN,
-        MODERATOR
+        USER,           // Обычный пользователь
+        ADMIN,          // Глобальный администратор
+        MODERATOR,      // Модератор
 
     }
 

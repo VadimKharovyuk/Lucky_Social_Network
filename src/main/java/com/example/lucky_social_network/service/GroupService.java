@@ -4,6 +4,7 @@ import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.*;
 import com.example.lucky_social_network.repository.GroupContentRepository;
 import com.example.lucky_social_network.repository.GroupJoinRequestRepository;
+import com.example.lucky_social_network.repository.GroupMembershipRepository;
 import com.example.lucky_social_network.repository.GroupRepository;
 import com.example.lucky_social_network.service.picService.ImgurService;
 import lombok.Builder;
@@ -21,7 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class GroupService {
     private final ActivityPublisher activityPublisher;
     private final PollService pollService;
     private final GroupJoinRequestRepository groupJoinRequestRepository;
+    private final GroupMembershipRepository membershipRepository;
 
 
     @Transactional
@@ -139,7 +143,6 @@ public class GroupService {
         return groupRepository.findAll();
     }
 
-
     @Transactional
     public Group createGroup(Group group, User owner) {
         if (owner == null) {
@@ -163,9 +166,20 @@ public class GroupService {
         group.setMembersCount(1L);
         group.getMembers().add(owner);
 
+        // Сохраняем группу
         Group savedGroup = groupRepository.save(group);
-        log.info("Group created successfully with id: {} and visibility: {}",
+
+        // Создаем членство с ролью OWNER
+        GroupMembership ownerMembership = new GroupMembership();
+        ownerMembership.setUser(owner);
+        ownerMembership.setGroup(savedGroup);
+        ownerMembership.setRole(GroupMembership.GroupRole.OWNER);
+        ownerMembership.setRoleAssignedAt(LocalDateTime.now());
+        membershipRepository.save(ownerMembership);
+
+        log.info("Group created successfully with id: {} and visibility: {}. Owner membership created.",
                 savedGroup.getId(), savedGroup.getVisibility());
+
         return savedGroup;
     }
 
@@ -453,6 +467,7 @@ public class GroupService {
         }
     }
 
+
     @Data
     @Builder
     public static class GroupAccessInfo {
@@ -462,5 +477,41 @@ public class GroupService {
         private GroupJoinRequest.RequestStatus joinRequestStatus;
         private Group.VisibilityType visibility;
         private boolean requiresJoinApproval;
+    }
+
+
+    /**
+     * Получает все группы, в которых пользователь является участником
+     */
+    public List<Group> getGroupsByUser(Long userId) {
+        List<GroupMembership> memberships = membershipRepository.findByUserId(userId);
+        return memberships.stream()
+                .map(GroupMembership::getGroup)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Получает группы, где пользователь имеет права администратора или владельца
+     */
+    public List<Group> getGroupsWithAdminAccess(Long userId) {
+        log.info("Получение групп с правами администратора для пользователя ID: {}", userId);
+
+        List<GroupMembership.GroupRole> adminRoles = Arrays.asList(
+                GroupMembership.GroupRole.OWNER,
+                GroupMembership.GroupRole.ADMIN
+        );
+
+        List<GroupMembership> memberships = membershipRepository.findByUserIdAndRoleIn(userId, adminRoles);
+        log.info("Найдено {} групп с правами администратора", memberships.size());
+
+        List<Group> groups = memberships.stream()
+                .map(GroupMembership::getGroup)
+                .collect(Collectors.toList());
+
+        log.info("Группы: {}", groups.stream()
+                .map(group -> String.format("ID: %d, Name: %s", group.getId(), group.getName()))
+                .collect(Collectors.joining(", ")));
+
+        return groups;
     }
 }

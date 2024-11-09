@@ -1,5 +1,6 @@
 package com.example.lucky_social_network.controller;
 
+import com.example.lucky_social_network.dto.AdDTO;
 import com.example.lucky_social_network.dto.PollResponseDTO;
 import com.example.lucky_social_network.exception.ResourceNotFoundException;
 import com.example.lucky_social_network.model.*;
@@ -37,6 +38,7 @@ public class GroupController {
     private final PostService postService;
     private final PollServiceImpl pollService;
     private final GroupJoinRequestService groupJoinRequestService;
+    private final AdService adService;
 
     @GetMapping("/{groupId}")
     public String showGroup(@PathVariable Long groupId, Model model) {
@@ -100,6 +102,8 @@ public class GroupController {
                     !post.getAuthor().getId().equals(currentUser.getId());
             canRepostMap.put(post.getId(), canRepost);
         }
+        List<AdDTO> groupAds = adService.getActiveAdsByGroup(groupId);
+        model.addAttribute("advertisements", groupAds);
 
         // Добавляем все в модель
         model.addAttribute("group", group);

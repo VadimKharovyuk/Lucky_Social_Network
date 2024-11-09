@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управление рекламой</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Управление рекламой</h2>
+        <a href="/ads/create" class="btn btn-primary">Создать новую рекламу</a>
+    </div>
+
+    <!-- Сообщения об успехе/ошибке -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Таблица реклам -->
+    <div class="card">
+
+        <div class="mb-3">
+        </div>
+        <div class="card-body">
+            <div th:if="${#lists.isEmpty(ads)}" class="alert alert-info">
+                У вас пока нет рекламных объявлений
+            </div>
+            <table th:if="${!#lists.isEmpty(ads)}" class="table table-hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Заголовок</th>
+                    <th>Статус</th>
+                    <th>Дата начала</th>
+                    <th>Дата окончания</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ad : ${ads}" th:data-status="${ad.status}">
+                    <td th:text="${ad.id}"></td>
+                    <td th:text="${ad.title}"></td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${ad.status == T(com.example.lucky_social_network.model.Ad.AdStatus).ACTIVE ? 'bg-success' :
+                                             (ad.status == T(com.example.lucky_social_network.model.Ad.AdStatus).DRAFT ? 'bg-warning' : 'bg-secondary')}"
+                              th:text="${ad.status}">
+                        </span>
+                    </td>
+                    <td th:text="${#temporals.format(ad.startTime, 'dd.MM.yyyy HH:mm')}"></td>
+                    <td th:text="${#temporals.format(ad.endTime, 'dd.MM.yyyy HH:mm')}"></td>
+                    <td>
+                        <div class="btn-group">
+                            <!-- Кнопка активации -->
+                            <form th:if="${ad.status == T(com.example.lucky_social_network.model.Ad.AdStatus).DRAFT}"
+                                  th:action="@{/ads-management/{id}/activate(id=${ad.id})}"
+                                  method="post"
+                                  style="display: inline;">
+                                <button type="submit"
+                                        class="btn btn-sm btn-success"
+                                        title="Активировать">
+                                    Активировать
+                                </button>
+                            </form>
+
+                            <!-- Кнопка деактивации -->
+                            <form th:if="${ad.status == T(com.example.lucky_social_network.model.Ad.AdStatus).ACTIVE}"
+                                  th:action="@{/ads-management/{id}/deactivate(id=${ad.id})}"
+                                  method="post"
+                                  style="display: inline;">
+                                <button type="submit"
+                                        class="btn btn-sm btn-warning"
+                                        title="Деактивировать">
+                                    Деактивировать
+                                </button>
+                            </form>
+
+                            <!-- Кнопка редактирования -->
+                            <a th:href="@{/ads/{id}/edit(id=${ad.id})}"
+                               class="btn btn-sm btn-outline-primary"
+                               title="Редактировать">
+                                Редактировать
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    function filterAds(status) {
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            if (status === 'ALL' || row.getAttribute('data-status') === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Обновляем активную кнопку
+        document.querySelectorAll('.btn-group button').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent.trim() === status ||
+                (status === 'ALL' && btn.textContent.trim() === 'Все')) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
+    // Инициализация статистики
+    function updateStats() {
+        const rows = document.querySelectorAll('tbody tr');
+        const stats = {};
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            stats[status] = (stats[status] || 0) + 1;
+        });
+
+        // Обновляем счетчики на кнопках
+        document.querySelectorAll('.btn-group button').forEach(btn => {
+            const status = btn.textContent.trim();
+            if (status !== 'Все') {
+                const count = stats[status] || 0;
+                btn.textContent = `${status} (${count})`;
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateStats();
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

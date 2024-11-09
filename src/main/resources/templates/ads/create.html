@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Создать рекламу</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .invalid-feedback {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="container mt-4">
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">Создать рекламу</h4>
+    </div>
+
+
+    <div class="card-body">
+        <!-- Сообщения об ошибках -->
+        <div th:if="${error}" class="alert alert-danger mb-3">
+            <p th:text="${error}" class="mb-0"></p>
+        </div>
+
+        <form th:action="@{/ads/create}" th:object="${adCreateRequest}" method="post" class="needs-validation"
+              novalidate>
+            <div class="form-group">
+                <label for="title" class="form-label">Заголовок</label>
+                <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="content" class="form-label">Содержание</label>
+                <textarea class="form-control" id="content" th:field="*{content}" rows="3" required></textarea>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="imageUrl" class="form-label">URL изображения</label>
+                <input type="url" class="form-control" id="imageUrl" th:field="*{imageUrl}">
+            </div>
+
+            <div class="form-group">
+                <label for="externalUrl" class="form-label">Внешний URL</label>
+                <input type="url" class="form-control" id="externalUrl" th:field="*{externalUrl}">
+            </div>
+
+            <div class="form-group">
+                <label for="owningGroupId" class="form-label">Группа-владелец</label>
+                <select class="form-select" id="owningGroupId" th:field="*{owningGroupId}" required>
+                    <option value="">Выберите группу</option>
+                    <option th:each="group : ${userGroups}"
+                            th:value="${group.id}"
+                            th:text="${group.name}"></option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('owningGroupId')}"
+                     th:errors="*{owningGroupId}"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="startTime" class="form-label">Время начала</label>
+                    <input type="datetime-local" class="form-control" id="startTime" th:field="*{startTime}" required>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('startTime')}"
+                         th:errors="*{startTime}"></div>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label for="endTime" class="form-label">Время окончания</label>
+                    <input type="datetime-local" class="form-control" id="endTime" th:field="*{endTime}" required>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
+                </div>
+            </div>
+
+            <h5 class="mt-4 mb-3">Расписание</h5>
+            <div th:each="schedule, iterStat : *{schedules}" class="row mb-3">
+                <div class="col-md-4">
+                    <label th:for="'schedules[' + ${iterStat.index} + '].dayOfWeek'" class="form-label">День
+                        недели</label>
+                    <select class="form-select" th:field="*{schedules[__${iterStat.index}__].dayOfWeek}" required>
+                        <option th:each="day : ${T(java.time.DayOfWeek).values()}"
+                                th:value="${day}"
+                                th:text="${day}"></option>
+                    </select>
+                    <div class="invalid-feedback"
+                         th:if="${#fields.hasErrors('schedules[' + iterStat.index + '].dayOfWeek')}"
+                         th:errors="*{schedules[__${iterStat.index}__].dayOfWeek}"></div>
+                </div>
+
+                <div class="col-md-4">
+                    <label th:for="'schedules[' + ${iterStat.index} + '].startTime'" class="form-label">Время
+                        начала</label>
+                    <input type="time" class="form-control"
+                           th:field="*{schedules[__${iterStat.index}__].startTime}"
+                           value="09:00" required>
+                    <div class="invalid-feedback"
+                         th:if="${#fields.hasErrors('schedules[' + iterStat.index + '].startTime')}"
+                         th:errors="*{schedules[__${iterStat.index}__].startTime}"></div>
+                </div>
+
+                <div class="col-md-4">
+                    <label th:for="'schedules[' + ${iterStat.index} + '].endTime'" class="form-label">Время
+                        окончания</label>
+                    <input type="time" class="form-control"
+                           th:field="*{schedules[__${iterStat.index}__].endTime}"
+                           value="18:00" required>
+                    <div class="invalid-feedback"
+                         th:if="${#fields.hasErrors('schedules[' + iterStat.index + '].endTime')}"
+                         th:errors="*{schedules[__${iterStat.index}__].endTime}"></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <a href="/ads" class="btn btn-secondary me-2">Отмена</a>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </div>
+        </form>
+        
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Создать рекламу</title>-->
+<!--    <link rel="stylesheet" href="/css/styles.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Создать рекламу</h1>-->
+
+<!--<form th:action="@{/ads/create}" th:object="${adCreateRequest}" method="post">-->
+<!--    <div>-->
+<!--        <label for="title">Заголовок</label>-->
+<!--        <input type="text" id="title" th:field="*{title}" required>-->
+<!--    </div>-->
+
+<!--    <div>-->
+<!--        <label for="content">Содержание</label>-->
+<!--        <textarea id="content" th:field="*{content}" required></textarea>-->
+<!--    </div>-->
+
+<!--    <div>-->
+<!--        <label for="imageUrl">URL изображения</label>-->
+<!--        <input type="url" id="imageUrl" th:field="*{imageUrl}">-->
+<!--    </div>-->
+
+<!--    <div>-->
+<!--        <label for="externalUrl">Внешний URL</label>-->
+<!--        <input type="url" id="externalUrl" th:field="*{externalUrl}">-->
+<!--    </div>-->
+
+<!--    <div>-->
+<!--        <label for="owningGroupId">Группа-владелец</label>-->
+<!--        <select id="owningGroupId" th:field="*{owningGroupId}" required>-->
+<!--            <option th:each="group : ${userGroups}" th:value="${group.id}" th:text="${group.name}"></option>-->
+<!--        </select>-->
+<!--    </div>-->
+
+<!--    <div>-->
+<!--        <label for="targetGroupIds">Целевые группы</label>-->
+<!--        <select id="targetGroupIds" th:field="*{targetGroupIds}" multiple>-->
+<!--            <option th:each="group : ${userGroups}" th:value="${group.id}" th:text="${group.name}"></option>-->
+<!--        </select>-->
+<!--    </div>-->
+
+<!--    <div>-->
+<!--        <label for="startTime">Время начала</label>-->
+<!--        <input type="datetime-local" id="startTime" th:field="*{startTime}" required>-->
+<!--    </div>-->
+
+<!--    <div>-->
+<!--        <label for="endTime">Время окончания</label>-->
+<!--        <input type="datetime-local" id="endTime" th:field="*{endTime}" required>-->
+<!--    </div>-->
+
+<!--    <h2>Расписание</h2>-->
+<!--    <div th:each="schedule, iterStat : *{schedules}">-->
+<!--        <div>-->
+<!--            <label th:for="'schedules[' + ${iterStat.index} + '].dayOfWeek'">День недели</label>-->
+<!--            <select th:field="*{schedules[__${iterStat.index}__].dayOfWeek}">-->
+<!--                <option th:each="day : ${T(java.time.DayOfWeek).values()}"-->
+<!--                        th:value="${day}"-->
+<!--                        th:text="${day}"></option>-->
+<!--            </select>-->
+<!--        </div>-->
+
+<!--        <div>-->
+<!--            <label th:for="'schedules[' + ${iterStat.index} + '].startTime'">Время начала</label>-->
+<!--            <input type="time" th:field="*{schedules[__${iterStat.index}__].startTime}" required>-->
+<!--        </div>-->
+
+<!--        <div>-->
+<!--            <label th:for="'schedules[' + ${iterStat.index} + '].endTime'">Время окончания</label>-->
+<!--            <input type="time" th:field="*{schedules[__${iterStat.index}__].endTime}" required>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <button type="submit">Создать</button>-->
+<!--</form>-->
+
+<!--<div th:if="${error}" class="error">-->
+<!--    <p th:text="${error}"></p>-->
+<!--</div>-->
+
+<!--</body>-->
+<!--</html>-->
+
+
+<!--&lt;!&ndash;<!DOCTYPE html>&ndash;&gt;-->
+<!--&lt;!&ndash;<html xmlns:th="http://www.thymeleaf.org">&ndash;&gt;-->
+<!--&lt;!&ndash;<head>&ndash;&gt;-->
+<!--&lt;!&ndash;    <title>Создание рекламы</title>&ndash;&gt;-->
+<!--&lt;!&ndash;    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">&ndash;&gt;-->
+<!--&lt;!&ndash;    <style>&ndash;&gt;-->
+<!--&lt;!&ndash;        .invalid-feedback {&ndash;&gt;-->
+<!--&lt;!&ndash;            display: block;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        .schedule-row {&ndash;&gt;-->
+<!--&lt;!&ndash;            transition: all 0.3s ease;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        .schedule-row:hover {&ndash;&gt;-->
+<!--&lt;!&ndash;            background-color: #f8f9fa;&ndash;&gt;-->
+<!--&lt;!&ndash;            padding: 0.5rem;&ndash;&gt;-->
+<!--&lt;!&ndash;            border-radius: 0.25rem;&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--&lt;!&ndash;    </style>&ndash;&gt;-->
+<!--&lt;!&ndash;</head>&ndash;&gt;-->
+<!--&lt;!&ndash;<body>&ndash;&gt;-->
+<!--&lt;!&ndash;<div th:fragment="content">&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="card">&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="card-header">&ndash;&gt;-->
+<!--&lt;!&ndash;            <h4 class="mb-0">Создание рекламного объявления</h4>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash;        <div class="card-body">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash;            &lt;!&ndash; Общие ошибки &ndash;&gt;&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash;            <div th:if="${error}" class="alert alert-danger" role="alert">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash;                <span th:text="${error}"></span>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash;            </div>&ndash;&gt;&ndash;&gt;-->
+
+<!--&lt;!&ndash;        &lt;!&ndash;            &lt;!&ndash;            <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">&ndash;&gt;&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash;            <ul>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash;                <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash;            </ul>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        &lt;!&ndash;        </div>&ndash;&gt;&ndash;&gt;-->
+
+<!--&lt;!&ndash;        <form th:action="@{/ads/create}"&ndash;&gt;-->
+<!--&lt;!&ndash;              th:object="${adCreateRequest}"&ndash;&gt;-->
+<!--&lt;!&ndash;              method="post"&ndash;&gt;-->
+<!--&lt;!&ndash;              class="needs-validation"&ndash;&gt;-->
+<!--&lt;!&ndash;              novalidate>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            &lt;!&ndash; Основная информация &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                <label for="title" class="form-label">Заголовок</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                <input type="text"&ndash;&gt;-->
+<!--&lt;!&ndash;                       class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                       id="title"&ndash;&gt;-->
+<!--&lt;!&ndash;                       th:field="*{title}"&ndash;&gt;-->
+<!--&lt;!&ndash;                       required>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                     th:if="${#fields.hasErrors('title')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                     th:errors="*{title}">&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            <div class="mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                <label for="content" class="form-label">Содержание</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                <textarea class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                          id="content"&ndash;&gt;-->
+<!--&lt;!&ndash;                          th:field="*{content}"&ndash;&gt;-->
+<!--&lt;!&ndash;                          rows="3"&ndash;&gt;-->
+<!--&lt;!&ndash;                          required></textarea>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                     th:if="${#fields.hasErrors('content')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                     th:errors="*{content}">&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            <div class="mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                <label for="imageUrl" class="form-label">URL изображения</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                <input type="url"&ndash;&gt;-->
+<!--&lt;!&ndash;                       class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                       id="imageUrl"&ndash;&gt;-->
+<!--&lt;!&ndash;                       th:field="*{imageUrl}">&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            <div class="mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                <label for="externalUrl" class="form-label">Внешняя ссылка</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                <input type="url"&ndash;&gt;-->
+<!--&lt;!&ndash;                       class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                       id="externalUrl"&ndash;&gt;-->
+<!--&lt;!&ndash;                       th:field="*{externalUrl}">&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            &lt;!&ndash; Группа &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                <label for="owningGroupId" class="form-label">Группа</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                <select class="form-select"&ndash;&gt;-->
+<!--&lt;!&ndash;                        id="owningGroupId"&ndash;&gt;-->
+<!--&lt;!&ndash;                        th:field="*{owningGroupId}"&ndash;&gt;-->
+<!--&lt;!&ndash;                        required>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <option value="">Выберите группу</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <option th:each="group : ${userGroups}"&ndash;&gt;-->
+<!--&lt;!&ndash;                            th:value="${group.id}"&ndash;&gt;-->
+<!--&lt;!&ndash;                            th:text="${group.name}">&ndash;&gt;-->
+<!--&lt;!&ndash;                    </option>&ndash;&gt;-->
+<!--&lt;!&ndash;                </select>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                     th:if="${#fields.hasErrors('owningGroupId')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                     th:errors="*{owningGroupId}">&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            &lt;!&ndash; Время показа &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="row">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="col-md-6 mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <label for="startTime" class="form-label">Начало показа</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <input type="datetime-local"&ndash;&gt;-->
+<!--&lt;!&ndash;                           class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                           id="startTime"&ndash;&gt;-->
+<!--&lt;!&ndash;                           th:field="*{startTime}"&ndash;&gt;-->
+<!--&lt;!&ndash;                           required>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                         th:if="${#fields.hasErrors('startTime')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                         th:errors="*{startTime}">&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="col-md-6 mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <label for="endTime" class="form-label">Окончание показа</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <input type="datetime-local"&ndash;&gt;-->
+<!--&lt;!&ndash;                           class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                           id="endTime"&ndash;&gt;-->
+<!--&lt;!&ndash;                           th:field="*{endTime}"&ndash;&gt;-->
+<!--&lt;!&ndash;                           required>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                         th:if="${#fields.hasErrors('endTime')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                         th:errors="*{endTime}">&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            &lt;!&ndash; Расписание &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                <label class="form-label">Расписание показов</label>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div id="schedules">&ndash;&gt;-->
+<!--&lt;!&ndash;                    &lt;!&ndash; Понедельник &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="row mb-2 schedule-row">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="col-md-4">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <select class="form-select"&ndash;&gt;-->
+<!--&lt;!&ndash;                                    th:field="*{schedules[0].dayOfWeek}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                    required>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="MONDAY" selected>Понедельник</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="TUESDAY">Вторник</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="WEDNESDAY">Среда</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="THURSDAY">Четверг</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="FRIDAY">Пятница</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="SATURDAY">Суббота</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="SUNDAY">Воскресенье</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                            </select>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:if="${#fields.hasErrors('schedules[0].dayOfWeek')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:errors="*{schedules[0].dayOfWeek}">&ndash;&gt;-->
+<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="col-md-4">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <input type="time"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   th:field="*{schedules[0].startTime}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   th:value="${schedules != null && schedules.size() > 0 && schedules[0].startTime != null ? schedules[0].startTime : '09:00'}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   required>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:if="${#fields.hasErrors('schedules[0].startTime')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:errors="*{schedules[0].startTime}">&ndash;&gt;-->
+<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="col-md-4">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <input type="time"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   th:field="*{schedules[0].endTime}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   th:value="${schedules[0].endTime != null ? schedules[0].endTime : '18:00'}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   value="18:00"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   required>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:if="${#fields.hasErrors('schedules[0].endTime')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:errors="*{schedules[0].endTime}">&ndash;&gt;-->
+<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                    &lt;!&ndash; Вторник &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="row mb-2 schedule-row">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="col-md-4">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <select class="form-select"&ndash;&gt;-->
+<!--&lt;!&ndash;                                    th:field="*{schedules[1].dayOfWeek}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                    required>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="MONDAY">Понедельник</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="TUESDAY" selected>Вторник</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="WEDNESDAY">Среда</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="THURSDAY">Четверг</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="FRIDAY">Пятница</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="SATURDAY">Суббота</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option th:value="SUNDAY">Воскресенье</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                            </select>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:if="${#fields.hasErrors('schedules[1].dayOfWeek')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:errors="*{schedules[1].dayOfWeek}">&ndash;&gt;-->
+<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="col-md-4">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <input type="time"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   th:field="*{schedules[1].startTime}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   th:value="${schedules[1].startTime != null ? schedules[1].startTime : '09:00'}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   value="09:00"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   required>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:if="${#fields.hasErrors('schedules[1].startTime')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:errors="*{schedules[1].startTime}">&ndash;&gt;-->
+<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="col-md-4">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <input type="time"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   th:field="*{schedules[1].endTime}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   th:value="${schedules[1].endTime != null ? schedules[1].endTime : '18:00'}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   value="18:00"&ndash;&gt;-->
+<!--&lt;!&ndash;                                   required>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="invalid-feedback"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:if="${#fields.hasErrors('schedules[1].endTime')}"&ndash;&gt;-->
+<!--&lt;!&ndash;                                 th:errors="*{schedules[1].endTime}">&ndash;&gt;-->
+<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;            <div class="d-flex justify-content-end gap-2">&ndash;&gt;-->
+<!--&lt;!&ndash;                <a href="/ads" class="btn btn-secondary">Отмена</a>&ndash;&gt;-->
+<!--&lt;!&ndash;                <button type="submit" class="btn btn-primary">Создать</button>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        </form>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>&ndash;&gt;-->
+<!--&lt;!&ndash;<script>&ndash;&gt;-->
+<!--&lt;!&ndash;    // Валидация формы&ndash;&gt;-->
+<!--&lt;!&ndash;    (function () {&ndash;&gt;-->
+<!--&lt;!&ndash;        'use strict'&ndash;&gt;-->
+<!--&lt;!&ndash;        const forms = document.querySelectorAll('.needs-validation');&ndash;&gt;-->
+<!--&lt;!&ndash;        Array.from(forms).forEach(form => {&ndash;&gt;-->
+<!--&lt;!&ndash;            form.addEventListener('submit', event => {&ndash;&gt;-->
+<!--&lt;!&ndash;                if (!form.checkValidity()) {&ndash;&gt;-->
+<!--&lt;!&ndash;                    event.preventDefault();&ndash;&gt;-->
+<!--&lt;!&ndash;                    event.stopPropagation();&ndash;&gt;-->
+<!--&lt;!&ndash;                }&ndash;&gt;-->
+<!--&lt;!&ndash;                form.classList.add('was-validated');&ndash;&gt;-->
+<!--&lt;!&ndash;            }, false);&ndash;&gt;-->
+<!--&lt;!&ndash;        });&ndash;&gt;-->
+
+<!--&lt;!&ndash;        // Валидация времени&ndash;&gt;-->
+<!--&lt;!&ndash;        const startTime = document.getElementById('startTime');&ndash;&gt;-->
+<!--&lt;!&ndash;        const endTime = document.getElementById('endTime');&ndash;&gt;-->
+
+<!--&lt;!&ndash;        function validateDates() {&ndash;&gt;-->
+<!--&lt;!&ndash;            if (startTime.value && endTime.value) {&ndash;&gt;-->
+<!--&lt;!&ndash;                const start = new Date(startTime.value);&ndash;&gt;-->
+<!--&lt;!&ndash;                const end = new Date(endTime.value);&ndash;&gt;-->
+
+<!--&lt;!&ndash;                if (end <= start) {&ndash;&gt;-->
+<!--&lt;!&ndash;                    endTime.setCustomValidity('Время окончания должно быть позже времени начала');&ndash;&gt;-->
+<!--&lt;!&ndash;                } else {&ndash;&gt;-->
+<!--&lt;!&ndash;                    endTime.setCustomValidity('');&ndash;&gt;-->
+<!--&lt;!&ndash;                }&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        startTime.addEventListener('change', validateDates);&ndash;&gt;-->
+<!--&lt;!&ndash;        endTime.addEventListener('change', validateDates);&ndash;&gt;-->
+<!--&lt;!&ndash;    })();&ndash;&gt;-->
+<!--&lt;!&ndash;</script>&ndash;&gt;-->
+<!--&lt;!&ndash;</body>&ndash;&gt;-->
+<!--&lt;!&ndash;</html>&ndash;&gt;-->

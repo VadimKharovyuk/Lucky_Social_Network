@@ -435,6 +435,53 @@
                 width: 100%;
             }
         }
+
+        .advertisements-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .ad-carousel {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .ad-card {
+            flex: 0 0 300px;
+            transition: transform 0.3s ease;
+        }
+
+        .ad-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .ad-card .card {
+            height: 100%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .ad-card .card-img-top img {
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .ad-card .card-body {
+            padding: 15px;
+        }
+
+        .ad-card .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .ad-card .card-text {
+            font-size: 0.9rem;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -457,6 +504,33 @@
     <div class="group-info">
         <h1 th:text="${group.name}">Group Name</h1>
         <p th:text="${group.description}">Group Description</p>
+
+
+        <!-- Блок рекламы -->
+        <div class="advertisements-section" th:if="${not #lists.isEmpty(advertisements)}">
+            <h3>Реклама</h3>
+            <div class="ad-carousel">
+                <div th:each="ad : ${advertisements}" class="ad-card">
+                    <div class="card">
+                        <div th:if="${ad.imageUrl}" class="card-img-top">
+                            <img th:src="${ad.imageUrl}" class="img-fluid" alt="Реклама">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${ad.title}">Заголовок рекламы</h5>
+                            <p class="card-text" th:text="${ad.content}">Содержание рекламы</p>
+                            <a th:if="${ad.externalUrl}"
+                               th:href="${ad.externalUrl}"
+                               class="btn btn-primary btn-sm"
+                               target="_blank">
+                                Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <p>Тип: <span th:text="${group.type}"></span></p>
         <p>Участники: <span th:text="${group.membersCount}"></span></p>
 
